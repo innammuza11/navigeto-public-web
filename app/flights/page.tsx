@@ -5,6 +5,7 @@ import { PageHero } from "@/components/PageHero";
 import { Notice } from "@/components/Notice";
 import { todayIso } from "@/lib/format";
 import { getActiveFlightProvider } from "@/lib/flights/providers";
+import { CloseIcon } from "@/components/icons";
 import type { CabinClass, FlightSegment, TripType } from "@/lib/flights/types";
 import { submitEnquiry } from "@/lib/travelos";
 
@@ -90,7 +91,7 @@ export default function FlightsPage() {
             <label>Departure date</label>
             <div style={{display:"flex", gap:8}}>
               <input className="input" type="date" min={todayIso()} value={segment.depart_date} onChange={(e) => setSegment(index, "depart_date", e.target.value)} required />
-              {tripType === "multi_city" && segments.length > 1 ? <button type="button" className="button button-ghost" onClick={() => removeSegment(index)}>✕</button> : null}
+              {tripType === "multi_city" && segments.length > 1 ? <button type="button" className="button button-ghost" onClick={() => removeSegment(index)} aria-label="Remove flight"><CloseIcon size={16} /></button> : null}
             </div>
           </div>
         </div>)}

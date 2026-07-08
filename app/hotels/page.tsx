@@ -8,6 +8,7 @@ import { Notice } from "@/components/Notice";
 import { formatMoney, todayIso } from "@/lib/format";
 import { getHotelSuggestions, requestHotelBooking, searchHotels } from "@/lib/travelos";
 import type { HotelResult } from "@/lib/types";
+import { CloseIcon } from "@/components/icons";
 
 type HotelForm = { q: string; checkin: string; checkout: string; rooms: string; guests: string; occupancy: string; meal_plan: string; market: string; hotel_category: string };
 type SortKey = "recommended" | "price_asc" | "price_desc";
@@ -111,7 +112,7 @@ function HotelBookingModal({ rate, search, onClose }: { rate: HotelResult; searc
     catch (cause) { setError(cause instanceof Error ? cause.message : "The booking request could not be submitted."); }
     finally { setPending(false); }
   }
-  return <div className="modal-backdrop" role="dialog" aria-modal="true"><div className="modal"><div className="modal-head"><div><h2>{done ? "Request received" : `Request ${rate.hotel_name}`}</h2><p>{rate.room_type} · {rate.meal_plan} · {formatMoney(rate.total_amount, rate.currency)}</p></div><button className="close-button" onClick={onClose}>✕</button></div><div className="modal-body">
+  return <div className="modal-backdrop" role="dialog" aria-modal="true"><div className="modal"><div className="modal-head"><div><h2>{done ? "Request received" : `Request ${rate.hotel_name}`}</h2><p>{rate.room_type} · {rate.meal_plan} · {formatMoney(rate.total_amount, rate.currency)}</p></div><button className="close-button" onClick={onClose} aria-label="Close"><CloseIcon size={18} /></button></div><div className="modal-body">
     {done ? <div className="reference-box"><span>Your TravelOS reference</span><strong>{done.public_ref}</strong><p>Our team will confirm availability and the next payment step.</p></div> : <>
       {rate.cancellation_policy || rate.child_policy ? <div className="policy-note" style={{marginBottom:18}}>{rate.cancellation_policy ? <div>🛡 <b>Cancellation:</b> {rate.cancellation_policy}</div> : null}{rate.child_policy ? <div>🧒 <b>Children:</b> {rate.child_policy}</div> : null}</div> : null}
       <form id="hotel-booking" className="form-grid two" onSubmit={submit}>

@@ -1,0 +1,41 @@
+import type { MetadataRoute } from "next";
+import { listTours } from "@/lib/travelos";
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.navigeto.com";
+
+const staticRoutes: Array<{ path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }> = [
+  { path: "/", priority: 1, changeFrequency: "daily" },
+  { path: "/hotels", priority: 0.9, changeFrequency: "daily" },
+  { path: "/tours", priority: 0.9, changeFrequency: "daily" },
+  { path: "/transfers", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/flights", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/holidays", priority: 0.8, changeFrequency: "weekly" },
+  { path: "/visas", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/corporate", priority: 0.6, changeFrequency: "monthly" },
+  { path: "/custom-trip", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/trip-assistant", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/about", priority: 0.4, changeFrequency: "monthly" },
+  { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
+  { path: "/privacy", priority: 0.2, changeFrequency: "yearly" },
+  { path: "/terms", priority: 0.2, changeFrequency: "yearly" },
+];
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const entries: MetadataRoute.Sitemap = staticRoutes.map((route) => ({
+    url: `${siteUrl}${route.path}`,
+    lastModified: new Date(),
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
+
+  try {
+    const tours = await listTours();
+    for (const tour of tours) {
+      entries.push({ url: `${siteUrl}/tours/${tour.slug}`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 });
+    }
+  } catch {
+    // Tour catalogue temporarily unreachable — ship the static routes rather than fail the whole sitemap.
+  }
+
+  return entries;
+}

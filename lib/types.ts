@@ -87,3 +87,35 @@ export type EnquiryResult = {
   public_ref: string;
   status: string;
 };
+
+export type CustomerProfile = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  nationality: string | null;
+  marketing_opt_in: boolean;
+};
+
+export type SavedTraveller = {
+  id: string;
+  customer_id: string;
+  full_name: string;
+  date_of_birth: string | null;
+  nationality: string | null;
+  passport_number: string | null;
+  passport_expiry: string | null;
+  notes: string | null;
+};
+
+export type CustomerEnquiry = {
+  id: string;
+  public_ref: string;
+  enquiry_type: string;
+  status: string;
+  subject: string | null;
+  travel_start_date: string | null;
+  travel_end_date: string | null;
+  created_at: string;
+};

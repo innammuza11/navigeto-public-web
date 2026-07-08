@@ -4,14 +4,28 @@ import Link from "next/link";
 import { HomeSearch } from "@/components/HomeSearch";
 import { useSite } from "@/components/SiteProvider";
 import { whatsappUrl } from "@/lib/format";
+import {
+  HotelIcon, TransferIcon, TourIcon, PlaneIcon, HolidayIcon, VisaIcon, CorporateIcon,
+  MapPinIcon, ShieldIcon, BoltIcon,
+} from "@/components/icons";
+
+const services = [
+  { key: "hotel_enabled", href: "/hotels", Icon: HotelIcon, title: "Live Hotel Search", body: "Search approved active hotel rates by destination, dates, room occupancy and meal plan.", cta: "Search hotels", art: "hotel" },
+  { key: "transfer_enabled", href: "/transfers", Icon: TransferIcon, title: "Private Transfers", body: "Get customer-ready transfer rates from approved route mileage and vehicle masters.", cta: "Check transfer rates", art: "transfer" },
+  { key: "tour_enabled", href: "/tours", Icon: TourIcon, title: "Tailor-made Tours", body: "Choose a starting program, then personalise hotels, pace, activities and transport.", cta: "Explore tours", art: "tour" },
+  { key: null, href: "/flights", Icon: PlaneIcon, title: "Flight Reservations", body: "Send your route and dates — a consultant checks live availability and fares for you.", cta: "Request a flight", art: "hotel" },
+  { key: null, href: "/holidays", Icon: HolidayIcon, title: "International Holidays", body: "Maldives, Dubai, Thailand and more — flights, hotels and tours planned as one trip.", cta: "Plan a holiday", art: "tour" },
+  { key: null, href: "/visas", Icon: VisaIcon, title: "Visa Assistance", body: "Eligibility, documents and processing time confirmed by a consultant before you apply.", cta: "Check visa requirements", art: "transfer" },
+] as const;
 
 export default function HomePage() {
   const { config } = useSite();
+  const visibleServices = services.filter((s) => s.key === null || Boolean(config[s.key]));
   return <>
     <section className="hero">
       <div className="shell hero-grid">
         <div className="hero-copy">
-          <div className="eyebrow light">Sri Lanka · Hotels · Transfers · Tours</div>
+          <div className="eyebrow light">Sri Lanka · Hotels · Transfers · Tours · Flights · Visas</div>
           <h1>{config.hero_title}</h1>
           <p>{config.hero_subtitle}</p>
           <div className="hero-actions">
@@ -27,7 +41,6 @@ export default function HomePage() {
               <circle cx="250" cy="250" r="205" fill="url(#sea)" opacity=".55"/>
               <path d="M278 65c-47 32-80 92-90 147-8 46 6 80 32 112 21 25 35 57 46 92 11-16 33-38 54-69 30-44 38-96 27-147-11-52-31-101-69-135z" fill="url(#land)" stroke="#fff" strokeOpacity=".5" strokeWidth="4"/>
               <path d="M175 350c-50-13-80 8-108 43M346 104c40-30 75-21 105-4" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="3" strokeDasharray="7 8"/>
-              <text x="70" y="390" fontSize="32">✈</text><text x="390" y="105" fontSize="32">☀</text><text x="270" y="270" fontSize="42">🌴</text>
             </svg>
           </div>
           <div className="floating-stat one"><b>Live</b> customer hotel rates</div>
@@ -38,26 +51,25 @@ export default function HomePage() {
     <div className="shell search-dock"><HomeSearch /></div>
 
     <section className="section white"><div className="shell">
-      <div className="section-heading"><div><div className="eyebrow">Book with confidence</div><h2>Everything for your Sri Lanka journey.</h2></div><p>One connected workflow from your first search to the Navigeto operations team. Public selling prices stay separate from contracted supplier rates.</p></div>
+      <div className="section-heading"><div><div className="eyebrow">Book with confidence</div><h2>Everything for your journey, in one place.</h2></div><p>One connected workflow from your first search to the Navigeto operations team. Public selling prices stay separate from contracted supplier rates.</p></div>
       <div className="card-grid">
-        {config.hotel_enabled ? <Link className="service-card" href="/hotels"><div className="service-art hotel"><span className="big-icon">🏨</span></div><div className="service-body"><h3>Live Hotel Search</h3><p>Search approved active hotel rates by destination, dates, room occupancy and meal plan.</p><span className="text-link">Search hotels →</span></div></Link> : null}
-        {config.transfer_enabled ? <Link className="service-card" href="/transfers"><div className="service-art transfer"><span className="big-icon">🚘</span></div><div className="service-body"><h3>Private Transfers</h3><p>Get customer-ready transfer rates from approved route mileage and vehicle masters.</p><span className="text-link">Check transfer rates →</span></div></Link> : null}
-        {config.tour_enabled ? <Link className="service-card" href="/tours"><div className="service-art tour"><span className="big-icon">🧭</span></div><div className="service-body"><h3>Tailor-made Tours</h3><p>Choose a starting program, then personalise hotels, pace, activities and transport.</p><span className="text-link">Explore tours →</span></div></Link> : null}
+        {visibleServices.map((s) => <Link className="service-card" href={s.href} key={s.href}><div className={`service-art ${s.art}`}><s.Icon size={54} className="service-icon" /></div><div className="service-body"><h3>{s.title}</h3><p>{s.body}</p><span className="text-link">{s.cta} →</span></div></Link>)}
+        <Link className="service-card" href="/corporate"><div className="service-art transfer"><CorporateIcon size={54} className="service-icon" /></div><div className="service-body"><h3>Corporate & Group Travel</h3><p>Business travel, MICE and group programs with one account team and consolidated invoicing.</p><span className="text-link">Talk to our corporate team →</span></div></Link>
       </div>
     </div></section>
 
     <section className="section soft"><div className="shell">
       <div className="section-heading"><div><div className="eyebrow">Sri Lanka favourites</div><h2>Four regions. Hundreds of possibilities.</h2></div><p>Start with the places you love. Our operations team can build the route around your arrival, departure, pace and travel style.</p></div>
-      <div className="destination-grid">{config.featured_destinations.map((item) => <Link href={`/custom-trip?destination=${encodeURIComponent(item.name)}`} className="destination-card" key={item.name}><span className="emoji">{item.emoji || "📍"}</span><h3>{item.name}</h3><p>{item.description}</p></Link>)}</div>
+      <div className="destination-grid">{config.featured_destinations.map((item) => <Link href={`/custom-trip?destination=${encodeURIComponent(item.name)}`} className="destination-card" key={item.name}><MapPinIcon size={26} className="dest-icon" /><h3>{item.name}</h3><p>{item.description}</p></Link>)}</div>
     </div></section>
 
     <section className="section white"><div className="shell why-grid">
       <div className="why-panel"><div className="eyebrow light">Why Navigeto</div><h2>Technology behind the scenes. Real people on the ground.</h2><p>TravelOS connects approved rates, route mileage, customer enquiries and our operations team. You get a simple booking experience without seeing internal supplier costs or operational calculations.</p><div className="why-number">2017</div></div>
       <div className="feature-list">
-        <div className="feature-item"><span className="feature-icon">✓</span><div><h3>Approved hotel inventory only</h3><p>Hotel search reads from the active Hotel Master, not temporary uploads or unapproved rates.</p></div></div>
-        <div className="feature-item"><span className="feature-icon">⚡</span><div><h3>Fast enquiry response</h3><p>Every hotel, transfer and tour request enters the same TravelOS workflow used by sales and operations.</p></div></div>
-        <div className="feature-item"><span className="feature-icon">🔒</span><div><h3>Protected commercial pricing</h3><p>Supplier rates, markups, margins, internal mileage and notes never appear on the customer website.</p></div></div>
-        <div className="feature-item"><span className="feature-icon">🇱🇰</span><div><h3>Sri Lanka-based support</h3><p>Local destination knowledge, chauffeur coordination and assistance throughout the trip.</p></div></div>
+        <div className="feature-item"><span className="feature-icon"><ShieldIcon size={22} /></span><div><h3>Approved hotel inventory only</h3><p>Hotel search reads from the active Hotel Master, not temporary uploads or unapproved rates.</p></div></div>
+        <div className="feature-item"><span className="feature-icon"><BoltIcon size={22} /></span><div><h3>Fast enquiry response</h3><p>Every hotel, transfer and tour request enters the same TravelOS workflow used by sales and operations.</p></div></div>
+        <div className="feature-item"><span className="feature-icon"><ShieldIcon size={22} /></span><div><h3>Protected commercial pricing</h3><p>Supplier rates, markups, margins, internal mileage and notes never appear on the customer website.</p></div></div>
+        <div className="feature-item"><span className="feature-icon"><MapPinIcon size={22} /></span><div><h3>Sri Lanka-based support</h3><p>Local destination knowledge, chauffeur coordination and assistance throughout the trip.</p></div></div>
       </div>
     </div></section>
 
