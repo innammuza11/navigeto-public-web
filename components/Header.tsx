@@ -7,6 +7,7 @@ import { useSite } from "./SiteProvider";
 import { whatsappUrl } from "@/lib/format";
 
 const baseLinks = [
+  ["Flights", "/flights", "always"],
   ["Hotels", "/hotels", "hotel_enabled"],
   ["Transfers", "/transfers", "transfer_enabled"],
   ["Tours", "/tours", "tour_enabled"],
