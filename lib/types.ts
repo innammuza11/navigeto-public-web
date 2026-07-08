@@ -31,6 +31,8 @@ export type HotelResult = {
   total_amount: number;
   nights: number;
   rooms: number;
+  cancellation_policy?: string | null;
+  child_policy?: string | null;
 };
 
 export type PublicPackage = {
@@ -62,14 +64,58 @@ export type TransferQuote = {
   destination?: string;
   route_name?: string;
   vehicle_type?: string;
+  vehicle_name?: string | null;
+  capacity?: number | null;
   standard_km?: number;
   total_amount?: number;
   currency?: string;
   included?: string[];
+  excluded?: string[];
   message?: string;
+};
+
+export type CatalogVehicle = {
+  vehicle_name: string;
+  capacity: number | null;
+  minimum_days: number | null;
+  minimum_km_per_day: number | null;
+  inclusions: string[];
+  exclusions: string[];
 };
 
 export type EnquiryResult = {
   public_ref: string;
   status: string;
+};
+
+export type CustomerProfile = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  nationality: string | null;
+  marketing_opt_in: boolean;
+};
+
+export type SavedTraveller = {
+  id: string;
+  customer_id: string;
+  full_name: string;
+  date_of_birth: string | null;
+  nationality: string | null;
+  passport_number: string | null;
+  passport_expiry: string | null;
+  notes: string | null;
+};
+
+export type CustomerEnquiry = {
+  id: string;
+  public_ref: string;
+  enquiry_type: string;
+  status: string;
+  subject: string | null;
+  travel_start_date: string | null;
+  travel_end_date: string | null;
+  created_at: string;
 };

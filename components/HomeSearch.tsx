@@ -4,8 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { todayIso } from "@/lib/format";
 import { useSite } from "@/components/SiteProvider";
+import { HotelIcon, TransferIcon, TourIcon } from "@/components/icons";
 
 type Tab = "hotels" | "transfers" | "tours";
+const tabIcons = { hotels: HotelIcon, transfers: TransferIcon, tours: TourIcon } as const;
 
 export function HomeSearch() {
   const router = useRouter();
@@ -34,7 +36,7 @@ export function HomeSearch() {
 
   return <div className="search-panel">
     <div className="tab-row">
-      {availableTabs.map((item) => <button type="button" className={`tab-button ${activeTab === item ? "active" : ""}`} onClick={() => setTab(item)} key={item}>{item === "hotels" ? "🏨 Hotels" : item === "transfers" ? "🚘 Transfers" : "🧭 Tours"}</button>)}
+      {availableTabs.map((item) => { const Icon = tabIcons[item]; return <button type="button" className={`tab-button ${activeTab === item ? "active" : ""}`} onClick={() => setTab(item)} key={item}><Icon size={16} className="nav-icon" />{item === "hotels" ? "Hotels" : item === "transfers" ? "Transfers" : "Tours"}</button>; })}
     </div>
     <form className="quick-form" onSubmit={submit}>
       {activeTab === "hotels" ? <>
