@@ -1,0 +1,6 @@
+"use client";
+import { EnquiryForm } from "@/components/EnquiryForm";
+import { PageHero } from "@/components/PageHero";
+import { useSite } from "@/components/SiteProvider";
+
+export default function ContactPage(){const{config}=useSite();return <><PageHero eyebrow="Contact Navigeto" title="Speak with our Sri Lanka travel team." description="Send your request directly into Navigeto TravelOS or contact the team through WhatsApp, phone or email."/><div className="shell content-wrap detail-grid"><section className="prose-card"><div className="eyebrow">General enquiry</div><h2>How may we help?</h2><EnquiryForm enquiryType="general" compact /></section><aside className="detail-side"><h2>Contact details</h2><div className="meta-grid"><div className="meta-item"><small>Email</small><b>{config.email}</b></div><div className="meta-item"><small>Phone</small><b>{config.phone}</b></div><div className="meta-item"><small>WhatsApp</small><b>+{config.whatsapp_number.replace(/\D/g,"")}</b></div><div className="meta-item"><small>Office</small><b>{config.office_address}</b></div></div><a className="button button-primary button-block" href={`https://wa.me/${config.whatsapp_number.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">Open WhatsApp</a></aside></div></>}

@@ -1,0 +1,52 @@
+"use client";
+
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { PageHero } from "@/components/PageHero";
+import { Notice } from "@/components/Notice";
+import { formatMoney, todayIso } from "@/lib/format";
+import { quoteTransfer, submitEnquiry } from "@/lib/travelos";
+import type { TransferQuote } from "@/lib/types";
+
+const vehicles = ["Sedan Car", "Toyota KDH", "Mini Coach", "Large Coach"];
+
+function TransfersContent() {
+  const params = useSearchParams();
+  const [form, setForm] = useState({ origin: params.get("origin") || "Bandaranaike International Airport", destination: params.get("destination") || "", travel_date: params.get("date") || "", vehicle_type: params.get("vehicle") || "Sedan Car", passengers: "2", trip_type: "one_way" });
+  const [quote, setQuote] = useState<TransferQuote | null>(null); const [loading, setLoading] = useState(false); const [error, setError] = useState(""); const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const set = (key: string, value: string) => setForm((current) => ({ ...current, [key]: value }));
+  async function submit(event: React.FormEvent) {
+    event.preventDefault(); setLoading(true); setError(""); setQuote(null);
+    try { setQuote(await quoteTransfer({ ...form, passengers: Number(form.passengers) })); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Transfer pricing is temporarily unavailable."); }
+    finally { setLoading(false); }
+  }
+  return <>
+    <PageHero eyebrow="Private Sri Lanka Transport" title="Airport and city transfers, priced from approved route data." description="Choose your route and vehicle. TravelOS applies internal rate and markup rules without exposing operational costs." />
+    <div className="shell content-wrap">
+      <form className="filter-panel form-grid" onSubmit={submit}>
+        <div className="field span-2"><label>Pick-up location</label><input className="input" value={form.origin} onChange={(e) => set("origin", e.target.value)} placeholder="Airport, hotel or city" required /></div>
+        <div className="field span-2"><label>Drop-off location</label><input className="input" value={form.destination} onChange={(e) => set("destination", e.target.value)} placeholder="Kandy, Galle, Ella…" required /></div>
+        <div className="field"><label>Travel date</label><input className="input" type="date" min={todayIso()} value={form.travel_date} onChange={(e) => set("travel_date", e.target.value)} required /></div>
+        <div className="field"><label>Vehicle</label><select className="select" value={form.vehicle_type} onChange={(e) => set("vehicle_type", e.target.value)}>{vehicles.map((vehicle) => <option key={vehicle}>{vehicle}</option>)}</select></div>
+        <div className="field"><label>Passengers</label><input className="input" type="number" min="1" value={form.passengers} onChange={(e) => set("passengers", e.target.value)} /></div>
+        <div className="field"><label>Trip type</label><select className="select" value={form.trip_type} onChange={(e) => set("trip_type", e.target.value)}><option value="one_way">One way</option><option value="return">Return</option></select></div>
+        <div className="form-actions span-all"><button className="button button-primary" type="submit" disabled={loading}>{loading ? "Checking approved rates…" : "Get transfer rate"}</button></div>
+      </form>
+      {error ? <Notice tone="error">{error}</Notice> : null}
+      {quote ? <div className="transfer-result">
+        {quote.quote_available ? <><div className="eyebrow">Customer transfer quote</div><h2>{quote.origin} → {quote.destination}</h2><div className="meta-grid"><div className="meta-item"><small>Vehicle</small><b>{quote.vehicle_type}</b></div><div className="meta-item"><small>Approved route</small><b>{quote.route_name || "Direct transfer"}</b></div><div className="meta-item"><small>Route distance</small><b>{quote.standard_km ? `${quote.standard_km} km` : "Included"}</b></div><div className="meta-item"><small>Trip type</small><b>{form.trip_type === "return" ? "Return" : "One way"}</b></div></div><ul className="clean-list">{(quote.included || ["Private air-conditioned vehicle", "Professional chauffeur", "Fuel and standard route charges"]).map((item) => <li key={item}>{item}</li>)}</ul><div className="quote-total"><div><small>Estimated customer selling price</small><strong>{formatMoney(quote.total_amount, quote.currency)}</strong></div><button className="button button-primary" onClick={() => setEnquiryOpen(true)}>Request this transfer</button></div></> : <><div className="eyebrow">Manual route review</div><h2>We need to check this route.</h2><p>{quote.message || "This route does not yet have an approved public rate. Send the request and our team will confirm it."}</p><button className="button button-primary" onClick={() => setEnquiryOpen(true)}>Send transfer request</button></>}
+      </div> : <section className="section white" style={{paddingBottom:0}}><div className="section-heading"><div><div className="eyebrow">Vehicle choices</div><h2>Private vehicles for different group sizes.</h2></div><p>Final vehicle assignment depends on passengers, luggage and route conditions.</p></div><div className="card-grid"><div className="info-card service-body"><h3>🚗 Sedan Car</h3><p>Best for couples or two travellers with standard luggage.</p></div><div className="info-card service-body"><h3>🚐 Toyota KDH</h3><p>Comfortable private option for families and small groups.</p></div><div className="info-card service-body"><h3>🚌 Coaches</h3><p>Mini and large coach arrangements for groups and corporate tours.</p></div></div></section>}
+    </div>
+    {enquiryOpen ? <TransferEnquiry form={form} quote={quote} onClose={() => setEnquiryOpen(false)} /> : null}
+  </>;
+}
+
+function TransferEnquiry({ form, quote, onClose }: { form: Record<string,string>; quote: TransferQuote | null; onClose: () => void }) {
+  const [guest, setGuest] = useState({ customer_name: "", whatsapp: "", email: "", nationality: "", notes: "" }); const [pending, setPending] = useState(false); const [error, setError] = useState(""); const [reference, setReference] = useState("");
+  const set = (key: string, value: string) => setGuest((current) => ({ ...current, [key]: value }));
+  async function submit(event: React.FormEvent) { event.preventDefault(); if (!guest.customer_name || !guest.whatsapp) return setError("Name and WhatsApp are required."); setPending(true); setError(""); try { const result = await submitEnquiry({ enquiry_type: "transfer", ...guest, travel_start_date: form.travel_date, pax: Number(form.passengers), details: { ...form, quoted: quote } }); setReference(result.public_ref); } catch (cause) { setError(cause instanceof Error ? cause.message : "Unable to submit request."); } finally { setPending(false); } }
+  return <div className="modal-backdrop"><div className="modal"><div className="modal-head"><div><h2>Transfer request</h2><p>{form.origin} → {form.destination}</p></div><button className="close-button" onClick={onClose}>✕</button></div><div className="modal-body">{reference ? <div className="reference-box"><span>Your TravelOS reference</span><strong>{reference}</strong><p>Our team will contact you to confirm the transfer.</p></div> : <form id="transfer-request" className="form-grid two" onSubmit={submit}><div className="field"><label>Name *</label><input className="input" value={guest.customer_name} onChange={(e) => set("customer_name", e.target.value)} /></div><div className="field"><label>WhatsApp *</label><input className="input" value={guest.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} /></div><div className="field"><label>Email</label><input className="input" type="email" value={guest.email} onChange={(e) => set("email", e.target.value)} /></div><div className="field"><label>Nationality</label><input className="input" value={guest.nationality} onChange={(e) => set("nationality", e.target.value)} /></div><div className="field span-all"><label>Flight, luggage or child-seat notes</label><textarea className="textarea" value={guest.notes} onChange={(e) => set("notes", e.target.value)} /></div>{error ? <div className="span-all"><Notice tone="error">{error}</Notice></div> : null}</form>}</div><div className="modal-foot"><button className="button button-ghost" onClick={onClose}>{reference ? "Close" : "Cancel"}</button>{!reference ? <button className="button button-primary" type="submit" form="transfer-request" disabled={pending}>{pending ? "Submitting…" : "Submit request"}</button> : null}</div></div></div>;
+}
+
+export default function TransfersPage() { return <Suspense fallback={null}><TransfersContent /></Suspense>; }
