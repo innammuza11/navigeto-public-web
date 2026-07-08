@@ -31,6 +31,8 @@ export type HotelResult = {
   total_amount: number;
   nights: number;
   rooms: number;
+  cancellation_policy?: string | null;
+  child_policy?: string | null;
 };
 
 export type PublicPackage = {
@@ -62,11 +64,23 @@ export type TransferQuote = {
   destination?: string;
   route_name?: string;
   vehicle_type?: string;
+  vehicle_name?: string | null;
+  capacity?: number | null;
   standard_km?: number;
   total_amount?: number;
   currency?: string;
   included?: string[];
+  excluded?: string[];
   message?: string;
+};
+
+export type CatalogVehicle = {
+  vehicle_name: string;
+  capacity: number | null;
+  minimum_days: number | null;
+  minimum_km_per_day: number | null;
+  inclusions: string[];
+  exclusions: string[];
 };
 
 export type EnquiryResult = {

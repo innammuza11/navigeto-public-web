@@ -1,4 +1,4 @@
-import type { EnquiryResult, HotelResult, PublicPackage, SiteConfig, TransferQuote } from "./types";
+import type { CatalogVehicle, EnquiryResult, HotelResult, PublicPackage, SiteConfig, TransferQuote } from "./types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -57,6 +57,11 @@ export async function requestHotelBooking(payload: Record<string, unknown>): Pro
 
 export async function quoteTransfer(payload: Record<string, unknown>): Promise<TransferQuote> {
   return post<TransferQuote>(`${publicApi}?action=transfer-quote`, payload);
+}
+
+export async function listVehicles(): Promise<CatalogVehicle[]> {
+  const data = await post<{ results: CatalogVehicle[] }>(`${publicApi}?action=vehicle-list`, {});
+  return data.results || [];
 }
 
 export async function submitEnquiry(payload: Record<string, unknown>): Promise<EnquiryResult> {
