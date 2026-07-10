@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -39,8 +40,7 @@ export function Header() {
       <header className="site-header">
         <div className="shell header-inner">
           <Link href="/" className="brand" onClick={() => setOpen(false)} aria-label="Navigeto home">
-            <span className="brand-mark" aria-hidden="true">N</span>
-            <span><strong>NAVIGETO</strong><small>TRAVELS · SRI LANKA</small></span>
+            <Image src="/logo.webp" alt="Navigeto Travels" width={2000} height={655} className="brand-logo" priority />
           </Link>
           <nav className="desktop-nav" aria-label="Main navigation">
             {links.map(([label, href, , Icon]) => <Link key={href} href={href} className={pathname === href || pathname.startsWith(`${href}/`) ? "active" : ""}><Icon size={16} className="nav-icon" />{label}</Link>)}

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Book Sri Lanka hotels, tours, private transfers and flights, plus international holidays and visa assistance — planned by Navigeto Travels.",
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/" },
-  openGraph: { title: "Navigeto Travels", description: "Hotels, tours, transfers, flights, international holidays and visa assistance.", type: "website", url: siteUrl, siteName: "Navigeto Travels" },
+  openGraph: { title: "Navigeto Travels", description: "Hotels, tours, transfers, flights, international holidays and visa assistance.", type: "website", url: siteUrl, siteName: "Navigeto Travels", images: [{ url: "/logo.webp", width: 2000, height: 655 }] },
   twitter: { card: "summary_large_image", title: "Navigeto Travels", description: "Hotels, tours, transfers, flights, international holidays and visa assistance." },
 };
 
@@ -22,6 +22,7 @@ const organizationSchema = {
   "@type": "TravelAgency",
   name: "Navigeto Travels",
   url: siteUrl,
+  logo: `${siteUrl}/logo.webp`,
   description: "Sri Lanka inbound DMC offering hotels, tours, transfers, flight reservations, international holidays and visa assistance.",
   address: { "@type": "PostalAddress", addressLocality: "Colombo", addressCountry: "LK" },
   sameAs: [] as string[],
