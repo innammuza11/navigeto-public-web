@@ -1,0 +1,38 @@
+name: Customer Mobile
+
+on:
+  pull_request:
+    paths:
+      - "mobile/**"
+      - ".github/workflows/customer-mobile.yml"
+  push:
+    branches:
+      - "codex/customer-mobile-foundation"
+    paths:
+      - "mobile/**"
+      - ".github/workflows/customer-mobile.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  customer-mobile-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Type-check and build
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: navigeto-customer-mobile-dist
+          path: mobile/dist
+          if-no-files-found: error
+          retention-days: 7
