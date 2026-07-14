@@ -3,19 +3,24 @@ import type { CatalogVehicle, EnquiryResult, HotelResult, PublicPackage, SiteCon
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 const publicApi = `${supabaseUrl}/functions/v1/public-travel-api`;
+const mobileCustomerApi = `${supabaseUrl}/functions/v1/mobile-customer-api`;
 const hotelApi = `${supabaseUrl}/functions/v1/customer-hotels`;
 
 function assertConfigured() {
   if (!supabaseUrl || !anonKey) throw new Error("The live TravelOS connection is not configured yet.");
 }
 
-async function post<T>(url: string, body: unknown): Promise<T> {
+async function post<T>(url: string, body: unknown, accessToken?: string): Promise<T> {
   assertConfigured();
   let response: Response;
   try {
     response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", apikey: anonKey },
+      headers: {
+        "Content-Type": "application/json",
+        apikey: anonKey,
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
       body: JSON.stringify(body ?? {}),
       cache: "no-store",
     });
@@ -66,6 +71,11 @@ export async function listVehicles(): Promise<CatalogVehicle[]> {
 
 export async function submitEnquiry(payload: Record<string, unknown>): Promise<EnquiryResult> {
   const data = await post<{ enquiry: EnquiryResult }>(`${publicApi}?action=enquiry`, payload);
+  return data.enquiry;
+}
+
+export async function submitCustomerEnquiry(payload: Record<string, unknown>, accessToken: string): Promise<EnquiryResult> {
+  const data = await post<{ enquiry: EnquiryResult }>(`${mobileCustomerApi}?action=create-enquiry`, payload, accessToken);
   return data.enquiry;
 }
 
