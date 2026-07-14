@@ -1,4 +1,4 @@
-import type { PublicPackage, SiteConfig } from "./types";
+import type { SiteConfig } from "./types";
 
 export const DEFAULT_SITE_CONFIG: SiteConfig = {
   brand_name: "Navigeto Travels",
@@ -24,63 +24,3 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
   ],
   social_links: {},
 };
-
-export const FALLBACK_PACKAGES: PublicPackage[] = [
-  {
-    id: "fallback-4n",
-    slug: "essence-of-sri-lanka-4-nights",
-    title: "Essence of Sri Lanka",
-    subtitle: "4 Nights / 5 Days",
-    summary: "A compact private journey combining Kandy, the cool hills, the south coast and Colombo.",
-    package_type: "private",
-    duration_days: 5,
-    duration_nights: 4,
-    destinations: ["Kandy", "Nuwara Eliya", "Bentota", "Colombo"],
-    highlights: ["Kandy cultural experiences", "Tea-country scenery", "South-coast leisure", "Private transport"],
-    itinerary: [
-      { day: 1, title: "Airport – Kandy", description: "Meet your Navigeto representative and travel privately to Kandy with suitable stops en route.", overnight: "Kandy" },
-      { day: 2, title: "Kandy – Nuwara Eliya", description: "Explore Kandy before continuing through the central highlands and tea country.", overnight: "Nuwara Eliya" },
-      { day: 3, title: "Nuwara Eliya – Bentota", description: "Descend from the hills to Sri Lanka’s south-west coast for a relaxed beach stay.", overnight: "Bentota" },
-      { day: 4, title: "Bentota – Colombo", description: "Enjoy coastal experiences before travelling to Colombo for a city stay.", overnight: "Colombo" },
-      { day: 5, title: "Departure", description: "Private transfer to the airport according to your flight schedule." },
-    ],
-    inclusions: ["Private air-conditioned transport", "Selected accommodation", "Daily breakfast", "English-speaking chauffeur"],
-    exclusions: ["International flights", "Entrance fees unless stated", "Personal expenses", "Travel insurance"],
-    tags: ["first-time", "culture", "beach"],
-    featured: true,
-  },
-  {
-    id: "fallback-5n",
-    slug: "island-highlights-5-nights",
-    title: "Island Highlights",
-    subtitle: "5 Nights / 6 Days",
-    summary: "A balanced Sri Lanka program covering the Cultural Triangle, Kandy, hill country and the beach.",
-    package_type: "private",
-    duration_days: 6,
-    duration_nights: 5,
-    destinations: ["Sigiriya", "Kandy", "Nuwara Eliya", "Bentota", "Colombo"],
-    highlights: ["Cultural Triangle", "Kandy", "Tea country", "Beach stay"],
-    itinerary: [],
-    inclusions: ["Private transport", "Accommodation", "Breakfast", "Chauffeur service"],
-    exclusions: ["Flights", "Entrance fees unless stated", "Meals not specified"],
-    tags: ["classic", "culture", "nature"],
-    featured: true,
-  },
-  {
-    id: "fallback-6n",
-    slug: "classic-sri-lanka-6-nights",
-    title: "Classic Sri Lanka",
-    subtitle: "6 Nights / 7 Days",
-    summary: "Sri Lanka’s signature route with heritage, mountains, Ella and the tropical coast.",
-    package_type: "private",
-    duration_days: 7,
-    duration_nights: 6,
-    destinations: ["Sigiriya", "Kandy", "Nuwara Eliya", "Ella", "Bentota", "Colombo"],
-    highlights: ["Sigiriya region", "Scenic hill country", "Ella", "South coast"],
-    itinerary: [],
-    inclusions: ["Private transport", "Accommodation", "Breakfast", "Chauffeur service"],
-    exclusions: ["Flights", "Entrance fees unless stated", "Personal expenses"],
-    tags: ["best-seller", "scenic", "heritage"],
-    featured: true,
-  },
-];

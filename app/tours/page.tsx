@@ -6,9 +6,9 @@ import { useSearchParams } from "next/navigation";
 import { PageHero } from "@/components/PageHero";
 import { LoadingCards } from "@/components/Loading";
 import { Notice } from "@/components/Notice";
-import { FALLBACK_PACKAGES } from "@/lib/defaults";
 import { formatMoney } from "@/lib/format";
 import { listTours } from "@/lib/travelos";
+import { TourIcon } from "@/components/icons";
 import type { PublicPackage } from "@/lib/types";
 
 function ToursContent() {
@@ -18,7 +18,7 @@ function ToursContent() {
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [featuredOnly, setFeaturedOnly] = useState(false);
   const [maxPrice, setMaxPrice] = useState("");
-  useEffect(() => { listTours().then((result) => setRows(result.length ? result : FALLBACK_PACKAGES)).catch(() => { setRows(FALLBACK_PACKAGES); setError("Live package publishing is not connected yet, so starter programs are shown."); }).finally(() => setLoading(false)); }, []);
+  useEffect(() => { listTours().then((result) => setRows(result)).catch(() => setError("We couldn't load the tour catalogue right now. Please try again shortly or send us your dates directly.")).finally(() => setLoading(false)); }, []);
 
   const styles = useMemo(() => [...new Set(rows.map((tour) => tour.package_type).filter(Boolean))] as string[], [rows]);
   const tags = useMemo(() => [...new Set(rows.flatMap((tour) => tour.tags))].sort((a, b) => a.localeCompare(b)), [rows]);
@@ -35,6 +35,10 @@ function ToursContent() {
   return <>
     <PageHero eyebrow="Sri Lanka Tour Packages" title="Start with a proven route. Personalise every detail." description="Choose a published Navigeto program, then adjust hotels, pace, activities, meal plan and transport for your travellers." />
     <div className="shell content-wrap">
+      <div className="tag-filter-row">
+        <Link className="tag-filter" href="/tours/sri-lanka">Sri Lanka Tours</Link>
+        <Link className="tag-filter" href="/tours/international">International Tours</Link>
+      </div>
       <div className="filter-panel form-grid three">
         <div className="field"><label>Duration</label><select className="select" value={duration} onChange={(e) => setDuration(e.target.value)}><option value="">Any duration</option><option value="5">Up to 5 nights</option><option value="7">6–7 nights</option><option value="10">8+ nights</option></select></div>
         <div className="field"><label>Tour style</label><select className="select" value={type} onChange={(e) => setType(e.target.value)}><option value="">All styles</option>{styles.map((style) => <option key={style} value={style}>{style.replace(/_/g, " ")}</option>)}</select></div>
@@ -45,14 +49,15 @@ function ToursContent() {
       {tags.length ? <div className="tag-filter-row">{tags.map((tag) => <button key={tag} type="button" className={`tag-filter${activeTags.includes(tag) ? " active" : ""}`} onClick={() => toggleTag(tag)}>{tag}</button>)}</div> : null}
       {error ? <Notice>{error}</Notice> : null}
       <div className="results-header"><div><h2>Published tour ideas</h2><p>Prices are shown only when published by Navigeto.</p></div><b>{filtered.length} package{filtered.length === 1 ? "" : "s"}</b></div>
-      {loading ? <LoadingCards count={6} /> : filtered.length ? <div className="card-grid">{filtered.map((tour, index) => <article className="tour-card" key={tour.id}>
+      {loading ? <LoadingCards count={6} /> : filtered.length ? <div className="card-grid">{filtered.map((tour) => <article className="tour-card" key={tour.id}>
         <div className="tour-art" style={tour.hero_image_url ? { backgroundImage: `url(${tour.hero_image_url})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}>
           {tour.featured ? <span className="badge" style={{alignSelf:"flex-start"}}>Featured</span> : <span />}
           <span className="duration">{tour.duration_nights} nights · {tour.duration_days} days</span>
-          {!tour.hero_image_url ? <span className="tour-emoji">{["🏯","🚂","🌴","🐘"][index % 4]}</span> : null}
+          {!tour.hero_image_url ? <TourIcon size={48} className="tour-icon" /> : null}
         </div>
         <div className="tour-body"><h3>{tour.title}</h3><div className="tour-destinations">{tour.destinations.join(" · ")}</div><p>{tour.summary}</p><div className="tag-row">{tour.tags.slice(0,4).map((tag) => <span className="tag" key={tag}>{tag}</span>)}</div><div className="tour-bottom"><strong>{formatMoney(tour.price_from, tour.currency || "USD")}</strong><Link className="text-link" href={`/tours/${tour.slug}`}>View itinerary →</Link></div></div></article>)}</div>
-        : <div className="empty-state"><b>No tours match these filters.</b>Try widening your duration, price or category selection.</div>}
+        : rows.length ? <div className="empty-state"><b>No tours match these filters.</b>Try widening your duration, price or category selection.</div>
+        : <div className="empty-state"><b>Our Sri Lanka tour collection is being finalised.</b>Tell us your dates and interests and a consultant will build a private itinerary for you.<div style={{marginTop:18}}><Link className="button button-primary" href="/custom-trip">Request a custom tour</Link></div></div>}
     </div>
   </>;
 }

@@ -46,7 +46,20 @@ export type PublicPackage = {
   duration_nights: number;
   destinations: string[];
   highlights: string[];
-  itinerary: Array<{ day: number; title: string; description: string; overnight?: string }>;
+  itinerary: Array<{
+    day: number;
+    date?: string;
+    title: string;
+    route?: string;
+    description: string;
+    overnight?: string;
+    hotel_name?: string;
+    meals?: string;
+    service_type?: string;
+    activities?: Array<{ icon?: string; title: string; description?: string }>;
+    optional_activities?: string[];
+    notes?: string;
+  }>;
   inclusions: string[];
   exclusions: string[];
   tags: string[];
@@ -56,6 +69,7 @@ export type PublicPackage = {
   min_pax?: number | null;
   max_pax?: number | null;
   featured?: boolean;
+  country?: string | null;
 };
 
 export type TransferQuote = {
