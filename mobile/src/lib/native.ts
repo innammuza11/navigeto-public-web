@@ -15,18 +15,31 @@ export type NativeCallbacks = {
   onNotification?: () => void;
 };
 
+async function getDeviceContext() {
+  const [identifier, info, appInfo] = await Promise.all([
+    Device.getId(),
+    Device.getInfo(),
+    App.getInfo().catch(() => null)
+  ]);
+  return {
+    identifier: identifier.identifier,
+    platform: Capacitor.getPlatform() as "ios" | "android",
+    deviceName: `${info.manufacturer || ""} ${info.model || ""}`.trim() || null,
+    appVersion: appInfo?.version || null
+  };
+}
+
 async function upsertDeviceSession(userId: string) {
   if (!Capacitor.isNativePlatform()) return;
-  const [identifier, info] = await Promise.all([Device.getId(), Device.getInfo()]);
-  const platform = Capacitor.getPlatform() as "ios" | "android";
+  const device = await getDeviceContext();
 
   const { error } = await supabase.from("travelos_mobile_device_sessions").upsert({
     user_id: userId,
     app_id: "customer",
-    platform,
-    device_install_id: identifier.identifier,
-    device_name: `${info.manufacturer || ""} ${info.model || ""}`.trim() || null,
-    app_version: info.appVersion || null,
+    platform: device.platform,
+    device_install_id: device.identifier,
+    device_name: device.deviceName,
+    app_version: device.appVersion,
     last_seen_at: new Date().toISOString(),
     revoked_at: null
   }, { onConflict: "user_id,app_id,device_install_id" });
@@ -44,19 +57,18 @@ async function registerPush(userId: string) {
   if (receive !== "granted") return;
 
   await PushNotifications.addListener("registration", async ({ value }) => {
-    const [identifier, info] = await Promise.all([Device.getId(), Device.getInfo()]);
-    const platform = Capacitor.getPlatform() as "ios" | "android";
-    const provider = platform === "ios" ? "apns" : "fcm";
+    const device = await getDeviceContext();
+    const provider = device.platform === "ios" ? "apns" : "fcm";
 
     const { error } = await supabase.from("travelos_mobile_device_tokens").upsert({
       user_id: userId,
       app_id: "customer",
-      platform,
-      device_install_id: identifier.identifier,
+      platform: device.platform,
+      device_install_id: device.identifier,
       provider,
       provider_token: value,
-      app_version: info.appVersion || null,
-      device_name: `${info.manufacturer || ""} ${info.model || ""}`.trim() || null,
+      app_version: device.appVersion,
+      device_name: device.deviceName,
       is_active: true,
       last_seen_at: new Date().toISOString()
     }, { onConflict: "app_id,device_install_id" });
@@ -99,17 +111,17 @@ export async function initializeNative(userId: string, callbacks: NativeCallback
 
 export async function deactivateCurrentDevice(userId: string) {
   if (!Capacitor.isNativePlatform()) return;
-  const identifier = await Device.getId();
+  const device = await getDeviceContext();
   await Promise.all([
     supabase.from("travelos_mobile_device_tokens")
       .update({ is_active: false, last_seen_at: new Date().toISOString() })
       .eq("user_id", userId)
       .eq("app_id", "customer")
-      .eq("device_install_id", identifier.identifier),
+      .eq("device_install_id", device.identifier),
     supabase.from("travelos_mobile_device_sessions")
       .update({ revoked_at: new Date().toISOString(), last_seen_at: new Date().toISOString() })
       .eq("user_id", userId)
       .eq("app_id", "customer")
-      .eq("device_install_id", identifier.identifier)
+      .eq("device_install_id", device.identifier)
   ]);
 }
