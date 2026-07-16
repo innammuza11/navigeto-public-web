@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Notice } from "@/components/Notice";
-import { submitEnquiry } from "@/lib/travelos";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { submitCustomerEnquiry, submitEnquiry } from "@/lib/travelos";
 import { todayIso } from "@/lib/format";
 
 type Props = {
@@ -12,8 +13,9 @@ type Props = {
 };
 
 export function EnquiryForm({ enquiryType = "custom_trip", initialSubject = "", compact = false }: Props) {
+  const { session } = useAuth();
   const [form, setForm] = useState({
-    customer_name: "", whatsapp: "", email: "", nationality: "", travel_start_date: "", travel_end_date: "",
+    customer_name: "", whatsapp: "", email: session?.user.email || "", nationality: "", travel_start_date: "", travel_end_date: "",
     adults: "2", children: "0", hotel_category: "4 Star", subject: initialSubject, notes: "",
   });
   const [pending, setPending] = useState(false);
@@ -29,11 +31,11 @@ export function EnquiryForm({ enquiryType = "custom_trip", initialSubject = "", 
     }
     setPending(true); setError("");
     try {
-      const result = await submitEnquiry({
+      const payload = {
         enquiry_type: enquiryType,
         customer_name: form.customer_name,
         whatsapp: form.whatsapp,
-        email: form.email,
+        email: form.email || session?.user.email || "",
         nationality: form.nationality,
         travel_start_date: form.travel_start_date || null,
         travel_end_date: form.travel_end_date || null,
@@ -41,14 +43,17 @@ export function EnquiryForm({ enquiryType = "custom_trip", initialSubject = "", 
         subject: form.subject || initialSubject || "Website enquiry",
         notes: form.notes,
         details: { adults: Number(form.adults || 0), children: Number(form.children || 0), hotel_category: form.hotel_category },
-      });
+      };
+      const result = session?.access_token
+        ? await submitCustomerEnquiry(payload, session.access_token)
+        : await submitEnquiry(payload);
       setReference(result.public_ref);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Your request could not be submitted.");
     } finally { setPending(false); }
   }
 
-  if (reference) return <div className="reference-box"><span>Your TravelOS reference</span><strong>{reference}</strong><p>Your enquiry is now inside Navigeto TravelOS. Our team will contact you with the next step.</p></div>;
+  if (reference) return <div className="reference-box"><span>Your TravelOS reference</span><strong>{reference}</strong><p>Your enquiry is now inside Navigeto TravelOS. Our team will contact you with the next step.</p>{session ? <p>This request is linked to your Navigeto account and will also appear in the mobile app.</p> : null}</div>;
 
   return <form className={`form-grid two ${compact ? "compact-form" : ""}`} onSubmit={submit}>
     <div className="field"><label>Name *</label><input className="input" value={form.customer_name} onChange={(e) => set("customer_name", e.target.value)} required /></div>
