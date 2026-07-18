@@ -1,0 +1,43 @@
+name: NAVI Public CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/navi-phase-0]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: preview-placeholder-key
+      NEXT_PUBLIC_ADMIN_URL: https://admin.navigeto.com
+      NEXT_PUBLIC_WHATSAPP_NUMBER: "94770000000"
+      NEXT_PUBLIC_SITE_URL: https://www.navigeto.com
+      NEXT_PUBLIC_ENABLE_NAVI_PUBLIC: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Production build
+        run: npm run build
