@@ -1,0 +1,55 @@
+/* ============================================================
+   ItineraryJourneyMap — drop-in interactive route map
+   Styled to match the cinematic "journeys" design. Reads the
+   host app's CSS vars (--paper/--ink/--forest/--gold) with
+   fallbacks, so it auto-matches the theme AND works standalone.
+   All classes are `ijm-*` — no global bleed.
+   ============================================================ */
+.ijm{
+  --ijm-paper:var(--paper,#faf8f2);
+  --ijm-ink:var(--ink,#10251e);
+  --ijm-forest:var(--forest,#0b3025);
+  --ijm-navy:var(--navy,#071914);
+  --ijm-gold:var(--gold,#d8a45a);
+  --ijm-teal:#9be3df;
+  --ijm-serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --ijm-sans:Manrope,ui-sans-serif,system-ui,-apple-system,sans-serif;
+  position:relative;
+  overflow:hidden;
+  border-radius:22px;
+  padding:clamp(26px,4vw,44px);
+  color:var(--ijm-paper);
+  background:linear-gradient(165deg,var(--ijm-forest),var(--ijm-navy));
+  box-shadow:0 24px 60px rgba(7,25,20,.22);
+}
+.ijm *{box-sizing:border-box}
+.ijm::before{content:"";position:absolute;right:-90px;top:-90px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(216,164,90,.22),transparent 70%);pointer-events:none}
+.ijm-eyebrow{position:relative;z-index:2;font-family:var(--ijm-sans);
+  font-size:12px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--ijm-teal);margin:0}
+.ijm-title{position:relative;z-index:2;font-family:var(--ijm-serif);font-weight:500;
+  font-size:clamp(26px,3.4vw,40px);line-height:1.06;letter-spacing:-.01em;margin:8px 0 6px;color:var(--ijm-paper)}
+.ijm-sub{position:relative;z-index:2;font-family:var(--ijm-sans);
+  font-size:14px;line-height:1.6;color:rgba(250,248,242,.72);margin:0 0 10px;max-width:62ch}
+.ijm-svg{position:relative;z-index:2;width:100%;height:auto;margin-top:20px;overflow:visible;display:block}
+.ijm-track{fill:none;stroke:rgba(250,248,242,.2);stroke-width:3;stroke-linecap:round;stroke-dasharray:7 10}
+.ijm-draw{fill:none;stroke:url(#ijmGrad);stroke-width:4.5;stroke-linecap:round}
+.ijm-pin{cursor:pointer}
+.ijm-pin .ijm-hit{fill:transparent}
+.ijm-pin .ijm-ring{transition:r .25s ease,stroke-width .25s ease}
+.ijm-pin:hover .ijm-ring,.ijm-pin:focus-visible .ijm-ring{r:12}
+.ijm-pin:focus-visible{outline:none}
+.ijm-pin:focus-visible .ijm-ring{stroke-width:4}
+.ijm-pin-label{font-family:var(--ijm-serif);font-size:15px;font-weight:600;fill:var(--ijm-paper)}
+.ijm-pin-day{font-family:var(--ijm-sans);font-size:10px;font-weight:700;letter-spacing:.08em;fill:rgba(250,248,242,.55)}
+.ijm-vehicle{filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.ijm-legend{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.ijm-chip{border:0;cursor:pointer;font-family:var(--ijm-sans);font-size:12.5px;font-weight:600;
+  color:var(--ijm-paper);background:rgba(250,248,242,.1);border:1px solid rgba(250,248,242,.2);
+  padding:8px 14px;border-radius:999px;transition:.18s;display:inline-flex;align-items:center;gap:8px}
+.ijm-chip:hover,.ijm-chip.active{background:var(--ijm-gold);border-color:var(--ijm-gold);color:var(--ijm-navy)}
+.ijm-chip b{font-weight:800}
+
+@media (prefers-reduced-motion:reduce){
+  .ijm-draw{transition:none!important}
+}
