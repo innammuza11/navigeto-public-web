@@ -1,0 +1,83 @@
+/* ============================================================
+   VisaChecker — drop-in live visa requirement + fee checker.
+   Styled to the cinematic "journeys" design: reads host CSS vars
+   (--paper/--ink/--forest/--gold) with fallbacks. All classes vc-*.
+   ============================================================ */
+.vc{
+  --vc-paper:var(--paper,#faf8f2);
+  --vc-ink:var(--ink,#10251e);
+  --vc-forest:var(--forest,#0b3025);
+  --vc-navy:var(--navy,#071914);
+  --vc-gold:var(--gold,#d8a45a);
+  --vc-teal:#9be3df;
+  --vc-line:#e7e0d2;
+  --vc-muted:#5c6b62;
+  --vc-good:#1f8a63;
+  --vc-warn:#c8863a;
+  --vc-serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --vc-sans:Manrope,ui-sans-serif,system-ui,-apple-system,sans-serif;
+  font-family:var(--vc-sans);
+  color:var(--vc-ink);
+}
+.vc *{box-sizing:border-box}
+
+/* form */
+.vc-form{background:#fff;border:1px solid var(--vc-line);border-radius:20px;padding:22px;box-shadow:0 16px 44px rgba(11,48,37,.08);
+  display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:16px;align-items:end}
+.vc-field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.vc-field label{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--vc-muted)}
+.vc-select{width:100%;border:1px solid var(--vc-line);background:var(--vc-paper);border-radius:12px;padding:13px 13px;color:var(--vc-ink);font:inherit;font-weight:600;outline:none;transition:.18s}
+.vc-select:focus{border-color:var(--vc-forest);box-shadow:0 0 0 4px rgba(11,48,37,.1)}
+.vc-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 26px;border:0;border-radius:14px;
+  font:inherit;font-weight:800;font-size:14px;cursor:pointer;background:linear-gradient(135deg,var(--vc-gold),#e7bd7c);color:var(--vc-navy);
+  box-shadow:0 12px 26px rgba(216,164,90,.34);transition:transform .18s ease,box-shadow .18s ease;white-space:nowrap}
+.vc-btn:hover:not(:disabled){transform:translateY(-2px)}
+.vc-btn:disabled{opacity:.6;cursor:default}
+@media(max-width:820px){.vc-form{grid-template-columns:1fr 1fr}.vc-btn{grid-column:1/-1}}
+@media(max-width:520px){.vc-form{grid-template-columns:1fr}}
+
+.vc-error{margin-top:14px;background:#fdece7;border:1px solid #f3c9bb;color:#9c3720;border-radius:12px;padding:13px 15px;font-size:13.5px;font-weight:600}
+
+/* result card */
+.vc-result{margin-top:22px;background:#fff;border:1px solid var(--vc-line);border-radius:22px;overflow:hidden;box-shadow:0 20px 54px rgba(11,48,37,.1);animation:vc-rise .35s cubic-bezier(.2,.7,.2,1)}
+@keyframes vc-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.vc-result-head{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:24px 26px;background:linear-gradient(150deg,var(--vc-forest),var(--vc-navy));color:var(--vc-paper)}
+.vc-flag{font-size:40px;line-height:1}
+.vc-result-head h3{font-family:var(--vc-serif);font-weight:600;font-size:clamp(22px,3vw,30px);margin:0;letter-spacing:-.01em}
+.vc-route{margin:2px 0 0;font-size:12.5px;font-weight:600;letter-spacing:.04em;color:rgba(250,248,242,.68);text-transform:uppercase}
+.vc-pill{margin-left:auto;align-self:flex-start;font-size:12px;font-weight:800;padding:8px 15px;border-radius:999px;white-space:nowrap}
+.vc-pill.good{background:rgba(155,227,223,.2);color:#c6f3ef;border:1px solid rgba(155,227,223,.5)}
+.vc-pill.warn{background:rgba(216,164,90,.22);color:#f2d09a;border:1px solid rgba(216,164,90,.5)}
+
+.vc-result-body{padding:24px 26px;display:flex;flex-direction:column;gap:22px}
+.vc-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.vc-fact{background:var(--vc-paper);border:1px solid var(--vc-line);border-radius:14px;padding:15px}
+.vc-fact small{display:block;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--vc-muted);margin-bottom:5px}
+.vc-fact b{font-family:var(--vc-serif);font-weight:600;font-size:22px;letter-spacing:-.01em;color:var(--vc-ink);display:block;line-height:1.15}
+.vc-fact.fee b{color:var(--vc-forest)}
+.vc-fact span{font-size:13px;color:var(--vc-muted)}
+@media(max-width:620px){.vc-facts{grid-template-columns:1fr}}
+
+.vc-block h4{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--vc-forest);margin:0 0 10px}
+.vc-summary{font-size:14.5px;line-height:1.65;color:var(--vc-ink);margin:0}
+.vc-checks{display:flex;flex-wrap:wrap;gap:8px}
+.vc-check{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:999px;border:1px solid var(--vc-line);background:var(--vc-paper);color:var(--vc-ink)}
+.vc-check svg{flex:none}
+.vc-docs{list-style:none;margin:0;padding:0;display:grid;gap:9px}
+.vc-docs li{position:relative;padding-left:26px;font-size:14px;line-height:1.5;color:var(--vc-ink)}
+.vc-docs li::before{content:"";position:absolute;left:0;top:2px;width:17px;height:17px;border-radius:50%;background:var(--vc-good) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center/11px no-repeat}
+.vc-warn-box{background:#fdf4e6;border:1px solid #f0dcb6;border-radius:12px;padding:13px 15px;font-size:13.5px;line-height:1.55;color:#7a5312}
+.vc-warn-box b{display:block;margin-bottom:4px;color:#8a5a12}
+
+.vc-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;border-top:1px solid var(--vc-line);padding-top:20px}
+.vc-cta{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border-radius:13px;font-weight:800;font-size:13.5px;text-decoration:none;transition:.18s}
+.vc-cta.primary{background:var(--vc-forest);color:var(--vc-paper)}
+.vc-cta.primary:hover{background:var(--vc-navy)}
+.vc-cta.ghost{background:transparent;border:1px solid var(--vc-forest);color:var(--vc-forest)}
+.vc-cta.ghost:hover{background:var(--vc-forest);color:var(--vc-paper)}
+.vc-disclaimer{font-size:12px;color:var(--vc-muted);line-height:1.5;margin:0}
+
+.vc-loading{margin-top:22px;display:flex;align-items:center;gap:12px;color:var(--vc-muted);font-size:14px;font-weight:600}
+.vc-spinner{width:20px;height:20px;border-radius:50%;border:2.5px solid var(--vc-line);border-top-color:var(--vc-gold);animation:vc-spin .8s linear infinite}
+@keyframes vc-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.vc-spinner{animation-duration:1.6s}.vc-result{animation:none}}
