@@ -1,7 +1,15 @@
 import type { MetadataRoute } from "next";
 import { listTours } from "@/lib/travelos";
+import { SITE_URL } from "@/lib/seo";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.navigeto.com";
+// Apex domain: www.navigeto.com 301-redirects here, so emitting www URLs would
+// point every sitemap entry at a redirect.
+const siteUrl = SITE_URL;
+
+// The tour detail route differs by design generation ("/tours/[slug]" vs the
+// cinematic "/tours/package/[slug]"). Set NEXT_PUBLIC_TOUR_PATH_PREFIX to match
+// whichever is deployed, so the sitemap never advertises 404s.
+const tourPathPrefix = process.env.NEXT_PUBLIC_TOUR_PATH_PREFIX || "/tours";
 
 const staticRoutes: Array<{ path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }> = [
   { path: "/", priority: 1, changeFrequency: "daily" },
@@ -31,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const tours = await listTours();
     for (const tour of tours) {
-      entries.push({ url: `${siteUrl}/tours/${tour.slug}`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 });
+      entries.push({ url: `${siteUrl}${tourPathPrefix}/${tour.slug}`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 });
     }
   } catch {
     // Tour catalogue temporarily unreachable — ship the static routes rather than fail the whole sitemap.
