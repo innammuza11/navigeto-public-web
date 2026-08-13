@@ -72,7 +72,7 @@ export default function FlightsPage() {
   }
 
   return <>
-    <PageHero eyebrow="Flight Reservations" title="Tell us your route. We'll find the fare." description="No live GDS connection is active yet, so every search is checked and quoted by a Navigeto travel consultant — never a guessed or invented fare." />
+    <PageHero image="/headers/flights.webp" eyebrow="Flight Reservations" title="Tell us your route. We'll find the fare." description="No live GDS connection is active yet, so every search is checked and quoted by a Navigeto travel consultant — never a guessed or invented fare." />
     <div className="shell content-wrap">
       {reference ? <div className="reference-box"><span>Your TravelOS reference</span><strong>{reference}</strong><p>Our team will check availability and send you fare options shortly.</p></div> : <form className="filter-panel" onSubmit={submit}>
         {!providerConnected ? <div style={{marginBottom:18}}><Notice>Live fare search isn&apos;t connected yet. Submit your route and dates below and our team will confirm availability and pricing directly.</Notice></div> : null}

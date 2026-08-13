@@ -2,17 +2,19 @@ import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { Notice } from "@/components/Notice";
 import { TourCard } from "@/components/TourCard";
-import { listTours } from "@/lib/travelos";
+import { getCachedInternationalTours } from "@/lib/server-public-data";
 import type { PublicPackage } from "@/lib/types";
+import { createSeoMetadata } from "@/lib/seo";
 
-export const metadata = {
+export const metadata = createSeoMetadata({
   title: "International Tour Packages | Navigeto Travels",
   description: "Navigeto's published international tour packages beyond Sri Lanka — Thailand, Vietnam, Malaysia, Singapore, Dubai and more.",
-};
+  path: "/tours/international",
+});
 
 async function loadInternationalTours(): Promise<{ tours: PublicPackage[]; unavailable: boolean }> {
   try {
-    const results = await listTours({ exclude_country: "Sri Lanka" });
+    const results = await getCachedInternationalTours();
     return { tours: results, unavailable: false };
   } catch {
     return { tours: [], unavailable: true };

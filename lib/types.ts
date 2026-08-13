@@ -1,3 +1,10 @@
+export type PublicMedia = {
+  url: string;
+  alt_text?: string | null;
+  caption?: string | null;
+  is_cover?: boolean;
+};
+
 export type SiteConfig = {
   brand_name: string;
   tagline: string;
@@ -16,6 +23,14 @@ export type SiteConfig = {
   booking_mode: "request" | "instant_request";
   featured_destinations: Array<{ name: string; description: string; emoji?: string }>;
   social_links: Record<string, string>;
+  google_tag_id?: string | null;
+  google_ads_conversion_id?: string | null;
+  google_ads_conversion_label?: string | null;
+  meta_pixel_id?: string | null;
+  marketing_consent_required?: boolean;
+  google_site_verification?: string | null;
+  bing_site_verification?: string | null;
+  default_og_image_url?: string | null;
 };
 
 export type HotelResult = {
@@ -33,6 +48,52 @@ export type HotelResult = {
   rooms: number;
   cancellation_policy?: string | null;
   child_policy?: string | null;
+  public_slug?: string | null;
+  cover_image_url?: string | null;
+};
+
+export type PublicHotelRoom = {
+  id: string;
+  room_name: string;
+  room_code?: string | null;
+  description?: string | null;
+  max_occupancy?: number | null;
+  adult_capacity?: number | null;
+  child_capacity?: number | null;
+  bed_configuration?: string | null;
+  room_size_sqm?: number | null;
+  view_type?: string | null;
+  amenities: string[];
+  smoking_policy?: string | null;
+  accessibility_info?: string | null;
+  cover_image_url?: string | null;
+  gallery: PublicMedia[];
+};
+
+export type PublicHotel = {
+  id: string;
+  slug: string;
+  hotel_name: string;
+  destination: string;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
+  short_description?: string | null;
+  full_description?: string | null;
+  star_category?: string | null;
+  facilities: string[];
+  nearby_attractions: string[];
+  check_in_time?: string | null;
+  check_out_time?: string | null;
+  child_policy?: string | null;
+  cancellation_policy?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  cover_image_url?: string | null;
+  gallery: PublicMedia[];
+  rooms: PublicHotelRoom[];
 };
 
 export type PublicPackage = {
@@ -59,17 +120,24 @@ export type PublicPackage = {
     activities?: Array<{ icon?: string; title: string; description?: string }>;
     optional_activities?: string[];
     notes?: string;
+    images?: PublicMedia[];
   }>;
   inclusions: string[];
   exclusions: string[];
   tags: string[];
   hero_image_url?: string;
+  gallery?: PublicMedia[];
   price_from?: number | null;
   currency?: string;
   min_pax?: number | null;
   max_pax?: number | null;
   featured?: boolean;
   country?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  focus_keyword?: string | null;
+  published_at?: string | null;
+  updated_at?: string | null;
 };
 
 export type TransferQuote = {

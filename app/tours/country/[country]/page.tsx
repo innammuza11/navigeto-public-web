@@ -2,8 +2,9 @@ import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { Notice } from "@/components/Notice";
 import { TourCard } from "@/components/TourCard";
-import { listTours } from "@/lib/travelos";
+import { getCachedCountryTours } from "@/lib/server-public-data";
 import type { PublicPackage } from "@/lib/types";
+import { createSeoMetadata } from "@/lib/seo";
 
 function titleCase(value: string): string {
   return value
@@ -16,15 +17,18 @@ function titleCase(value: string): string {
 export async function generateMetadata({ params }: { params: Promise<{ country: string }> }) {
   const { country } = await params;
   const name = titleCase(decodeURIComponent(country));
-  return {
+  const tours = await getCachedCountryTours(name).catch(() => []);
+  return createSeoMetadata({
     title: `${name} Tour Packages | Navigeto Travels`,
     description: `Navigeto's published ${name} tour packages, ready to personalise with hotels, pace and transport.`,
-  };
+    path: `/tours/country/${encodeURIComponent(country)}`,
+    noIndex: tours.length === 0,
+  });
 }
 
 async function loadCountryTours(country: string): Promise<{ tours: PublicPackage[]; unavailable: boolean }> {
   try {
-    const results = await listTours({ country });
+    const results = await getCachedCountryTours(country);
     return { tours: results, unavailable: false };
   } catch {
     return { tours: [], unavailable: true };

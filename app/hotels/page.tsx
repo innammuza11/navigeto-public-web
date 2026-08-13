@@ -1,6 +1,8 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { PageHero } from "@/components/PageHero";
 import { LoadingCards } from "@/components/Loading";
@@ -59,7 +61,7 @@ function HotelsContent() {
   }
 
   return <>
-    <PageHero eyebrow="Live Hotel Selling Rates" title="Find the right Sri Lanka hotel." description="Search approved active TravelOS hotel rates. Supplier costs and internal markup rules stay protected." />
+    <PageHero image="/headers/hotels.webp" eyebrow="Live Hotel Selling Rates" title="Find the right Sri Lanka hotel." description="Search approved active TravelOS hotel rates. Supplier costs and internal markup rules stay protected." />
     <div className="shell content-wrap">
       <form className="filter-panel form-grid" onSubmit={runSearch}>
         <div className="field span-2"><label>Hotel or destination</label><input list="hotel-places" className="input" value={form.q} onChange={(e) => set("q", e.target.value)} placeholder="Kandy, Bentota, Weligama…" /><datalist id="hotel-places">{places.map((place) => <option key={place} value={place} />)}</datalist></div>
@@ -78,22 +80,16 @@ function HotelsContent() {
         <div><h2>Available hotel rates</h2><p>Final customer selling rates for the selected stay.</p></div>
         <div className="results-controls">
           <b>{sortedRows.length} result{sortedRows.length === 1 ? "" : "s"}</b>
-          <select className="select" value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label="Sort results">
-            <option value="recommended">Recommended</option>
-            <option value="price_asc">Price: low to high</option>
-            <option value="price_desc">Price: high to low</option>
-          </select>
-          <div className="view-toggle" role="group" aria-label="Result layout">
-            <button type="button" className={view === "grid" ? "active" : ""} onClick={() => setView("grid")} aria-pressed={view === "grid"}>Grid</button>
-            <button type="button" className={view === "list" ? "active" : ""} onClick={() => setView("list")} aria-pressed={view === "list"}>List</button>
-          </div>
+          <select className="select" value={sort} onChange={(e) => setSort(e.target.value as SortKey)} aria-label="Sort results"><option value="recommended">Recommended</option><option value="price_asc">Price: low to high</option><option value="price_desc">Price: high to low</option></select>
+          <div className="view-toggle" role="group" aria-label="Result layout"><button type="button" className={view === "grid" ? "active" : ""} onClick={() => setView("grid")} aria-pressed={view === "grid"}>Grid</button><button type="button" className={view === "list" ? "active" : ""} onClick={() => setView("list")} aria-pressed={view === "list"}>List</button></div>
         </div>
       </div>
-      {loading ? <LoadingCards count={6} /> : sortedRows.length ? <div className={view === "grid" ? "card-grid" : "results-list"}>{sortedRows.map((row) => <article className="hotel-card" key={row.rate_id}>
-        <div className="card-accent"/><div className="hotel-body"><div className="card-top"><div><h3>{row.hotel_name}</h3><div className="location">📍 {row.destination || "Sri Lanka"}{row.hotel_category ? ` · ${row.hotel_category}` : ""}</div></div><span className="badge">{row.meal_plan || "Room only"}</span></div>
+      {loading ? <LoadingCards count={6} /> : sortedRows.length ? <div className={view === "grid" ? "card-grid" : "results-list"}>{sortedRows.map((row) => <article className="hotel-card hotel-card-with-media" key={row.rate_id}>
+        {row.cover_image_url ? (row.public_slug ? <Link className="hotel-card-media" href={`/hotels/${row.public_slug}`}><Image src={row.cover_image_url} alt={row.hotel_name} fill sizes="(max-width: 1000px) 100vw, 34vw" /></Link> : <div className="hotel-card-media"><Image src={row.cover_image_url} alt={row.hotel_name} fill sizes="(max-width: 1000px) 100vw, 34vw" /></div>) : <div className="card-accent" />}
+        <div className="hotel-body"><div className="card-top"><div><h3>{row.hotel_name}</h3><div className="location">📍 {row.destination || "Sri Lanka"}{row.hotel_category ? ` · ${row.hotel_category}` : ""}</div></div><span className="badge">{row.meal_plan || "Room only"}</span></div>
         <div className="meta-grid"><div className="meta-item"><small>Room</small><b>{row.room_type || "Standard"}</b></div><div className="meta-item"><small>Stay</small><b>{row.nights} night{row.nights === 1 ? "" : "s"}</b></div><div className="meta-item"><small>Rooms</small><b>{row.rooms}</b></div><div className="meta-item"><small>Market</small><b>{row.market || "All Markets"}</b></div></div>
         {row.cancellation_policy || row.child_policy ? <div className="policy-note">{row.cancellation_policy ? <div>🛡 {row.cancellation_policy}</div> : null}{row.child_policy ? <div>🧒 {row.child_policy}</div> : null}</div> : null}
-        <div className="price-block"><small>Per room / night</small><strong>{formatMoney(row.selling_rate_per_night, row.currency)}</strong><span>Stay total: <b>{formatMoney(row.total_amount, row.currency)}</b></span><button className="button button-primary button-block" style={{marginTop:16}} onClick={() => setSelected(row)}>Request this hotel</button></div></div>
+        <div className="price-block"><small>Per room / night</small><strong>{formatMoney(row.selling_rate_per_night, row.currency)}</strong><span>Stay total: <b>{formatMoney(row.total_amount, row.currency)}</b></span>{row.public_slug ? <Link className="button button-ghost button-block" style={{ marginTop: 14 }} href={`/hotels/${row.public_slug}`}>View hotel & rooms</Link> : null}<button type="button" className="button button-primary button-block" style={{marginTop:10}} onClick={() => setSelected(row)}>Request this hotel</button></div></div>
       </article>)}</div> : <div className="empty-state"><b>Start with your travel dates.</b>Search the active Hotel Master for customer-ready rates.</div>}
     </div>
     {selected ? <HotelBookingModal rate={selected} search={form} onClose={() => setSelected(null)} /> : null}

@@ -34,7 +34,7 @@ export default function CorporatePage() {
   }
 
   return <>
-    <PageHero eyebrow="Corporate & Group Travel" title="Corporate travel, MICE and group programs for Sri Lanka." description="Business travel, incentive trips, conferences and group tours — coordinated by one account team with consolidated invoicing and a dedicated point of contact." />
+    <PageHero image="/headers/corporate.webp" eyebrow="Corporate & Group Travel" title="Corporate travel, MICE and group programs for Sri Lanka." description="Business travel, incentive trips, conferences and group tours — coordinated by one account team with consolidated invoicing and a dedicated point of contact." />
     <div className="shell content-wrap detail-grid">
       <section className="prose-card">
         {reference ? <div className="reference-box"><span>Your TravelOS reference</span><strong>{reference}</strong><p>Our corporate team will contact you to scope your program.</p></div> : <>

@@ -23,4 +23,12 @@ export const DEFAULT_SITE_CONFIG: SiteConfig = {
     { name: "South Coast", description: "Golden beaches, Galle Fort and relaxed coastal stays.", emoji: "🌊" },
   ],
   social_links: {},
+  google_tag_id: process.env.NEXT_PUBLIC_GOOGLE_TAG_ID || null,
+  google_ads_conversion_id: process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_ID || null,
+  google_ads_conversion_label: process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL || null,
+  meta_pixel_id: process.env.NEXT_PUBLIC_META_PIXEL_ID || null,
+  marketing_consent_required: true,
+  google_site_verification: null,
+  bing_site_verification: null,
+  default_og_image_url: null,
 };

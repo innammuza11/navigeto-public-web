@@ -14,7 +14,7 @@ function HolidaysContent() {
   const params = useSearchParams();
   const destination = params.get("destination") || "";
   return <>
-    <PageHero eyebrow="International Holidays" title="Tailor-made holidays beyond Sri Lanka." description="Navigeto's international desk puts together flights, hotels, transfers and tours for the destinations below. Every package is built and quoted by a consultant against real hotel and airline availability — never an invented fare." />
+    <PageHero image="/headers/holidays.webp" eyebrow="International Holidays" title="Tailor-made holidays beyond Sri Lanka." description="Navigeto's international desk puts together flights, hotels, transfers and tours for the destinations below. Every package is built and quoted by a consultant against real hotel and airline availability — never an invented fare." />
     <div className="shell content-wrap">
       <div className="tag-row" style={{marginBottom:40}}>
         {destinations.map((d) => <span key={d} className="tag">{d}</span>)}
