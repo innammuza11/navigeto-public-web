@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { displayCurrencies, useCurrency } from "@/components/currency-context";
 import { NaviChat } from "@/components/navi-chat";
+import { MarketingTracker } from "@/components/marketing-tracker";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 import { nav } from "@/lib/site-data";
 
@@ -65,5 +66,5 @@ export function SiteShell({children, hideNavi = false}:{children:React.ReactNode
     liveApi.siteConfig().then((value) => { if (active) setConfig({ ...DEFAULT_CONFIG, ...value }); }).catch(() => undefined);
     return () => { active = false; };
   }, []);
-  return <><Header config={config}/><main>{children}</main><Footer config={config}/>{!hideNavi && config.assistant_enabled !== false && <NaviChat/>}</>;
+  return <><MarketingTracker config={config}/><Header config={config}/><main>{children}</main><Footer config={config}/>{!hideNavi && config.assistant_enabled !== false && <NaviChat/>}</>;
 }

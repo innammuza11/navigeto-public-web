@@ -1,3 +1,5 @@
+import { trackTravelosConversion } from "@/lib/marketing";
+
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://drtunalervcihvyxtxbi.supabase.co";
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_uuG7Eh-Kyijjd5cYsm_jIA_2QdwCo7u";
 
@@ -76,6 +78,8 @@ export type HotelStartingRate = {
   room_type?: string | null;
   meal_plan?: string | null;
 };
+
+export type HotelSitemapPage = { public_slug: string; updated_at?: string | null };
 
 export type PublicMedia = {
   url: string;
@@ -220,6 +224,14 @@ export type PublicSiteConfig = {
   transfer_enabled?: boolean;
   tour_enabled?: boolean;
   assistant_enabled?: boolean;
+  google_tag_id?: string | null;
+  google_ads_conversion_id?: string | null;
+  google_ads_conversion_label?: string | null;
+  meta_pixel_id?: string | null;
+  marketing_consent_required?: boolean;
+  google_site_verification?: string | null;
+  bing_site_verification?: string | null;
+  default_og_image_url?: string | null;
 };
 
 export type TransferItinerarySection = {
@@ -266,14 +278,14 @@ export const liveApi = {
       payload,
       "starting-rates",
     ),
+  hotelSitemap: () => invoke<{ results: HotelSitemapPage[] }>("customer-hotels", {}, "sitemap"),
   hotel: (slug: string) =>
     invoke<{ result: PublicHotel | null }>("customer-hotels", { slug }, "detail"),
-  hotelBooking: (payload: Record<string, unknown>) =>
-    invoke<{ booking: { public_ref: string; total_amount: number; currency: string } }>(
-      "customer-hotels",
-      payload,
-      "booking",
-    ),
+  hotelBooking: async (payload: Record<string, unknown>) => {
+    const result = await invoke<{ booking: { public_ref: string; total_amount: number; currency: string } }>("customer-hotels", payload, "booking");
+    trackTravelosConversion({ sourceRef: result.booking.public_ref, value: result.booking.total_amount, currency: result.booking.currency });
+    return result;
+  },
   tours: (payload: Record<string, unknown> = {}) =>
     invoke<{ results: PublicTour[] }>("public-travel-api", payload, "tour-list"),
   tour: (slug: string) =>
@@ -281,8 +293,11 @@ export const liveApi = {
   vehicles: () => invoke<{ results: Vehicle[] }>("public-travel-api", {}, "vehicle-list"),
   transferQuote: (payload: Record<string, unknown>) =>
     invoke<TransferQuote>("public-travel-api", payload, "transfer-quote"),
-  enquiry: (payload: Record<string, unknown>) =>
-    invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", payload, "enquiry"),
+  enquiry: async (payload: Record<string, unknown>) => {
+    const result = await invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", payload, "enquiry");
+    trackTravelosConversion({ sourceRef: result.enquiry.public_ref });
+    return result;
+  },
   assistant: (payload: {
     message: string;
     history?: Array<{ role: "user" | "assistant"; content: string }>;
