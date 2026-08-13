@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { PageHero } from "@/components/PageHero";
 import { TourCard } from "@/components/TourCard";
-import { listTours } from "@/lib/travelos";
+import { getCachedCountryTours } from "@/lib/server-public-data";
 import type { PublicPackage } from "@/lib/types";
+import { createSeoMetadata } from "@/lib/seo";
 
-export const metadata = {
+export const metadata = createSeoMetadata({
   title: "Sri Lanka Tour Packages | Navigeto Travels",
   description: "Browse Navigeto's published Sri Lanka tour packages — cultural triangle, hill country, wildlife and beach routes, ready to personalise.",
-};
+  path: "/tours/sri-lanka",
+});
 
 async function loadSriLankaTours(): Promise<PublicPackage[]> {
   try {
-    return await listTours({ country: "Sri Lanka" });
+    return await getCachedCountryTours("Sri Lanka");
   } catch {
     return [];
   }

@@ -47,7 +47,7 @@ function TransfersContent() {
   const grouped = tripTypeOptions.reduce<Record<string, typeof tripTypeOptions>>((acc, opt) => { (acc[opt.group] ||= []).push(opt); return acc; }, {});
 
   return <>
-    <PageHero eyebrow="Private Sri Lanka Transport" title="Airport and city transfers, priced from approved route data." description="Choose your route and vehicle. TravelOS applies internal rate and markup rules without exposing operational costs." />
+    <PageHero image="/headers/transfers.webp" eyebrow="Private Sri Lanka Transport" title="Airport and city transfers, priced from approved route data." description="Choose your route and vehicle. TravelOS applies internal rate and markup rules without exposing operational costs." />
     <div className="shell content-wrap">
       <form className="filter-panel form-grid" onSubmit={submit}>
         <div className="field span-2"><label>Pick-up location</label><input className="input" value={form.origin} onChange={(e) => set("origin", e.target.value)} placeholder="Airport, hotel or city" required /></div>

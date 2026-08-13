@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Notice } from "@/components/Notice";
 import { PageHero } from "@/components/PageHero";
 import { submitEnquiry } from "@/lib/travelos";
@@ -11,7 +11,15 @@ export default function VisasPage() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [reference, setReference] = useState("");
+  const [showVisaChecker, setShowVisaChecker] = useState(false);
   const set = (key: keyof typeof form, value: string) => setForm((current) => ({ ...current, [key]: value }));
+
+  useEffect(() => {
+    // window is unavailable during SSR, so this can't be a lazy useState initializer.
+    // Visa Intelligence checker link is a .com-only feature for now — keep it off navigeto.lk.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setShowVisaChecker(window.location.hostname.endsWith("navigeto.com"));
+  }, []);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -36,6 +44,13 @@ export default function VisasPage() {
 
   return <>
     <PageHero eyebrow="Visa Assistance" title="Visa guidance and application support, handled by a consultant." description="Tell us your passport nationality, country of residence and destination. A Navigeto consultant checks the current requirements and confirms eligibility, documents and processing time before you apply — we do not guarantee visa approval, since that decision always rests with the issuing authority." />
+    {showVisaChecker ? <div className="shell">
+      <div className="reference-box">
+        <span>Not sure if you need a visa?</span>
+        <p>Try our free instant visa checker — enter your passport and destination for a quick, verified answer before you request a consultation.</p>
+        <a className="button button-primary" href={`${process.env.NEXT_PUBLIC_ADMIN_URL || "https://admin.navigeto.com"}/visa-check`} target="_blank" rel="noreferrer">Check visa requirement</a>
+      </div>
+    </div> : null}
     <div className="shell content-wrap detail-grid">
       <section className="prose-card">
         {reference ? <div className="reference-box"><span>Your TravelOS reference</span><strong>{reference}</strong><p>Our visa desk will review your request and contact you with the requirements and next steps.</p></div> : <>

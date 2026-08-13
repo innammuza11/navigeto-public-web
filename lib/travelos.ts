@@ -1,4 +1,5 @@
-import type { CatalogVehicle, EnquiryResult, HotelResult, PublicPackage, SiteConfig, TransferQuote } from "./types";
+import type { CatalogVehicle, EnquiryResult, HotelResult, PublicHotel, PublicPackage, SiteConfig, TransferQuote } from "./types";
+import { currentMarketingAttribution, trackTravelosConversion } from "./marketing";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -20,7 +21,6 @@ async function post<T>(url: string, body: unknown): Promise<T> {
       cache: "no-store",
     });
   } catch {
-    // Network/DNS/CORS-level failures never reach the customer as raw text.
     throw new Error("Navigeto TravelOS is temporarily unavailable. Please try again shortly or contact us directly.");
   }
   const payload = await response.json().catch(() => ({}));
@@ -51,8 +51,21 @@ export async function searchHotels(payload: Record<string, unknown>): Promise<Ho
   return data.results || [];
 }
 
+export async function getHotel(slug: string): Promise<PublicHotel | null> {
+  const data = await post<{ result: PublicHotel | null }>(`${hotelApi}?action=detail`, { slug });
+  return data.result || null;
+}
+
+export async function listHotelPages(): Promise<Array<{ slug: string; updated_at?: string | null }>> {
+  const data = await post<{ results: Array<{ public_slug: string; updated_at?: string | null }> }>(`${hotelApi}?action=sitemap`, {});
+  return (data.results || []).filter((row) => row.public_slug).map((row) => ({ slug: row.public_slug, updated_at: row.updated_at }));
+}
+
 export async function requestHotelBooking(payload: Record<string, unknown>): Promise<{ booking: EnquiryResult & { total_amount?: number; currency?: string } }> {
-  return post(`${hotelApi}?action=booking`, payload);
+  const marketing = currentMarketingAttribution();
+  const result = await post<{ booking: EnquiryResult & { total_amount?: number; currency?: string } }>(`${hotelApi}?action=booking`, { ...payload, marketing });
+  trackTravelosConversion({ sourceRef: result.booking.public_ref, eventName: "Lead", value: result.booking.total_amount, currency: result.booking.currency });
+  return result;
 }
 
 export async function quoteTransfer(payload: Record<string, unknown>): Promise<TransferQuote> {
@@ -65,7 +78,10 @@ export async function listVehicles(): Promise<CatalogVehicle[]> {
 }
 
 export async function submitEnquiry(payload: Record<string, unknown>): Promise<EnquiryResult> {
-  const data = await post<{ enquiry: EnquiryResult }>(`${publicApi}?action=enquiry`, payload);
+  const marketing = currentMarketingAttribution();
+  const details = payload.details && typeof payload.details === "object" ? payload.details as Record<string, unknown> : {};
+  const data = await post<{ enquiry: EnquiryResult }>(`${publicApi}?action=enquiry`, { ...payload, details: { ...details, marketing } });
+  trackTravelosConversion({ sourceRef: data.enquiry.public_ref, eventName: "Lead" });
   return data.enquiry;
 }
 

@@ -8,11 +8,12 @@ import type { SiteConfig } from "@/lib/types";
 type SiteContextValue = { config: SiteConfig; loading: boolean };
 const SiteContext = createContext<SiteContextValue>({ config: DEFAULT_SITE_CONFIG, loading: true });
 
-export function SiteProvider({ children }: { children: React.ReactNode }) {
-  const [config, setConfig] = useState(DEFAULT_SITE_CONFIG);
-  const [loading, setLoading] = useState(true);
+export function SiteProvider({ children, initialConfig }: { children: React.ReactNode; initialConfig?: SiteConfig }) {
+  const [config, setConfig] = useState(initialConfig || DEFAULT_SITE_CONFIG);
+  const [loading, setLoading] = useState(!initialConfig);
 
   useEffect(() => {
+    if (initialConfig) return;
     let active = true;
     loadSiteConfig()
       .then((live) => {
@@ -22,7 +23,7 @@ export function SiteProvider({ children }: { children: React.ReactNode }) {
       .catch(() => undefined)
       .finally(() => active && setLoading(false));
     return () => { active = false; };
-  }, []);
+  }, [initialConfig]);
 
   const value = useMemo(() => ({ config, loading }), [config, loading]);
   return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>;
