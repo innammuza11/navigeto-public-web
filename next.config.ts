@@ -1,20 +1,11 @@
-import path from "node:path";
 import type { NextConfig } from "next";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
-  poweredByHeader: false,
-  compress: true,
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "**.supabase.co", pathname: "/storage/v1/object/public/**" },
-    ],
-  },
-  experimental: {
-    optimizePackageImports: [],
-  },
+  reactCompiler: true,
   turbopack: {
-    root: path.resolve(__dirname),
+    root: path.dirname(fileURLToPath(import.meta.url)),
   },
 };
 
