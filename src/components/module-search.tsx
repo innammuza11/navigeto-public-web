@@ -7,12 +7,18 @@ export type SearchType = "flight" | "hotel" | "tour" | "visa" | "transfer";
 type Values = Record<string, string>;
 type SearchSurface = "module" | "home";
 
+function dateAfter(days: number) {
+  const value = new Date();
+  value.setUTCDate(value.getUTCDate() + days);
+  return value.toISOString().slice(0, 10);
+}
+
 const defaults: Record<SearchType, Values> = {
-  flight: { trip_type: "return", origin: "CMB", destination: "LHR", depart_date: "2026-08-15", return_date: "2026-08-24", adults: "1", children: "0", infants: "0", cabin_class: "economy", direct_only: "false" },
-  hotel: { q: "Sri Lanka", checkin: "2026-08-15", checkout: "2026-08-19", rooms: "1", adults: "2", children: "0", occupancy: "double", meal_plan: "any", market: "All Markets" },
-  tour: { country: "Sri Lanka", theme: "culture", duration: "any", month: "2026-08", travellers: "2", pace: "any", hotel_style: "any", budget: "any" },
-  visa: { passport: "LK", destination: "GB", purpose: "tourism", depart_date: "2026-09-01", entry_type: "single", stay_length: "14", previous_refusal: "no" },
-  transfer: { origin: "Bandaranaike Airport", destination: "Galle", travel_date: "2026-08-15", pickup_time: "09:30", passengers: "2", luggage: "2", trip_type: "one_way", vehicle_type: "any" },
+  flight: { trip_type: "return", origin: "CMB", destination: "KUL", depart_date: dateAfter(30), return_date: dateAfter(37), adults: "1", children: "0", infants: "0", cabin_class: "economy", direct_only: "false" },
+  hotel: { q: "Sri Lanka", checkin: dateAfter(30), checkout: dateAfter(34), rooms: "1", adults: "2", children: "0", occupancy: "double", meal_plan: "any", market: "All Markets" },
+  tour: { country: "Sri Lanka", theme: "culture", duration: "any", month: dateAfter(30).slice(0, 7), travellers: "2", pace: "any", hotel_style: "any", budget: "any" },
+  visa: { passport: "LK", destination: "MY", purpose: "tourism", depart_date: dateAfter(45), entry_type: "single", stay_length: "14", previous_refusal: "no" },
+  transfer: { origin: "Bandaranaike Airport", destination: "Galle", travel_date: dateAfter(30), pickup_time: "09:30", passengers: "2", luggage: "2", trip_type: "one_way", vehicle_type: "any" },
 };
 
 const actions: Record<SearchType, string> = {

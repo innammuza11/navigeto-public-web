@@ -4,7 +4,9 @@ import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { BookingSearch } from "./booking-search";
 import { AvailableHotels } from "./available-hotels";
+import { HomeMarketplace } from "./home-marketplace";
 import { ModuleSearch, type SearchType } from "./module-search";
+import { ReviewShowcase } from "./review-showcase";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 type Data={
  eyebrow:string; title:string; copy:string; action:string;
@@ -75,9 +77,9 @@ export function HomeSections(){
   ["heritage","Living history","Ancient stories, still unfolding.","/tours/sri-lanka?theme=culture"],
  ] as const;
  const worldDestinations=[
-  ["NRT","Japan","Tradition. Design. Discovery."],["DXB","United Arab Emirates","Desert light. City nights."],
-  ["LHR","United Kingdom","Icons, culture and countryside."],["MLE","Maldives","Nothing between you and blue."],
-  ["BKK","Thailand","Flavour, energy and islands."],["IST","Türkiye","Where continents meet."],
+  ["KUL","Malaysia","City energy. Highland escapes."],["SIN","Singapore","Design, flavour and family fun."],
+  ["BKK","Thailand","Culture, flavour and islands."],["SGN","Vietnam","Old stories. New energy."],
+  ["DXB","United Arab Emirates","Desert light. City nights."],
  ] as const;
  const services=[
   ["hotel","01","Hotels","Handpicked stays with real rooms and live selling rates.","/hotels"],
@@ -111,6 +113,7 @@ export function HomeSections(){
   <section className="experience-ribbon" aria-label="Navigeto experiences">
    <div><span>THE INDIAN OCEAN</span><i>—</i><span>ELLA BY RAIL</span><i>—</i><span>WILD ENCOUNTERS</span><i>—</i><span>ANCIENT KINGDOMS</span><i>—</i><span>THE WORLD BEYOND</span><i>—</i><span aria-hidden="true">THE INDIAN OCEAN</span><i aria-hidden="true">—</i><span aria-hidden="true">ELLA BY RAIL</span><i aria-hidden="true">—</i></div>
   </section>
+  <HomeMarketplace/>
   <section className="section journey-section">
    <div className="shell">
     <div className="section-title journey-heading"><div><p className="eyebrow">Sri Lanka, frame by frame</p><h2>Come for the view.<br/><em>Stay for the feeling.</em></h2></div><p>Warm water in the morning, cool tea-country air by evening. We turn the island&apos;s contrasts into one effortless journey.</p></div>
@@ -122,7 +125,7 @@ export function HomeSections(){
     <div className="world-copy"><p className="eyebrow">The world, from Colombo</p><h2>Sri Lanka is only<br/><em>the beginning.</em></h2><p>Flights, visa guidance and the kind of practical human support that makes a faraway place feel closer.</p><div className="hero-actions"><Link className="button button-gold" href="/flights">Find an international flight</Link><Link className="button button-dark-soft" href="/visas">Explore visa support</Link></div></div>
     <div className="destination-board" aria-label="Popular international destinations">
      <div className="destination-board-head"><span>Departing</span><b>Colombo · CMB</b><i>Live routes</i></div>
-     {worldDestinations.map(([code,country,mood])=><Link className="destination-line" href="/flights" key={country}><span>{code}</span><div><b>{country}</b><small>{mood}</small></div><i aria-hidden="true">↗</i></Link>)}
+     {worldDestinations.map(([code,country,mood])=><Link className="destination-line" href={`/flights/search?origin=CMB&destination=${code}`} key={country}><span>{code}</span><div><b>{country}</b><small>{mood}</small></div><i aria-hidden="true">↗</i></Link>)}
     </div>
    </div>
   </section>
@@ -132,6 +135,7 @@ export function HomeSections(){
     <div className="service-flow-grid">{services.map(([kind,number,title,copy,href])=><Link className={`service-flow-card service-flow-${kind}`} href={href} key={title}><span>{number}</span><div><h3>{title}</h3><p>{copy}</p></div><b>Explore <i aria-hidden="true">↗</i></b></Link>)}</div>
    </div>
   </section>
+  <ReviewShowcase/>
   <section className="trust shell">{[["TravelOS connected","Live public selling information"],["Human support","Real people when it matters"],["Clear pricing","Transparent selling rates"],["Flexible planning","Thoughtfully handled changes"]].map(([h,p],index)=><div key={h}><span>0{index+1}</span><p><b>{h}</b><small>{p}</small></p></div>)}</section>
  </>;
 }

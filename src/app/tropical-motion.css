@@ -803,3 +803,70 @@ body:has(.tour-collection-redesign) .navi-launcher b,body:has(.tour-collection-r
   .tour-story-redesign{padding-block:65px}.tour-story-redesign h2{font-size:43px}.tour-highlight-redesign{grid-template-columns:1fr}.tour-route-ribbon p{font-size:18px}
   .tour-customizer-redesign{padding:24px}.tour-customizer-redesign h3{font-size:31px}
 }
+
+/* Homepage connected marketplace */
+.marketplace-section{padding:118px 0 32px;background:linear-gradient(180deg,#f8fbff 0%,#edf5fb 58%,#f8fbff 100%);overflow:hidden}
+.marketplace-intro{display:grid;grid-template-columns:1fr 1.05fr;gap:70px;align-items:end;margin-bottom:92px}
+.marketplace-intro>.eyebrow{grid-column:1/-1;margin-bottom:-44px}
+.marketplace-intro h2,.marketplace-heading h2,.review-copy h2{margin:0;font:500 clamp(42px,5vw,70px)/.98 var(--font-serif);letter-spacing:-.04em}
+.marketplace-intro h2 em,.review-copy h2 em{color:var(--gold);font-weight:400}
+.marketplace-intro>p:last-child{max-width:560px;margin:0 0 7px;color:var(--muted);font-size:14px;line-height:1.8}
+.marketplace-row{padding:0 0 100px}
+.marketplace-row-last{padding-bottom:54px}
+.marketplace-heading{display:grid;grid-template-columns:1fr .7fr;gap:56px;align-items:end;margin-bottom:30px}
+.marketplace-heading h2{font-size:clamp(35px,3.5vw,50px)}
+.marketplace-heading>div:last-child{justify-self:end;max-width:480px}
+.marketplace-heading>div:last-child p{margin:0 0 14px;color:var(--muted);font-size:12px;line-height:1.7}
+.marketplace-heading>div:last-child>a{display:inline-flex;gap:12px;align-items:center;color:#241c68;font-size:10px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+.marketplace-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:13px}
+.market-card{min-width:0;overflow:hidden;border:1px solid rgba(35,48,91,.12);border-radius:20px;background:#fff;box-shadow:0 16px 38px rgba(32,37,83,.07);transition:transform .25s,box-shadow .25s}
+.market-card:hover{transform:translateY(-5px);box-shadow:0 24px 54px rgba(32,37,83,.13)}
+.market-card-art{min-height:184px;display:flex;flex-direction:column;justify-content:space-between;padding:15px;background-position:center;background-size:cover;color:#fff}
+.market-card-art>span{align-self:flex-start;padding:6px 9px;border:1px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(12,19,48,.24);backdrop-filter:blur(9px);font-size:8px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.market-card-art>b{font:500 22px var(--font-serif)}
+.market-card-body{min-height:245px;display:flex;flex-direction:column;padding:18px}
+.market-card-body h3{margin:2px 0 8px;font:500 25px/1.05 var(--font-serif)}
+.market-card-body>p{margin:0 0 16px;color:#68718d;font-size:10px;line-height:1.65}
+.market-card-body>b{margin-top:auto;font-size:17px}
+.market-card-body>small{display:block;margin-top:auto;color:#7b839a;font-size:8px;line-height:1.45}
+.market-card-body>a{display:flex;justify-content:space-between;align-items:center;margin-top:15px;padding-top:13px;border-top:1px solid var(--line);color:#231b67;font-size:9px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+.marketplace-empty{min-height:210px;display:flex;align-items:center;justify-content:space-between;gap:32px;padding:38px;border:1px dashed #b9ccd9;border-radius:22px;background:rgba(255,255,255,.68)}
+.marketplace-empty span{color:var(--gold);font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+.marketplace-empty h3{margin:7px 0 4px;font:500 31px var(--font-serif)}
+.marketplace-empty p{margin:0;color:var(--muted);font-size:12px}
+.market-card-loading{min-height:420px;padding:15px}
+.market-card-loading div,.market-card-loading span,.market-card-loading b,.market-card-loading i{display:block;border-radius:12px;background:linear-gradient(90deg,#edf3f7,#fff,#edf3f7);background-size:200% 100%;animation:marketShimmer 1.4s infinite}
+.market-card-loading div{height:180px}.market-card-loading span{width:45%;height:11px;margin-top:18px}.market-card-loading b{height:22px;margin-top:12px}.market-card-loading i{height:10px;margin-top:24px}
+@keyframes marketShimmer{to{background-position:-200% 0}}
+.destination-market-card{min-height:420px;display:flex;flex-direction:column;color:#fff;background:radial-gradient(circle at 90% 5%,rgba(255,194,71,.36),transparent 32%),linear-gradient(155deg,#211765,#066d73)}
+.destination-market-2{background:radial-gradient(circle at 85% 8%,rgba(126,222,216,.3),transparent 34%),linear-gradient(155deg,#071e34,#0c5a7c)}
+.destination-market-3{background:radial-gradient(circle at 85% 8%,rgba(255,194,71,.3),transparent 34%),linear-gradient(155deg,#41205d,#a54d3d)}
+.destination-market-4{background:radial-gradient(circle at 85% 8%,rgba(126,222,216,.3),transparent 34%),linear-gradient(155deg,#123f54,#087b78)}
+.destination-market-5{background:radial-gradient(circle at 85% 8%,rgba(255,194,71,.4),transparent 34%),linear-gradient(155deg,#171c53,#674c78)}
+.destination-market-top,.visa-market-top{display:flex;align-items:center;justify-content:space-between;padding:18px}
+.destination-market-top span{font-size:30px}.destination-market-top b{font:600 18px var(--font-serif);letter-spacing:.12em}
+.destination-market-card .market-card-body{margin-top:auto}.destination-market-card .market-card-body>small{color:#ffc247;text-transform:uppercase;letter-spacing:.09em}.destination-market-card .market-card-body h3{font-size:34px}.destination-market-card .market-card-body>p{color:rgba(255,255,255,.72)}.destination-market-card .market-card-body>a{border-color:rgba(255,255,255,.18);color:#fff}
+.visa-market-card{min-height:420px;background:linear-gradient(180deg,#fff,#f1f8fc)}
+.visa-market-top span{width:48px;height:48px;display:grid;place-items:center;border-radius:14px;background:#201765;color:#fff;font:600 14px var(--font-serif);letter-spacing:.08em}
+.visa-market-top small{max-width:120px;color:var(--muted);font-size:8px;line-height:1.4;text-align:right}
+.flight-market-card{min-height:420px;display:flex;flex-direction:column;color:#fff;background:linear-gradient(155deg,#071e34,#0b6177)}
+.flight-market-2{background:linear-gradient(155deg,#1a1760,#165a84)}.flight-market-3{background:linear-gradient(155deg,#442064,#9a4939)}.flight-market-4{background:linear-gradient(155deg,#073f4b,#087b78)}.flight-market-5{background:linear-gradient(155deg,#171c53,#73527d)}
+.flight-route{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:28px 18px 10px;font:600 22px var(--font-serif);letter-spacing:.07em}
+.flight-route i{height:1px;background:linear-gradient(90deg,rgba(255,255,255,.18),#ffc247,rgba(255,255,255,.18));position:relative}.flight-route i:after{content:"✈";position:absolute;left:50%;top:50%;transform:translate(-50%,-54%);padding:0 7px;background:#0b5268;color:#ffc247;font-size:13px;font-style:normal}
+.flight-market-card .market-card-body{margin-top:auto}.flight-market-card .market-card-body>small{color:#ffc247;text-transform:uppercase;letter-spacing:.08em}.flight-market-card .market-card-body h3{font-size:31px}.flight-market-card .market-card-body>p{color:rgba(255,255,255,.72)}.flight-market-card .market-card-body>em{margin-top:auto;color:rgba(255,255,255,.58);font-size:8px;font-style:normal}.flight-market-card .market-card-body>a{border-color:rgba(255,255,255,.16);color:#fff}
+
+/* Independent review profiles */
+.review-section{padding:120px 0;background:linear-gradient(135deg,#17124d,#071e34);color:#fff}
+.review-layout{display:grid;grid-template-columns:.78fr 1.22fr;gap:70px;align-items:center}
+.review-copy .eyebrow{color:#7de0d8}.review-copy h2 em{color:#ffc247}.review-copy>p:last-child{max-width:480px;color:#b7c9d6;font-size:12px;line-height:1.8}
+.review-source-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.review-source-card{min-height:365px;display:flex;flex-direction:column;padding:22px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:rgba(255,255,255,.07);transition:.25s}
+.review-source-card:hover{transform:translateY(-5px);background:rgba(255,255,255,.11)}
+.review-source-head{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.review-source-head>span{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#fff;color:#2c63d7;font-weight:900}.review-tripadvisor .review-source-head>span{color:#00aa6c}.review-trustpilot .review-source-head>span{color:#00b67a}
+.review-source-head>b{font-size:11px}.review-source-head>i{font-style:normal;color:rgba(255,255,255,.5)}
+.review-score{margin:42px 0 4px}.review-score strong{display:block;font:500 55px/1 var(--font-serif)}.review-score span{color:#ffc247;font-size:12px;letter-spacing:.08em}.review-tripadvisor .review-score span{color:#00d084}.review-trustpilot .review-score span{color:#00b67a}
+.review-score-google strong{font-size:35px}.review-score-google span{display:block;margin-top:8px;color:#aebdca;font-size:9px;letter-spacing:0}.review-source-card>small{color:#aebdca;font-size:9px}.review-source-card>p{color:#c1d0da;font-size:10px;line-height:1.7}.review-source-card>b:last-child{margin-top:auto;padding-top:13px;border-top:1px solid rgba(255,255,255,.13);font-size:8px;letter-spacing:.06em;text-transform:uppercase}
+
+@media(max-width:1050px){.marketplace-grid{grid-template-columns:repeat(5,minmax(230px,1fr));overflow-x:auto;padding:0 0 18px;scroll-snap-type:x proximity}.market-card{scroll-snap-align:start}.marketplace-grid::-webkit-scrollbar{height:6px}.marketplace-grid::-webkit-scrollbar-thumb{border-radius:999px;background:#c4d4de}.review-layout{grid-template-columns:1fr}.review-source-grid{max-width:850px}}
+@media(max-width:720px){.marketplace-section{padding-top:80px}.marketplace-intro,.marketplace-heading{grid-template-columns:1fr;gap:22px}.marketplace-intro{margin-bottom:70px}.marketplace-intro>.eyebrow{grid-column:auto;margin-bottom:-8px}.marketplace-heading>div:last-child{justify-self:start}.marketplace-row{padding-bottom:76px}.marketplace-grid{margin-right:-15px}.marketplace-empty{align-items:flex-start;flex-direction:column;padding:28px}.review-section{padding:80px 0}.review-layout{gap:42px}.review-source-grid{grid-template-columns:repeat(3,minmax(220px,1fr));overflow-x:auto;padding-bottom:16px}.review-source-card{scroll-snap-align:start}}
