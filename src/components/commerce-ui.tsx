@@ -13,6 +13,7 @@ import {
   loadSelection,
   TransferQuote,
   PublicTour,
+  PublicTourRateCard,
   saveSelection,
   Vehicle,
   VisaProduct,
@@ -214,8 +215,69 @@ export function TourResults(){
  <div className="tour-tailor-callout tour-tailor-callout-redesign"><div><p className="eyebrow">Need a different rhythm?</p><h3>Start with a feeling. We’ll design the route.</h3><p>Change the number of nights, hotel category, pace, wildlife, beaches or cultural stops—without starting over.</p></div><Link className="button button-gold" href="/custom-trip">Create my private journey</Link></div></section><AvailableHotels title="Available stays to pair with your tour."/></>;
 }
 
+const publicRateFields = [
+  ["double_sharing", "Double sharing"],
+  ["triple_sharing", "Triple sharing"],
+  ["single_sharing", "Single room"],
+  ["single_supplement", "Single supplement"],
+  ["child_sharing_bed", "Child with bed"],
+  ["child_no_bed", "Child without bed"],
+  ["child_extra_bed", "Child extra bed"],
+] as const satisfies ReadonlyArray<readonly [keyof PublicTourRateCard, string]>;
+
+const hasSellingAmount = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value) && value > 0;
+const availablePublicRateCards = (cards?: PublicTourRateCard[]) => (cards || []).filter((card) => publicRateFields.some(([field]) => hasSellingAmount(card[field])));
+const sellingRate = (value: number, currency: string) => `${currency || "USD"} ${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const publicRateDate = (value?: string | null) => {
+  if (!value) return "";
+  const parsed = new Date(`${value.slice(0, 10)}T00:00:00Z`);
+  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+};
+
+function TourSellingRates({ cards }: { cards: PublicTourRateCard[] }) {
+  const grouped = Array.from(cards.reduce((groups, card) => {
+    const label = card.star_category?.trim() || "Published hotel category";
+    groups.set(label, [...(groups.get(label) || []), card]);
+    return groups;
+  }, new Map<string, PublicTourRateCard[]>()).entries());
+
+  return <section className="tour-rates-section" id="rates">
+    <div className="shell">
+      <div className="tour-rates-heading">
+        <div><p className="eyebrow">Available public selling rates</p><h2>Choose the band that fits your party.</h2></div>
+        <p>Per person in USD unless another currency is shown. Only approved available rate bands are displayed; hotels and final availability are reconfirmed for your dates.</p>
+      </div>
+      <div className="tour-rate-groups">
+        {grouped.map(([category, rateCards], groupIndex) => <details className="tour-rate-group" open={groupIndex === 0} key={category}>
+          <summary><span><small>Hotel category</small><b>{category}</b></span><em>{rateCards.length} available {rateCards.length === 1 ? "band" : "bands"}</em><i aria-hidden="true">+</i></summary>
+          <div className="tour-rate-card-grid">
+            {rateCards.map((card, index) => {
+              const validity = [publicRateDate(card.validity_start), publicRateDate(card.validity_end)].filter(Boolean).join(" – ");
+              const pax = card.band_label || (card.min_pax && card.max_pax ? `${card.min_pax}–${card.max_pax} travellers` : card.min_pax ? `From ${card.min_pax} travellers` : "Published party band");
+              return <article className="tour-rate-card" key={`${category}-${card.season_label || "season"}-${pax}-${index}`}>
+                <header><div><small>{card.season_label || "Published season"}</small><h3>{pax}</h3></div>{card.market ? <span>{card.market}</span> : null}</header>
+                {validity ? <p className="tour-rate-validity">Travel validity · {validity}</p> : null}
+                <div className="tour-rate-values">
+                  {publicRateFields.flatMap(([field, label]) => {
+                    const value = card[field];
+                    return hasSellingAmount(value) ? [<div key={field}><span>{label}</span><b>{sellingRate(value, card.currency)}</b></div>] : [];
+                  })}
+                </div>
+              </article>;
+            })}
+          </div>
+        </details>)}
+      </div>
+      <p className="tour-rates-note">These are final customer-facing selling rates for the published bands. Your exact travel date, party size, hotel allocation and availability are checked before confirmation.</p>
+    </div>
+  </section>;
+}
+
 export function TourDetail({slug}:{slug:string}){
- const fallback=tours.find(t=>t.slug===slug)||tours[0]; const [tour,setTour]=useState<PublicTour|null>(null); const [hotelLevel,setHotelLevel]=useState("Boutique"); const [loading,setLoading]=useState(true);
+ const fallback=tours.find(t=>t.slug===slug)||tours[0];
+ const [tour,setTour]=useState<PublicTour|null>(null);
+ const [hotelLevel,setHotelLevel]=useState("Boutique");
+ const [loading,setLoading]=useState(true);
  useEffect(()=>{liveApi.tour(slug).then(r=>setTour(r.result)).catch(()=>setTour(null)).finally(()=>setLoading(false));},[slug]);
  const book=()=>saveSelection("tour",tour||fallback);
  const routeDestinations=useMemo(()=>tour?.destinations?.length?tourPlaces(tour):fallback.route.split(" · ").map(cleanPlace).filter(Boolean),[tour,fallback.route]);
@@ -241,14 +303,20 @@ export function TourDetail({slug}:{slug:string}){
  const durationDays=tour?.duration_days||Number.parseInt(fallback.days)||liveItinerary.length;
  const durationNights=tour?.duration_nights??Math.max(0,durationDays-1);
  const routeLine=routeDestinations.slice(0,6).join(" → ");
- const publicSummary=tour?conciseTourSummary(tour,durationDays):"A private island journey with each day arranged around your pace.";
+ const journeyCountry=tour?.country?.trim()||"Sri Lanka";
+ const isSriLankaJourney=/^(sri\s*lanka|lk)$/i.test(journeyCountry);
+ const publicSummary=tour?conciseTourSummary(tour,durationDays):`A private ${journeyCountry} journey with each day arranged around your pace.`;
  const highlightRows=tour?.highlights?.length?tour.highlights.slice(0,4):["Private airport welcome","Thoughtful route pacing","Local support throughout"];
- return <><section className="tour-detail-hero tour-detail-hero-next tour-detail-hero-redesign" style={{backgroundImage:`linear-gradient(90deg,rgba(24,19,78,.93),rgba(24,19,78,.38) 58%,rgba(24,19,78,.08)),url("${hero}")`}}><div className="tour-detail-film"/><div className="shell tour-hero-content"><Link className="tour-back-link" href="/tours">← All private journeys</Link><p className="eyebrow">{loading?"Loading published journey":tour?tourMood(tour):"Private Sri Lanka journey"}</p><h1>{publicTitle}</h1><p className="tour-hero-route-line">{routeLine||fallback.route}</p><div className="tour-hero-tags"><span>{durationDays} days · {durationNights} nights</span><span>Private chauffeur</span><span>Flexible hotel style</span><span>Local support</span></div><a className="tour-hero-scroll" href="#journey"><small>See the journey</small><i>↓</i></a></div><div className="tour-hero-routeglass"><span>Route at a glance</span><b>{routeLine||"Sri Lanka, your way"}</b><small>Full interactive itinerary below</small></div><div className="tour-hero-orbit" aria-hidden="true"><i/><i/><i/></div></section>
- <section className="tour-glance"><div className="shell"><div><small>Duration</small><b>{durationDays} days · {durationNights} nights</b></div><div><small>Journey style</small><b>Private & adjustable</b></div><div><small>Route</small><b>{routeDestinations.slice(0,3).join(" · ")||"Sri Lanka"}</b></div><div><small>Starting price</small>{tour?.price_from?<Money value={tour.price_from} currency={tour.currency} suffix="Per person · starting from"/>:<b>Tailor-made</b>}</div><Link href="#customize">Personalize this trip <span>↗</span></Link></div></section>
- <nav className="anchor-nav tour-anchor-nav"><div className="shell"><a href="#journey">Overview</a><a href="#itinerary">Day by day</a><a href="#included">Included</a><a href="#hotels">Hotels</a><a href="#customize">Price & customize</a></div></nav>
- <section className="shell tour-story-grid tour-story-redesign" id="journey"><div><p className="eyebrow">The journey</p><h2>{tour?.subtitle||publicTitle}</h2><p className="body-copy">{publicSummary}</p><div className="tour-highlight-grid tour-highlight-redesign">{highlightRows.map((highlight,index)=><div key={`${highlight}-${index}`}><span>{String(index+1).padStart(2,"0")}</span><b>{highlight}</b></div>)}</div><div className="tour-route-ribbon"><small>Your private route</small><p>{routeLine||"Designed around your preferred island experiences"}</p></div></div><aside className="customizer tour-customizer-next tour-customizer-redesign" id="customize"><p className="eyebrow">Your version of this journey</p><h3>Make it yours.</h3><p>Choose the travel style below. Our team verifies the final hotels, availability and exact selling price before confirmation.</p><label>Hotel style<select value={hotelLevel} onChange={e=>setHotelLevel(e.target.value)}><option>Boutique</option><option>Luxury</option><option>Essential</option></select></label><label>Travellers<select><option>2 adults</option><option>Family of 4</option><option>Private group</option></select></label><label>Preferred departure<input type="date" defaultValue="2026-09-15"/></label><div className="tour-customizer-price"><span>Starting price · per person</span>{tour?.price_from?<Money value={tour.price_from} currency={tour.currency} suffix="Per person · final price confirmed for your dates"/>:<b>Tailor-made</b>}</div><Link className="button button-gold" href={`/tours/booking?tour=${slug}`} onClick={book}>Check my dates</Link><a className="button tour-button-outline" href="https://wa.me/94774206166">Talk to a Sri Lanka specialist</a><small>No payment now. Exact availability is checked before confirmation.</small></aside></section>
- <div className="itinerary-world"><div className="shell"><InteractiveItineraryMap days={liveItinerary} destinations={routeDestinations}/></div></div>
- <section className="shell tour-after-map" id="included"><div className="tour-inclusions"><div><p className="eyebrow">Included</p><h3>Handled as one journey.</h3><ul>{(tour?.inclusions?.length?tour.inclusions:["Private transport","Selected accommodation","Published experiences","Navigeto local support"]).map(x=><li key={x}>✓ {x}</li>)}</ul></div><div><p className="eyebrow">Before you confirm</p><h3>Clear from the start.</h3><ul>{(tour?.exclusions?.length?tour.exclusions:["International flights unless stated","Visa and insurance","Personal expenses"]).map(x=><li key={x}>— {x}</li>)}</ul></div></div></section><div id="hotels"><AvailableHotels title="Hotels currently available for this journey." destination={tour?.destinations?.[0]||""}/></div></>;
+ const publicRates=availablePublicRateCards(tour?.rate_cards);
+ return <>
+  <section className="tour-detail-hero tour-detail-hero-next tour-detail-hero-redesign" style={{backgroundImage:`linear-gradient(90deg,rgba(24,19,78,.93),rgba(24,19,78,.38) 58%,rgba(24,19,78,.08)),url("${hero}")`}}><div className="tour-detail-film"/><div className="shell tour-hero-content"><Link className="tour-back-link" href="/tours">← All private journeys</Link><p className="eyebrow">{loading?"Loading published journey":tour?tourMood(tour):`Private ${journeyCountry} journey`}</p><h1>{publicTitle}</h1><p className="tour-hero-route-line">{routeLine||fallback.route}</p><div className="tour-hero-tags"><span>{durationDays} days · {durationNights} nights</span><span>{isSriLankaJourney?"Private chauffeur":"Private transfers"}</span><span>Flexible hotel style</span><span>Local support</span></div><a className="tour-hero-scroll" href="#journey"><small>See the journey</small><i>↓</i></a></div><div className="tour-hero-routeglass"><span>Route at a glance</span><b>{routeLine||`${journeyCountry}, your way`}</b><small>Full interactive itinerary below</small></div><div className="tour-hero-orbit" aria-hidden="true"><i/><i/><i/></div></section>
+  <section className="tour-glance"><div className="shell"><div><small>Duration</small><b>{durationDays} days · {durationNights} nights</b></div><div><small>Journey style</small><b>Private & adjustable</b></div><div><small>Route</small><b>{routeDestinations.slice(0,3).join(" · ")||journeyCountry}</b></div><div><small>Starting price</small>{tour?.price_from?<Money value={tour.price_from} currency={tour.currency} suffix="Per person · starting from"/>:<b>Tailor-made</b>}</div><Link href="#customize">Personalize this trip <span>↗</span></Link></div></section>
+  <nav className="anchor-nav tour-anchor-nav"><div className="shell"><a href="#journey">Overview</a><a href="#itinerary">Day by day</a>{publicRates.length?<a href="#rates">Rates</a>:null}<a href="#included">Included</a><a href="#hotels">Hotels</a><a href="#customize">Price & customize</a></div></nav>
+  <section className="shell tour-story-grid tour-story-redesign" id="journey"><div><p className="eyebrow">The journey</p><h2>{tour?.subtitle||publicTitle}</h2><p className="body-copy">{publicSummary}</p><div className="tour-highlight-grid tour-highlight-redesign">{highlightRows.map((highlight,index)=><div key={`${highlight}-${index}`}><span>{String(index+1).padStart(2,"0")}</span><b>{highlight}</b></div>)}</div><div className="tour-route-ribbon"><small>Your private route</small><p>{routeLine||`Designed around your preferred ${journeyCountry} experiences`}</p></div></div><aside className="customizer tour-customizer-next tour-customizer-redesign" id="customize"><p className="eyebrow">Your version of this journey</p><h3>Make it yours.</h3><p>Choose the travel style below. Our team verifies the final hotels, availability and exact selling price before confirmation.</p><label>Hotel style<select value={hotelLevel} onChange={e=>setHotelLevel(e.target.value)}><option>Boutique</option><option>Luxury</option><option>Essential</option></select></label><label>Travellers<select><option>2 adults</option><option>Family of 4</option><option>Private group</option></select></label><label>Preferred departure<input type="date" defaultValue="2026-09-15"/></label><div className="tour-customizer-price"><span>Starting price · per person</span>{tour?.price_from?<Money value={tour.price_from} currency={tour.currency} suffix="Per person · final price confirmed for your dates"/>:<b>Tailor-made</b>}</div><Link className="button button-gold" href={`/tours/booking?tour=${slug}`} onClick={book}>Check my dates</Link><a className="button tour-button-outline" href="https://wa.me/94774206166">Talk to a travel specialist</a><small>No payment now. Exact availability is checked before confirmation.</small></aside></section>
+  <div className="itinerary-world"><div className="shell"><InteractiveItineraryMap days={liveItinerary} destinations={routeDestinations} country={journeyCountry} journeyImage={isSriLankaJourney?null:hero}/></div></div>
+  {publicRates.length?<TourSellingRates cards={publicRates}/>:null}
+  <section className="shell tour-after-map" id="included"><div className="tour-inclusions"><div><p className="eyebrow">Included</p><h3>Handled as one journey.</h3><ul>{(tour?.inclusions?.length?tour.inclusions:["Private transport","Selected accommodation","Published experiences","Navigeto local support"]).map(x=><li key={x}>✓ {x}</li>)}</ul></div><div><p className="eyebrow">Before you confirm</p><h3>Clear from the start.</h3><ul>{(tour?.exclusions?.length?tour.exclusions:["International flights unless stated","Visa and insurance","Personal expenses"]).map(x=><li key={x}>— {x}</li>)}</ul></div></div></section><div id="hotels"><AvailableHotels title="Hotels currently available for this journey." destination={tour?.destinations?.[0]||""}/></div>
+ </>;
 }
 
 export function TransferResults(){

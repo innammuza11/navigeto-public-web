@@ -15,7 +15,7 @@ export type ItineraryDay = {
   overnight?: string;
 };
 
-type PlaceKind = "gateway" | "heritage" | "hills" | "wildlife" | "coast";
+type PlaceKind = "gateway" | "heritage" | "hills" | "wildlife" | "coast" | "journey";
 type KnownPlace = { name: string; x: number; y: number; kind: PlaceKind };
 type RouteStop = ItineraryDay & KnownPlace;
 type AtlasLayer = "all" | "route" | "wildlife" | "heritage" | "hills" | "coast";
@@ -126,7 +126,8 @@ function activityLabel(activity: string, index: number) {
   return `${words.slice(0, 7).join(" ")}${words.length > 7 ? "…" : ""}`;
 }
 
-function imageForStop(stop: RouteStop, index: number) {
+function imageForStop(stop: RouteStop, index: number, journeyImage?: string | null) {
+  if (journeyImage) return journeyImage;
   const text = normalize(`${stop.name} ${stop.title} ${stop.copy}`);
   if (/sigiriya|dambulla|anuradhapura|polonnaruwa|ancient/.test(text)) return "/media/tour-sigiriya-v1.webp";
   if (/yala|udawalawe|wildlife|safari|elephant/.test(text)) return "/media/wildlife-yala-v1.webp";
@@ -137,10 +138,10 @@ function imageForStop(stop: RouteStop, index: number) {
   return dayImages[index % dayImages.length];
 }
 
-function dayMoments(stop: RouteStop): Array<[string, string]> {
+function dayMoments(stop: RouteStop, isSriLankaJourney: boolean): Array<[string, string]> {
   const text = normalize(`${stop.name} ${stop.title} ${stop.copy}`);
   if (/airport|arrival|ayubowan|negombo/.test(text)) return [
-    ["Welcome", "Meet your Navigeto host and settle into the island rhythm."],
+    ["Welcome", isSriLankaJourney ? "Meet your Navigeto host and settle into the island rhythm." : "Meet your Navigeto host and settle into the journey."],
     ["Transfer", "Private arrival transfer with time to pause after the flight."],
     ["Evening", "A gentle first night, paced around your landing time."],
   ];
@@ -174,6 +175,27 @@ function dayMoments(stop: RouteStop): Array<[string, string]> {
     ["Experience", stop.copy],
     ["Evening", "Your exact timing, transfer and overnight stay are confirmed before travel."],
   ];
+}
+
+function fallbackPosition(index: number, total: number) {
+  const x = total > 1 ? 15 + (index / (total - 1)) * 70 : 50;
+  const yPattern = [25, 54, 37, 70, 45, 63];
+  return { x, y: yPattern[index % yPattern.length] };
+}
+
+function routeStopName(day: ItineraryDay, destination: string, index: number) {
+  const routeParts = (day.location || "")
+    .split(/\s*(?:→|->|·)\s*/)
+    .map((value) => value.replace(/\b(?:international\s+)?airport\b|\bhotel\b/gi, "").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .filter((value, partIndex, values) => values.findIndex((item) => item.toLowerCase() === value.toLowerCase()) === partIndex);
+  const candidate = (routeParts.length ? routeParts.slice(0, 2).join(" · ") : [day.overnight, destination, day.location, day.title]
+    .find((value) => typeof value === "string" && value.trim()))
+    ?.replace(/^day\s*\d+\s*[:.\-–—]?\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!candidate) return `Day ${index + 1}`;
+  return candidate.length > 42 ? `${candidate.slice(0, 39).trim()}…` : candidate;
 }
 
 function doodleForStop(stop: RouteStop): DoodleType {
@@ -228,15 +250,31 @@ function TravellerTukTuk() {
   </svg>;
 }
 
-export function InteractiveItineraryMap({ days, destinations = [] }: { days: ItineraryDay[]; destinations?: string[] }) {
+function TravellerPlane() {
+  return <svg className="itinerary-traveller-plane" viewBox="0 0 96 54" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path className="plane-speed-line" d="M2 29H24M9 37H29M16 21H33"/>
+    <path className="plane-body" d="M25 28L88 16C92 15 95 18 92 21L69 34L38 38L25 28Z"/>
+    <path className="plane-wing" d="M47 31L32 8H43L65 27M65 27L78 43H68L55 31"/>
+    <path className="plane-tail" d="M77 20L82 8H89L87 18"/>
+  </svg>;
+}
+
+export function InteractiveItineraryMap({ days, destinations = [], country = "Sri Lanka", journeyImage }: { days: ItineraryDay[]; destinations?: string[]; country?: string | null; journeyImage?: string | null }) {
   const [selected, setSelected] = useState(0);
   const [layer, setLayer] = useState<AtlasLayer>("all");
+  const journeyCountry = country?.trim() || "Sri Lanka";
+  const isSriLankaJourney = /^(sri\s*lanka|lk)$/i.test(journeyCountry);
 
   const stops = useMemo<RouteStop[]>(() => {
-    const mapped = days.flatMap((day, index) => {
+    const mapped = days.map((day, index) => {
       const destination = destinations[index] || destinations[Math.min(index, destinations.length - 1)] || "";
-      const place = (day.location ? findKnownPlace(day.location) : null) || findKnownPlace(`${day.title} ${day.copy}`) || findKnownPlace(destination);
-      return place ? [{ ...day, ...place }] : [];
+      const knownPlace = isSriLankaJourney
+        ? (day.location ? findKnownPlace(day.location) : null) || findKnownPlace(`${day.title} ${day.copy}`) || findKnownPlace(destination)
+        : null;
+      const fallback = fallbackPosition(index, days.length);
+      return knownPlace
+        ? { ...day, ...knownPlace }
+        : { ...day, name: routeStopName(day, destination, index), kind: "journey" as const, ...fallback };
     });
     const visits = new Map<string, number>();
     const placed: RouteStop[] = [];
@@ -260,16 +298,17 @@ export function InteractiveItineraryMap({ days, destinations = [] }: { days: Iti
       placed.push(positioned);
       return positioned;
     });
-  }, [days, destinations]);
+  }, [days, destinations, isSriLankaJourney]);
 
   const activeIndex = Math.min(selected, Math.max(0, stops.length - 1));
   const selectedStop = stops[activeIndex] || stops[0];
   const routePoints = stops.map((stop) => `${stop.x},${stop.y}`).join(" ");
   const routeProgress = stops.length > 1 ? Math.max(1, (activeIndex / (stops.length - 1)) * 100) : 100;
-  const activeImage = selectedStop ? imageForStop(selectedStop, activeIndex) : dayImages[0];
+  const internationalJourneyImage = isSriLankaJourney ? null : journeyImage;
+  const activeImage = selectedStop ? imageForStop(selectedStop, activeIndex, internationalJourneyImage) : dayImages[0];
   const moments: Array<[string, string]> = selectedStop?.activities?.length
     ? selectedStop.activities.map((copy, index): [string, string] => [activityLabel(copy, index), copy])
-    : selectedStop ? dayMoments(selectedStop) : [];
+    : selectedStop ? dayMoments(selectedStop, isSriLankaJourney) : [];
   const dayFacts = selectedStop ? [
     selectedStop.meals ? { label: "Meals included", value: selectedStop.meals, icon: "○" } : null,
     selectedStop.hotel ? { label: "Your stay", value: selectedStop.hotel, icon: "⌂" } : null,
@@ -282,10 +321,10 @@ export function InteractiveItineraryMap({ days, destinations = [] }: { days: Iti
   };
 
   return <section className="itinerary-experience" id="itinerary">
-    <div className="itinerary-doodle-cloud" aria-hidden="true"><SriLankaDoodle type="sigiriya"/><SriLankaDoodle type="stupa"/><SriLankaDoodle type="train"/><SriLankaDoodle type="elephant"/><SriLankaDoodle type="lighthouse"/></div>
+    {isSriLankaJourney ? <div className="itinerary-doodle-cloud" aria-hidden="true"><SriLankaDoodle type="sigiriya"/><SriLankaDoodle type="stupa"/><SriLankaDoodle type="train"/><SriLankaDoodle type="elephant"/><SriLankaDoodle type="lighthouse"/></div> : null}
     <div className="itinerary-intro">
       <div><p className="eyebrow">Your interactive day-by-day journey</p><h2>See the whole route. Then open every day.</h2></div>
-      <p>Select any stop to explore the exact Tour Library programme, hotel, meals and overnight plan. The travelling tuk-tuk moves with you across the island.</p>
+      <p>Select any stop to explore the exact Tour Library programme, hotel, meals and overnight plan. The journey marker moves with you from one stop to the next.</p>
     </div>
     {stops.length ? <>
       <div className="itinerary-chapter-selector">
@@ -296,7 +335,7 @@ export function InteractiveItineraryMap({ days, destinations = [] }: { days: Iti
         </div>
         <div className="itinerary-day-rail" style={{ gridTemplateColumns: `repeat(${stops.length}, minmax(150px, 1fr))` }} aria-label="Choose an itinerary day">
           {stops.map((stop, index) => <button type="button" className={index === activeIndex ? "is-active" : ""} key={`${stop.day}-rail-${stop.title}`} aria-pressed={index === activeIndex} onClick={() => setSelected(index)}>
-            <span className="itinerary-day-rail-image" style={{ backgroundImage: `linear-gradient(180deg,rgba(24,19,78,.02),rgba(24,19,78,.38)),url("${imageForStop(stop, index)}")` }}/>
+            <span className="itinerary-day-rail-image" style={{ backgroundImage: `linear-gradient(180deg,rgba(24,19,78,.02),rgba(24,19,78,.38)),url("${imageForStop(stop, index, internationalJourneyImage)}")` }}/>
             <span className="itinerary-day-rail-copy"><small>{stop.day} · {markerLabel(index)}</small><b>{stop.title}</b><em>{stop.name}</em></span>
             <i className="itinerary-day-rail-dot" aria-hidden="true"/>
           </button>)}
@@ -306,31 +345,33 @@ export function InteractiveItineraryMap({ days, destinations = [] }: { days: Iti
       <div className="itinerary-map-stage">
         <div className="itinerary-map-shell">
           <div className="itinerary-atlas-toolbar">
-            <div><span>Navigeto tour atlas</span><b>{selectedStop.name}</b></div>
-            <div className="itinerary-layer-controls" aria-label="Map story layers">
+            <div><span>{isSriLankaJourney ? "Navigeto tour atlas" : "Navigeto journey atlas"}</span><b>{selectedStop.name}</b></div>
+            {isSriLankaJourney ? <div className="itinerary-layer-controls" aria-label="Map story layers">
               {(["all", "route", "wildlife", "heritage", "hills", "coast"] as AtlasLayer[]).map((item) => <button type="button" key={item} className={layer === item ? "is-active" : ""} aria-pressed={layer === item} onClick={() => setLayer(item)}>{item === "all" ? "All stories" : item}</button>)}
-            </div>
+            </div> : null}
           </div>
-          <div className={`itinerary-atlas-frame atlas-layer-${layer}`} role="group" aria-label="Coded interactive vector map of this Sri Lanka itinerary">
+          <div className={`itinerary-atlas-frame atlas-layer-${layer}${isSriLankaJourney ? "" : " is-global-journey"}`} role="group" aria-label={isSriLankaJourney ? "Coded interactive vector map of this Sri Lanka itinerary" : `Illustrated interactive route for this ${journeyCountry} itinerary`}>
             <svg className="itinerary-atlas-vector-map" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-labelledby="atlas-title atlas-description">
-              <title id="atlas-title">Navigeto coded Sri Lanka tour atlas</title>
-              <desc id="atlas-description">A vector map showing the island outline, central highlands, national parks, rivers, roads, cities and this itinerary route.</desc>
+              <title id="atlas-title">{isSriLankaJourney ? "Navigeto coded Sri Lanka tour atlas" : `Navigeto ${journeyCountry} journey atlas`}</title>
+              <desc id="atlas-description">{isSriLankaJourney ? "A vector map showing the island outline, central highlands, national parks, rivers, roads, cities and this itinerary route." : "An illustrated journey atlas showing every published itinerary day in sequence. It is a route overview, not a geographic navigation map."}</desc>
               <defs>
                 <linearGradient id="atlas-ocean" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#0b4f91"/><stop offset=".48" stopColor="#1078b8"/><stop offset="1" stopColor="#28a8e0"/></linearGradient>
                 <linearGradient id="atlas-island" x1=".1" y1="0" x2=".9" y2="1"><stop offset="0" stopColor="#f9fcff"/><stop offset=".55" stopColor="#eef7f4"/><stop offset="1" stopColor="#dfeee8"/></linearGradient>
                 <radialGradient id="atlas-highlands"><stop offset="0" stopColor="#2b7b58" stopOpacity=".82"/><stop offset=".45" stopColor="#6fac68" stopOpacity=".64"/><stop offset="1" stopColor="#b9d8a3" stopOpacity="0"/></radialGradient>
                 <linearGradient id="atlas-park" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#38b848"/><stop offset="1" stopColor="#7fd34f"/></linearGradient>
+                <linearGradient id="atlas-global" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#102f6d"/><stop offset=".52" stopColor="#1078b8"/><stop offset="1" stopColor="#28a8e0"/></linearGradient>
                 <pattern id="atlas-grid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M8 0H0V8" fill="none" stroke="#fff" strokeOpacity=".08" strokeWidth=".12" vectorEffect="non-scaling-stroke"/></pattern>
                 <pattern id="atlas-topography" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 3 Q1.5 1.4 3 3 T6 3" fill="none" stroke="#282068" strokeOpacity=".08" strokeWidth=".18" vectorEffect="non-scaling-stroke"/></pattern>
                 <clipPath id="atlas-island-clip"><path d={SRI_LANKA_VECTOR_PATH}/></clipPath>
                 <filter id="atlas-island-shadow" x="-30%" y="-20%" width="160%" height="160%"><feDropShadow dx="0" dy="7" stdDeviation="3" floodColor="#171248" floodOpacity=".42"/></filter>
                 <filter id="atlas-route-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation=".8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
               </defs>
-              <rect width="100" height="100" fill="url(#atlas-ocean)"/>
+              <rect width="100" height="100" fill={isSriLankaJourney ? "url(#atlas-ocean)" : "url(#atlas-global)"}/>
               <rect width="100" height="100" fill="url(#atlas-grid)"/>
               <g className="atlas-ocean-lines" aria-hidden="true"><path d="M3 22 C12 18 16 27 25 22 S40 18 47 23"/><path d="M66 12 C74 8 82 15 96 10"/><path d="M4 84 C14 78 22 86 30 82"/><path d="M72 92 C80 86 89 92 97 88"/></g>
-              <path className="atlas-island-shadow" d={SRI_LANKA_VECTOR_PATH} filter="url(#atlas-island-shadow)"/>
-              <g clipPath="url(#atlas-island-clip)">
+              {isSriLankaJourney ? <>
+                <path className="atlas-island-shadow" d={SRI_LANKA_VECTOR_PATH} filter="url(#atlas-island-shadow)"/>
+                <g clipPath="url(#atlas-island-clip)">
                 <rect x="14" y="1" width="72" height="97" fill="url(#atlas-island)"/>
                 <rect className="atlas-terrain-texture" x="14" y="1" width="72" height="97" fill="url(#atlas-topography)"/>
                 <g className="atlas-highland-layer">
@@ -352,36 +393,41 @@ export function InteractiveItineraryMap({ days, destinations = [] }: { days: Iti
                 <g className="atlas-road-layer">
                   {atlasRoads.map((path, index) => <path className={index < 3 ? "is-highway" : ""} d={path} key={path} vectorEffect="non-scaling-stroke"/>)}
                 </g>
-              </g>
-              <path className="atlas-island-outline" d={SRI_LANKA_VECTOR_PATH} vectorEffect="non-scaling-stroke"/>
-              <g className="atlas-city-layer">
-                {atlasCities.map((city) => <g className={city.capital ? "atlas-city is-capital" : "atlas-city"} key={city.name} transform={`translate(${city.x} ${city.y})`}><circle r={city.capital ? 1.1 : .72}/><text x={city.anchor === "end" ? -1.6 : 1.6} y=".65" textAnchor={city.anchor}>{city.name}</text></g>)}
-              </g>
+                </g>
+                <path className="atlas-island-outline" d={SRI_LANKA_VECTOR_PATH} vectorEffect="non-scaling-stroke"/>
+                <g className="atlas-city-layer">
+                  {atlasCities.map((city) => <g className={city.capital ? "atlas-city is-capital" : "atlas-city"} key={city.name} transform={`translate(${city.x} ${city.y})`}><circle r={city.capital ? 1.1 : .72}/><text x={city.anchor === "end" ? -1.6 : 1.6} y=".65" textAnchor={city.anchor}>{city.name}</text></g>)}
+                </g>
+              </> : <g className="atlas-global-layer" aria-hidden="true">
+                <ellipse cx="18" cy="24" rx="28" ry="17"/><ellipse cx="80" cy="72" rx="34" ry="22"/><ellipse cx="71" cy="19" rx="18" ry="10"/>
+                <path d="M-5 66 C18 42 28 82 52 57 S80 35 106 50"/><path d="M-8 36 C17 58 35 16 60 38 S86 78 108 60"/>
+                <circle cx="14" cy="82" r="7"/><circle cx="90" cy="31" r="5"/>
+              </g>}
               <g className="itinerary-atlas-route-lines" filter="url(#atlas-route-glow)" aria-hidden="true">
                 <polyline className="itinerary-route-shadow" vectorEffect="non-scaling-stroke" points={routePoints}/>
                 <polyline className="itinerary-route-base" vectorEffect="non-scaling-stroke" points={routePoints}/>
                 <polyline className="itinerary-route-progress" vectorEffect="non-scaling-stroke" pathLength="100" strokeDasharray={`${routeProgress} 100`} points={routePoints}/>
               </g>
             </svg>
-            <div className="itinerary-landmark-layer" aria-hidden="true">
+            {isSriLankaJourney ? <div className="itinerary-landmark-layer" aria-hidden="true">
               {atlasLandmarks.filter((landmark) => layer === "all" || layer === landmark.kind).map((landmark, index) => <span className={`itinerary-landmark itinerary-landmark-${landmark.kind}`} style={{ left: `${landmark.x}%`, top: `${landmark.y}%`, animationDelay: `${index * .3}s` }} key={landmark.label}><i>{landmark.icon}</i><b>{landmark.label}</b></span>)}
-            </div>
+            </div> : null}
             {stops.map((stop, index) => <button type="button" className={`itinerary-atlas-marker${index === activeIndex ? " is-active" : ""}${index < activeIndex ? " is-past" : ""}`} style={{ left: `${stop.x}%`, top: `${stop.y}%` }} key={`${stop.day}-${stop.title}`} aria-label={`Open ${stop.day}: ${stop.title} in ${stop.name}`} aria-pressed={index === activeIndex} onClick={() => setSelected(index)}><span>{markerLabel(index)}</span><b>{stop.name}</b></button>)}
-            <span className="itinerary-atlas-traveller-vehicle" style={{ left: `${selectedStop.x}%`, top: `${selectedStop.y}%` }} aria-hidden="true"><TravellerTukTuk/></span>
-            <div className="itinerary-atlas-compass" aria-hidden="true"><b>N</b><i/><span>8° N</span></div>
+            <span className="itinerary-atlas-traveller-vehicle" style={{ left: `${selectedStop.x}%`, top: `${selectedStop.y}%` }} aria-hidden="true">{isSriLankaJourney ? <TravellerTukTuk/> : <TravellerPlane/>}</span>
+            <div className="itinerary-atlas-compass" aria-hidden="true"><b>{isSriLankaJourney ? "N" : "GO"}</b><i/><span>{isSriLankaJourney ? "8° N" : markerLabel(activeIndex)}</span></div>
           </div>
-          <div className="itinerary-atlas-legend"><span><i className="legend-vector"/>Coded vector terrain</span><span><i className="legend-route"/>Your journey</span><span><i className="legend-park"/>National parks</span><span><i className="legend-water"/>Water</span><span><i className="legend-place"/>Day stop</span></div>
+          <div className="itinerary-atlas-legend">{isSriLankaJourney ? <><span><i className="legend-vector"/>Coded vector terrain</span><span><i className="legend-route"/>Your journey</span><span><i className="legend-park"/>National parks</span><span><i className="legend-water"/>Water</span><span><i className="legend-place"/>Day stop</span></> : <><span><i className="legend-vector"/>Journey overview</span><span><i className="legend-route"/>Day sequence</span><span><i className="legend-place"/>Published stop</span></>}</div>
         </div>
 
         <article className="itinerary-day-chapter" key={`${selectedStop.day}-${activeIndex}`} aria-live="polite">
           <div className="itinerary-chapter-visual" style={{ backgroundImage: `linear-gradient(180deg,rgba(24,19,78,.03),rgba(24,19,78,.88)),url("${activeImage}")` }}>
             <span className="itinerary-chapter-kicker">A day designed around you</span>
-            <div className="itinerary-chapter-coordinate"><small>{selectedStop.kind}</small><b>{selectedStop.name}</b></div>
+            <div className="itinerary-chapter-coordinate"><small>{selectedStop.kind === "journey" ? journeyCountry : selectedStop.kind}</small><b>{selectedStop.name}</b></div>
             <div className="itinerary-chapter-count"><small>Chapter</small><b>{markerLabel(activeIndex)}</b><span>/ {markerLabel(stops.length - 1)}</span></div>
             <i className="itinerary-chapter-orbit" aria-hidden="true"/>
           </div>
           <div className="itinerary-chapter-copy">
-            <SriLankaDoodle type={doodleForStop(selectedStop)} className="itinerary-chapter-doodle"/>
+            {isSriLankaJourney ? <SriLankaDoodle type={doodleForStop(selectedStop)} className="itinerary-chapter-doodle"/> : null}
             <div className="itinerary-chapter-overline"><p className="eyebrow">{selectedStop.day} · {selectedStop.name}</p><span>Private journey</span></div>
             <h3>{selectedStop.title}</h3>
             <p>{selectedStop.copy}</p>
@@ -401,7 +447,7 @@ export function InteractiveItineraryMap({ days, destinations = [] }: { days: Iti
         </article>
       </div>
     </> : <div className="itinerary-no-map">
-      <p className="eyebrow">Route being tailored</p><h3>Your specialist will plot every confirmed stop here.</h3><p>We only place destinations we can match confidently; no invented route points.</p>
+      <p className="eyebrow">Programme unavailable</p><h3>Your specialist will add each confirmed day here.</h3><p>No itinerary day is invented when a published programme is not available.</p>
     </div>}
     <p className="itinerary-map-note">Illustrated route overview based on published itinerary stops. Exact roads, timings, activities and overnight stays are verified when your tailored journey is prepared.</p>
   </section>;

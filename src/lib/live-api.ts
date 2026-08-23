@@ -136,6 +136,25 @@ export type PublicHotel = {
   rooms: PublicHotelRoom[];
 };
 
+export type PublicTourRateCard = {
+  market?: string | null;
+  star_category?: string | null;
+  band_label?: string | null;
+  min_pax?: number | null;
+  max_pax?: number | null;
+  currency: string;
+  season_label?: string | null;
+  validity_start?: string | null;
+  validity_end?: string | null;
+  double_sharing?: number | null;
+  triple_sharing?: number | null;
+  single_sharing?: number | null;
+  single_supplement?: number | null;
+  child_sharing_bed?: number | null;
+  child_no_bed?: number | null;
+  child_extra_bed?: number | null;
+};
+
 export type PublicTour = {
   id: string;
   slug: string;
@@ -156,6 +175,7 @@ export type PublicTour = {
   currency: string;
   featured?: boolean;
   country?: string | null;
+  rate_cards?: PublicTourRateCard[];
 };
 
 export type VisaProduct = {
