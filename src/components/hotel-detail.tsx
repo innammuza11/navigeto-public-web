@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { hotelParty } from "@/lib/hotel-checkout";
 import { useEffect, useState } from "react";
 import { Money } from "@/components/money";
 import {
@@ -44,6 +45,8 @@ export function HotelDetail({ slug }: { slug: string }) {
     checkout: "2026-08-19",
     rooms: 1,
     adults: 2,
+    children: 0,
+    occupancy: "double",
   });
 
   useEffect(() => {
@@ -52,8 +55,7 @@ export function HotelDetail({ slug }: { slug: string }) {
     const nextQuery = {
       checkin: params.get("checkin") || "2026-08-15",
       checkout: params.get("checkout") || "2026-08-19",
-      rooms: Number(params.get("rooms") || 1),
-      adults: Number(params.get("adults") || 2),
+      ...hotelParty(params),
     };
     liveApi.hotel(slug).then(async ({ result }) => {
       if (!active) return;
@@ -66,8 +68,8 @@ export function HotelDetail({ slug }: { slug: string }) {
         checkout: nextQuery.checkout,
         rooms: nextQuery.rooms,
         adults: nextQuery.adults,
-        children: Number(params.get("children") || 0),
-        occupancy: params.get("occupancy") || "double",
+        children: nextQuery.children,
+        occupancy: nextQuery.occupancy,
         meal_plan: params.get("meal_plan") === "any" ? undefined : params.get("meal_plan") || undefined,
         market: params.get("market") || "All Markets",
         max_results: 100,
@@ -105,16 +107,14 @@ export function HotelDetail({ slug }: { slug: string }) {
   const selectedRoom = hotel.rooms[selected] || hotel.rooms[0] || null;
   const selectedRate = selectedRoom ? roomRate(selectedRoom, rates) : rates[0] || null;
   const lowestRate = [...rates].sort((a, b) => a.total_amount - b.total_amount)[0] || null;
-  const searchHref = `/hotels/search?q=${encodeURIComponent(hotel.hotel_name)}&checkin=${query.checkin}&checkout=${query.checkout}&rooms=${query.rooms}&adults=${query.adults}`;
+  const searchHref = `/hotels/search?q=${encodeURIComponent(hotel.hotel_name)}&checkin=${query.checkin}&checkout=${query.checkout}&rooms=${query.rooms}&adults=${query.adults}&children=${query.children}&occupancy=${encodeURIComponent(query.occupancy)}`;
   const location = [hotel.address, hotel.city, hotel.destination, hotel.country].filter(Boolean).join(", ");
 
   const saveRoom = () => {
     if (selectedRate) {
       saveSelection("hotel", {
         ...selectedRate,
-        checkin: query.checkin,
-        checkout: query.checkout,
-        rooms: query.rooms,
+        ...query,
       });
     }
   };
