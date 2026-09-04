@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { HotelManualQuote } from "@/components/hotel-manual-quote";
+import { hotelPartyStatus } from "@/lib/hotel-party-policy";
 import { hotelParty } from "@/lib/hotel-checkout";
 import { useEffect, useState } from "react";
 import { Money } from "@/components/money";
@@ -47,6 +49,8 @@ export function HotelDetail({ slug }: { slug: string }) {
     adults: 2,
     children: 0,
     occupancy: "double",
+    meal_plan: "any",
+    market: "All Markets",
   });
 
   useEffect(() => {
@@ -56,6 +60,8 @@ export function HotelDetail({ slug }: { slug: string }) {
       checkin: params.get("checkin") || "2026-08-15",
       checkout: params.get("checkout") || "2026-08-19",
       ...hotelParty(params),
+      meal_plan: params.get("meal_plan") || "any",
+      market: params.get("market") || "All Markets",
     };
     liveApi.hotel(slug).then(async ({ result }) => {
       if (!active) return;
@@ -93,6 +99,8 @@ export function HotelDetail({ slug }: { slug: string }) {
   if (error || !hotel) {
     return <section className="shell results-section"><div className="empty-state"><h1>Hotel page not found.</h1><p>{error || "This profile is not published yet."}</p><Link className="button button-primary" href="/hotels/search">Search published hotels</Link></div></section>;
   }
+
+  if (hotelPartyStatus(query).kind !== "automatic") return <HotelManualQuote selection={{ ...query, hotel_name: hotel.hotel_name }}/>;
 
   const gallery = hotel.gallery.length
     ? hotel.gallery.slice(0, 3)
