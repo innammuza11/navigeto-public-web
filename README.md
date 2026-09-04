@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Navigeto public website
 
-## Getting Started
+Customer-facing website for [navigeto.com](https://navigeto.com), deployed as Netlify project `navigeto-b2c`.
 
-First, run the development server:
+## Architecture
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 16 App Router UI under `src/app`
+- Next.js local development and production build
+- Netlify hosting
+- Public TravelOS services supplied by Supabase Edge Functions
+- Visa requests proxied to `admin.navigeto.com`
+
+The public and admin apps share business services. API-contract changes must be verified in both repositories.
+
+## Configuration
+
+Set these variables locally and in the appropriate Netlify context. Never commit their values.
+
+```text
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+TRAVELOS_ADMIN_ORIGIN
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Node.js 22 or later is required.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm ci
+npm run dev
+```
 
-## Learn More
+## Verification
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm audit
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The unused Vinext/Cloudflare template toolchain was removed during the September
+2026 audit. Its Vite configuration depended on untracked files that are absent
+from a clean checkout; neither the npm scripts nor Netlify used it. The original
+configuration and Worker entry point remain recoverable in Git history.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Release safety
 
-## Deploy on Vercel
+1. Merge only after the quality workflow passes.
+2. Inspect a Netlify preview for `navigeto-b2c`.
+3. Exercise hotel, tour, transfer, flight, and Visa journeys.
+4. Publish to `navigeto.com` only after explicit production approval.
+5. Retain the previous production deployment for rollback.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Never deploy this repository to `navigeto-next`; that project serves `admin.navigeto.com`.
