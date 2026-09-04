@@ -6,6 +6,8 @@ export type HotelStaySelection = {
   adults?: number;
   children?: number;
   occupancy?: string;
+  meal_plan?: string;
+  market?: string;
 };
 
 /** Capture the same party parameters used to request the selling rate. */
