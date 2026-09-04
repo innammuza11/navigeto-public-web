@@ -23,8 +23,12 @@ type VisaProduct = {
   lastVerifiedAt?: string | null;
   requiredDocuments: string[];
   conditionalDocuments: { name: string; when: string }[];
-  documentStatus: "officially_verified" | "profile_review_required";
+  documentStatus:
+    | "officially_verified"
+    | "review_due"
+    | "profile_review_required";
   documentSourceUrl?: string | null;
+  documentSourceUrls?: string[];
   financialEvidenceGuidance: string;
 };
 type VisaCountry = {
@@ -99,6 +103,18 @@ async function jsonRequest<T>(url: string, init?: RequestInit): Promise<T> {
       result.error || "The Visa service is temporarily unavailable.",
     );
   return (result.data ?? result) as T;
+}
+
+function formatVerifiedDate(value?: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
 }
 
 export function VisaStorefront() {
@@ -309,7 +325,7 @@ export function VisaStorefront() {
 }
 
 function ChecklistView({ product }: { product: VisaProduct }) {
-  if (product.documentStatus !== "officially_verified")
+  if (product.documentStatus === "profile_review_required")
     return (
       <p>
         The Visa desk will verify the current VFS, embassy or immigration
@@ -319,6 +335,13 @@ function ChecklistView({ product }: { product: VisaProduct }) {
     );
   return (
     <>
+      {product.documentStatus === "review_due" && (
+        <p>
+          <strong>Review due:</strong> this is the last source-verified checklist.
+          Navigeto will recheck it before submission because official requirements
+          can change.
+        </p>
+      )}
       <h4>Required for every applicant</h4>
       <ul>
         {product.requiredDocuments.map((document) => (
@@ -408,22 +431,32 @@ function VisaCountryRates({
                   <b>
                     {product.documentStatus === "officially_verified"
                       ? "Official document checklist"
-                      : "Applicant-specific checklist review"}
+                      : product.documentStatus === "review_due"
+                        ? "Official checklist · review due"
+                        : "Applicant-specific checklist review"}
                   </b>
                   <ChecklistView product={product} />
+                  {formatVerifiedDate(product.lastVerifiedAt) && (
+                    <small>
+                      Official information checked {formatVerifiedDate(product.lastVerifiedAt)}
+                    </small>
+                  )}
                   <p>
                     <strong>Financial evidence:</strong>{" "}
                     {product.financialEvidenceGuidance}
                   </p>
-                  {product.documentSourceUrl && (
-                    <a
-                      href={product.documentSourceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      View official requirement source ↗
+                  {(product.documentSourceUrls?.length
+                    ? product.documentSourceUrls
+                    : product.documentSourceUrl
+                      ? [product.documentSourceUrl]
+                      : []
+                  ).map((source, index) => (
+                    <a key={source} href={source} target="_blank" rel="noreferrer">
+                      {index === 0
+                        ? "View official requirement source ↗"
+                        : `Official application/source ${index + 1} ↗`}
                     </a>
-                  )}
+                  ))}
                 </div>
               </div>
               <div className="visa-rate-action">
@@ -570,7 +603,9 @@ function VisaApplicationModal({
               <b>
                 {product.documentStatus === "officially_verified"
                   ? "Document checklist"
-                  : "Document review required"}
+                  : product.documentStatus === "review_due"
+                    ? "Document checklist · review due"
+                    : "Document review required"}
               </b>
               <ChecklistView product={product} />
               <p>
