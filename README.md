@@ -5,7 +5,7 @@ Customer-facing website for [navigeto.com](https://navigeto.com), deployed as Ne
 ## Architecture
 
 - Next.js 16 App Router UI under `src/app`
-- Next.js local development and production build; legacy Vinext/Vite configuration remains in the repository
+- Next.js local development and production build
 - Netlify hosting
 - Public TravelOS services supplied by Supabase Edge Functions
 - Visa requests proxied to `admin.navigeto.com`
@@ -38,7 +38,13 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
+npm audit
 ```
+
+The unused Vinext/Cloudflare template toolchain was removed during the September
+2026 audit. Its Vite configuration depended on untracked files that are absent
+from a clean checkout; neither the npm scripts nor Netlify used it. The original
+configuration and Worker entry point remain recoverable in Git history.
 
 ## Release safety
 
