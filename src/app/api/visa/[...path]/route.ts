@@ -1,19 +1,9 @@
-const ADMIN_ORIGIN = process.env.TRAVELOS_ADMIN_ORIGIN || "https://admin.navigeto.com";
-const ALLOWED = [
-  /^catalog$/,
-  /^countries$/,
-  /^check$/,
-  /^intake$/,
-  /^intake\/[^/]+\/documents$/,
-  /^intake\/[^/]+\/submit$/,
-  /^portal\/[^/]+$/,
-  /^intake\/[^/]+\/documents\/[^/]+$/,
-];
+import { buildAdminVisaUrl, isAllowedVisaPath } from "../route-helpers";
 
 async function forward(request: Request, context: { params: Promise<{ path: string[] }> }) {
   const { path } = await context.params;
   const joined = path.join("/");
-  if (!ALLOWED.some((pattern) => pattern.test(joined))) {
+  if (!isAllowedVisaPath(joined)) {
     return Response.json({ ok: false, error: "Unknown Visa service." }, { status: 404 });
   }
   const headers = new Headers();
@@ -23,7 +13,7 @@ async function forward(request: Request, context: { params: Promise<{ path: stri
   if (intakeToken) headers.set("x-visa-intake-token", intakeToken);
   headers.set("accept", "application/json");
   const body = request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer();
-  const response = await fetch(`${ADMIN_ORIGIN}/api/visa/${joined}`, {
+  const response = await fetch(buildAdminVisaUrl(request.url, joined), {
     method: request.method,
     headers,
     body,
