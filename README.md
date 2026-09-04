@@ -5,7 +5,7 @@ Customer-facing website for [navigeto.com](https://navigeto.com), deployed as Ne
 ## Architecture
 
 - Next.js 16 App Router UI under `src/app`
-- Vinext/Vite local runtime
+- Next.js local development and production build; legacy Vinext/Vite configuration remains in the repository
 - Netlify hosting
 - Public TravelOS services supplied by Supabase Edge Functions
 - Visa requests proxied to `admin.navigeto.com`
