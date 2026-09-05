@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { liveApi } from "@/lib/live-api";
+import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
 import { hotelPartyStatus } from "@/lib/hotel-party-policy";
 import type { HotelStaySelection } from "@/lib/hotel-checkout";
 
@@ -22,7 +23,7 @@ export function HotelManualQuote({ selection }: { selection: HotelStaySelection 
       if (status.kind === "invalid") throw new Error(status.reason);
       const checkin = String(data.get("checkin")); const checkout = String(data.get("checkout"));
       const validDate = (date: string) => /^\d{4}-\d{2}-\d{2}$/.test(date) && Number.isFinite(Date.parse(date)) && new Date(date).toISOString().slice(0,10) === date;
-      if (!validDate(checkin) || !validDate(checkout) || checkin < new Date().toISOString().slice(0,10) || checkout <= checkin) throw new Error("Please choose valid upcoming stay dates.");
+      if (!validDate(checkin) || !validDate(checkout) || checkout <= checkin) throw new Error("Please choose valid stay dates.");
       const agesText = String(data.get("child_ages") || "").trim();
       const childAges = agesText ? agesText.split(",").map(age => /^\d+$/.test(age.trim()) ? Number(age.trim()) : NaN) : [];
       const bedNeeds = String(data.get("bed_needs") || "").trim();
@@ -32,15 +33,16 @@ export function HotelManualQuote({ selection }: { selection: HotelStaySelection 
       if (!name || !whatsapp) throw new Error("Please enter your name and WhatsApp number.");
       const result = await liveApi.enquiry({ enquiry_type: "hotel", customer_name: name, whatsapp, email: String(data.get("email") || ""), consent_contact: true,
         subject: `Manual hotel quote: ${String(data.get("hotel"))}`, travel_start_date: checkin, travel_end_date: checkout, pax: party.adults + party.children,
-        notes: String(data.get("notes") || ""), details: { quotation_type: "hotel-manual-quote", pricing_status: "unquoted", hotel: String(data.get("hotel")), rate_id: selection.rate_id || null, checkin, checkout, ...party, meal_plan: selection.meal_plan || null, market: selection.market || null, child_ages: childAges, child_bed_needs: bedNeeds } });
+        notes: String(data.get("notes") || ""), details: { quotation_type: "hotel-manual-quote", pricing_status: "unquoted", hotel: String(data.get("hotel")), rate_id: selection.rate_id || null, checkin, checkout, ...party, meal_plan: selection.meal_plan || null, market: selection.market || null, child_ages: childAges, child_bed_needs: bedNeeds } }, () => { if (checkin < new Date().toISOString().slice(0,10)) throw new Error("Please choose upcoming stay dates."); });
       setReference(result.enquiry.public_ref);
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Your quote request could not be sent."); }
     finally { locked.current = false; setBusy(false); }
   }
-  if (reference) return <section className="shell confirmation"><h1>Quote request received</h1><p>Reference {reference}. Our team will verify room capacity, child policies and the full price before confirmation.</p></section>;
+  if (reference) return <section className="shell confirmation"><h1>Quote request received</h1><p>Reference {reference}. Our team will verify room capacity, child policies and the full price before confirmation.</p><EnquiryRecoveryActions onReset={()=>{setReference("");setError("");}}/></section>;
   return <section className="shell results-section"><h1>Manual quote required</h1><p>No automatic total is shown. Our team must verify your party’s room arrangements and any child charges. Room capacity is not confirmed by selecting a room basis.</p>
     <form onSubmit={submit} className="traveller-form">
       {error && <p role="alert">{error}</p>}
+      {error && <EnquiryRecoveryActions disabled={busy} onReset={()=>setError("")}/>}
       <div className="form-grid">
         <label>Hotel or destination<input name="hotel" required defaultValue={selection.hotel_name || selection.q || ""}/></label>
         <label>Check-in<input name="checkin" type="date" required defaultValue={selection.checkin}/></label>

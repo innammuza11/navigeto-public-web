@@ -1,4 +1,6 @@
 import { trackTravelosConversion } from "@/lib/marketing";
+import { EnquiryRequestSession } from "@/lib/enquiry-request-session";
+const enquirySession = new EnquiryRequestSession(() => sessionStorage);
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://drtunalervcihvyxtxbi.supabase.co";
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_uuG7Eh-Kyijjd5cYsm_jIA_2QdwCo7u";
@@ -313,11 +315,14 @@ export const liveApi = {
   vehicles: () => invoke<{ results: Vehicle[] }>("public-travel-api", {}, "vehicle-list"),
   transferQuote: (payload: Record<string, unknown>) =>
     invoke<TransferQuote>("public-travel-api", payload, "transfer-quote"),
-  enquiry: async (payload: Record<string, unknown>) => {
-    const result = await invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", payload, "enquiry");
-    trackTravelosConversion({ sourceRef: result.enquiry.public_ref });
-    return result;
-  },
+  startSeparateEnquiry: () => enquirySession.startSeparateRequest(),
+  enquiry: (payload: Record<string, unknown>, validateNew: () => void = () => {}) =>
+    enquirySession.submit(payload, async data => {
+      const ready = await invoke<{ enquiry_receipts?: number }>("public-travel-api", {}, "enquiry-capabilities");
+      if (ready.enquiry_receipts !== 1) throw new Error("Safe enquiry submission is temporarily unavailable. Please retry with the same details later.");
+      return invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", data, "enquiry");
+    }, validateNew,
+      result => trackTravelosConversion({ sourceRef: result.enquiry.public_ref })),
   assistant: (payload: {
     message: string;
     history?: Array<{ role: "user" | "assistant"; content: string }>;
