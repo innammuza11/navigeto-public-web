@@ -8,6 +8,7 @@ import { HomeMarketplace } from "./home-marketplace";
 import { ModuleSearch, type SearchType } from "./module-search";
 import { ReviewShowcase } from "./review-showcase";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
+import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
 type Data={
  eyebrow:string; title:string; copy:string; action:string;
  stats:readonly (readonly [string,string])[];
@@ -51,8 +52,8 @@ function ConnectedEnquiryForm({ kind }: { kind: string }) {
       setError(cause instanceof Error ? cause.message : "Your enquiry could not be sent.");
     } finally { setPending(false); }
   }
-  if (reference) return <div className="reference-box"><span>TravelOS reference</span><strong>{reference}</strong><p>Your request is now visible to the Navigeto team.</p></div>;
-  return <form onSubmit={submit}><input name="name" aria-label="Name" placeholder="Your name" required/><input name="contact" aria-label="WhatsApp number" placeholder="WhatsApp number with country code" required/><textarea name="details" aria-label="Trip details" placeholder="Dates, destination and what matters to you" rows={4}/>{error && <p role="alert">{error}</p>}<button className="button button-gold" type="submit" disabled={pending}>{pending ? "Sending to TravelOS…" : "Send enquiry"}</button></form>;
+  if (reference) return <div className="reference-box"><span>TravelOS reference</span><strong>{reference}</strong><p>Your request is saved for the Navigeto team.</p><EnquiryRecoveryActions onReset={()=>{setReference("");setError("");}}/></div>;
+  return <form onSubmit={submit}><input name="name" aria-label="Name" placeholder="Your name" required/><input name="contact" aria-label="WhatsApp number" placeholder="WhatsApp number with country code" required/><textarea name="details" aria-label="Trip details" placeholder="Dates, destination and what matters to you" rows={4}/>{error && <><p role="alert">{error}</p><EnquiryRecoveryActions disabled={pending} onReset={()=>setError("")}/></>}<button className="button button-gold" type="submit" disabled={pending}>{pending ? "Sending to TravelOS…" : "Send enquiry"}</button></form>;
 }
 
 export function LegalPage({kind}:{kind:"privacy"|"terms"}) {

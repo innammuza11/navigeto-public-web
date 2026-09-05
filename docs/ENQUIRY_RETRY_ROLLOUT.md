@@ -1,0 +1,13 @@
+# Enquiry retry handling — deployment gate
+
+Paired backend: innammuza11/navigeto-travelos PR337. This client must not be published before the reviewed receipt/lease SQL is approved and applied, and public-travel-api plus both helper files are deployed. No database migration or production change is performed by this client PR.
+
+Every liveApi.enquiry caller now shares one per-tab intent: manual hotel quotes, general/landing-page forms, visa review, and non-hotel BookingFlow requests. Automatic hotel bookings retain their existing independent receipt session. Session storage contains only token, digest and minimal receipt, not contact/form data. Reload recovery requires re-entering the original details. A changed payload is blocked until the visitor explicitly confirms a separate enquiry; that does not cancel the earlier request.
+
+The API is checked through enquiry-capabilities before a keyed send, so an older backend cannot silently ignore request_id and insert through its keyless path. Backend failures never trigger an automatic fresh identity. Corrupt, unavailable or unwritable browser storage blocks sending. Success caching and optional marketing failures do not turn a saved request into a failed form. Conversion attempt is durably marked before tracking to avoid repeats (a crash can undercount analytics, never duplicate the enquiry).
+
+Validation: 31 local tests including 10 new session cases; TypeScript, lint (only three pre-existing navigation warnings), production build. Local mock browser test: first submission simulated a committed enquiry followed by a lost response; editing details was blocked; reloading/re-entering original details recovered LOCAL-FIXTURE-0. Mock statistics: two network attempts, one saved enquiry. No real enquiries, bookings, payments or production changes.
+
+Release sequence: approve/preflight/apply backend SQL, deploy/verify backend capabilities and safe unauthenticated controls, then approve/publish this public client via its normal preview-first process. Never publish the local mock build (it intentionally points to localhost). The PR/build workflow must rebuild with normal production configuration. No retry schedule or batch activation is included. Without a separately approved invoker, failed CRM delivery remains durably pending until a due same-request retry or later authorized batch.
+
+Rollback must preserve keyed backend receipt support and all receipt/outbox data. Do not restore keyless-only submission behind an active keyed client or delete recovery identities/customer requests. Previously loaded keyless clients remain unprotected during transition; this does not deduplicate pre-existing records.
