@@ -8,6 +8,12 @@ Required: dedicated server-only VISA_PROXY_IDENTITY_SECRET (32 random bytes as
 or configured by this code change. No NEXT_PUBLIC prefix or fallback shared secret.
 Missing key or platform identity returns 503 intentionally, including local dev.
 
+Runtime detection uses Netlify's reserved SITE_ID plus SITE_NAME, requiring the
+exact navigeto-b2c project. It does not use the build-only NETLIFY flag or any
+request header/hostname. Admin direct ingress similarly requires navigeto-next.
+The shared runtime-identity.ts files must remain identical. See Netlify's
+[runtime variable reference](https://docs.netlify.com/build/functions/environment-variables/).
+
 Prove actual Netlify Next.js ingress overwrites spoofed x-nf-client-connection-ip
 before rollout. Ordinary x-forwarded-for and caller signed metadata are ignored by
 the proxy. No raw visitor IP is forwarded; the secret-keyed hash is signed with

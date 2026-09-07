@@ -1,6 +1,7 @@
 import { signVisitorIdentity, validIdentityKey, visitorHash } from "./visitor-identity-protocol.ts";
+import { isTrustedVisaRuntime } from "./runtime-identity.ts";
 
-export function buildVisaProxyIdentity(request: Request, upstream: URL, key = process.env.VISA_PROXY_IDENTITY_SECRET, netlify = process.env.NETLIFY === "true") {
+export function buildVisaProxyIdentity(request: Request, upstream: URL, key = process.env.VISA_PROXY_IDENTITY_SECRET, netlify = isTrustedVisaRuntime("public")) {
   if (upstream.protocol !== "https:" || upstream.username || upstream.password ||
       !(upstream.hostname === "admin.navigeto.com" || /^[a-f0-9]{24}--navigeto-next\.netlify\.app$/.test(upstream.hostname)) ||
       !upstream.pathname.startsWith("/api/visa/")) throw new Error("Unapproved Visa upstream");

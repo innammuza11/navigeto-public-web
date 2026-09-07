@@ -3,8 +3,17 @@ import test from "node:test";
 
 import { buildAdminVisaUrl, isAllowedVisaPath } from "./route-helpers.ts";
 import { buildVisaProxyIdentity } from "./proxy-identity.ts";
+import { isTrustedVisaRuntime } from "./runtime-identity.ts";
 import { verifyVisitorIdentity, visitorHash } from "./visitor-identity-protocol.ts";
 import { POST as forwardVisa } from "./[...path]/route.ts";
+
+test("runtime identity requires the exact public site and name, not a build flag", () => {
+  const valid = { SITE_ID: "db6d1981-151c-421e-8692-7412da9f85e3", SITE_NAME: "navigeto-b2c" };
+  assert.equal(isTrustedVisaRuntime("public", valid), true);
+  for (const env of [{}, { SITE_ID: valid.SITE_ID }, { ...valid, SITE_NAME: "other" }, { ...valid, SITE_ID: "66f75c9a-c466-43fc-94c7-740db6eaab6e" }]) {
+    assert.equal(isTrustedVisaRuntime("public", env), false);
+  }
+});
 
 test("allows every Visa path used by the storefront", () => {
   for (const path of ["catalog", "countries", "check", "intake", "intake/a/documents", "intake/a/documents/b", "intake/a/passport/confirm", "intake/a/submit", "portal/token"]) {
@@ -46,8 +55,10 @@ test("proxy refuses absent ingress identity or key and an unapproved upstream", 
 test("proxy handler signs fresh identity, disables redirects and preserves Retry-After", async () => {
   const oldFetch = globalThis.fetch;
   const oldKey = process.env.VISA_PROXY_IDENTITY_SECRET, oldNetlify = process.env.NETLIFY;
+  const oldSite = process.env.SITE_ID, oldName = process.env.SITE_NAME;
   const key = "1".repeat(64);
-  process.env.VISA_PROXY_IDENTITY_SECRET = key; process.env.NETLIFY = "true";
+  process.env.VISA_PROXY_IDENTITY_SECRET = key; delete process.env.NETLIFY;
+  process.env.SITE_ID = "db6d1981-151c-421e-8692-7412da9f85e3"; process.env.SITE_NAME = "navigeto-b2c";
   let called = 0;
   globalThis.fetch = async (url, init) => {
     called++;
@@ -69,9 +80,15 @@ test("proxy handler signs fresh identity, disables redirects and preserves Retry
     called = 0;
     const blocked = await forwardVisa(new Request("https://navigeto.com/api/visa/check", { method: "POST" }), { params: Promise.resolve({ path: ["check"] }) });
     assert.equal(blocked.status, 503); assert.equal(called, 0);
+    process.env.SITE_ID = "66f75c9a-c466-43fc-94c7-740db6eaab6e";
+    process.env.NETLIFY = "true";
+    const wrongSite = await forwardVisa(new Request("https://navigeto.com/api/visa/check", { method: "POST", headers: { "x-nf-client-connection-ip": "192.0.2.1" } }), { params: Promise.resolve({ path: ["check"] }) });
+    assert.equal(wrongSite.status, 503); assert.equal(called, 0);
   } finally {
     globalThis.fetch = oldFetch;
     if (oldKey === undefined) delete process.env.VISA_PROXY_IDENTITY_SECRET; else process.env.VISA_PROXY_IDENTITY_SECRET = oldKey;
     if (oldNetlify === undefined) delete process.env.NETLIFY; else process.env.NETLIFY = oldNetlify;
+    if (oldSite === undefined) delete process.env.SITE_ID; else process.env.SITE_ID = oldSite;
+    if (oldName === undefined) delete process.env.SITE_NAME; else process.env.SITE_NAME = oldName;
   }
 });
