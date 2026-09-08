@@ -133,3 +133,93 @@
   .nature-shell { background: white; }
   [data-nature-surface="public"] .cinematic-hero-art { opacity: 1 !important; }
 }
+
+/* Sky Journey: scoped to the homepage; original section geometry is retained. */
+[data-sky-journey="true"] {
+  --nature-backdrop: linear-gradient(180deg, #318bd0 0%, #9ccdf0 46%, #e9f4ff 72%, #b6cde1);
+}
+[data-sky-journey="true"] .cinematic-hero .hero-shade {
+  background: linear-gradient(90deg, #082c4de8 0%, #0b365cc7 32%, #174f773b 65%, transparent 83%),
+    linear-gradient(0deg, #173f5c99, transparent 35%);
+}
+[data-sky-journey="true"] .cinematic-copy h1 {
+  text-shadow: 0 3px 34px #082a4638;
+}
+[data-sky-journey="true"] .cinematic-copy h1 em {
+  color: #b5eaff;
+  text-shadow: 0 0 42px #6ad6ff33;
+}
+[data-sky-journey="true"] .hero-proof { border-color: #c4eaff40; }
+[data-sky-journey="true"] .hero-proof span { color: #e2f3fc; }
+[data-sky-journey="true"] .hero-proof b { color: #b5eaff; }
+[data-sky-journey="true"] .hero-actions .button-gold {
+  color: #093852;
+  background: linear-gradient(120deg, #dcf7ff, #90daff);
+  border: 1px solid #e1f7ff;
+  box-shadow: inset 0 1px 0 #fff, 0 8px 30px #032c4a33;
+}
+[data-sky-journey="true"] .cinematic-copy .button-soft {
+  color: #f3fbff;
+  border-color: #c7ecff70;
+  background: #17466c99;
+  backdrop-filter: blur(8px);
+}
+[data-sky-journey="true"] .button {
+  transition: transform 240ms cubic-bezier(.2,.8,.2,1), box-shadow 240ms ease, background-color 240ms ease;
+}
+[data-sky-journey="true"] .button:active { transform: translateY(0) scale(.985); }
+[data-sky-journey="true"] :is(.button, .journey-card, .service-flow-card, .destination-line):focus-visible {
+  outline: 3px solid #1688bb;
+  outline-offset: 5px;
+}
+[data-sky-journey="true"] .cinematic-hero .button:focus-visible { outline-color: #e2f8ff; }
+[data-sky-journey="true"] .search-panel {
+  border-color: #e6f6ff;
+  background: #eaf6fff0;
+  box-shadow: 0 24px 65px #082c4938, inset 0 1px 0 #fff;
+  backdrop-filter: none;
+}
+[data-sky-journey="true"] .search-tabs button { transition: color 200ms ease, background-color 200ms ease; }
+[data-sky-journey="true"] .search-tabs button.active { background: #ffffff80; }
+[data-sky-journey="true"] .service-flow-card {
+  background: linear-gradient(145deg, #fff, #edf8ff);
+  border-color: #d0e6f2;
+}
+[data-sky-journey="true"] :is(.journey-card, .service-flow-card) {
+  transition: transform 380ms cubic-bezier(.2,.8,.2,1), box-shadow 380ms ease, border-color 380ms ease;
+}
+[data-sky-journey="true"] .journey-card { background-size: cover; }
+[data-sky-journey="true"] .journey-card::after {
+  background: radial-gradient(circle at var(--sky-light-x, 50%) var(--sky-light-y, 25%), #e6f8ff1f, transparent 65%);
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  [data-sky-journey="true"] :is(.journey-card, .service-flow-card)[data-sky-hover="true"] {
+    transform: perspective(1100px) translateY(-5px) rotateX(var(--sky-tilt-x, 0deg)) rotateY(var(--sky-tilt-y, 0deg));
+    box-shadow: 0 24px 48px #17405d26;
+    border-color: #83c7e6;
+  }
+  [data-sky-journey="true"] .hero-actions .button-gold:hover { box-shadow: inset 0 1px 0 #fff, 0 14px 35px #42bdf54d; }
+  [data-sky-journey="true"] .destination-line { transition: background-color 200ms ease; }
+  [data-sky-journey="true"] .destination-line:hover { background-color: #94d9f412; }
+}
+/* Native scroll timelines progressively enhance the view; unsupported browsers
+   retain the full scene, and text is never hidden while JavaScript loads. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-sky-journey="true"] .cinematic-copy {
+      animation: sky-copy-depth linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0px 800px;
+    }
+  }
+}
+@keyframes sky-copy-depth { from { translate: 0 0; } to { translate: 0 32px; } }
+@media (max-width: 767px) {
+  [data-sky-journey="true"] .cinematic-hero .hero-shade {
+    background: linear-gradient(90deg, #092f51eb, #16466bbb 75%, #16466b70), linear-gradient(0deg, #173f5c99, transparent 55%);
+  }
+  [data-sky-journey="true"] .cinematic-copy .button-soft { backdrop-filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-sky-journey="true"] :is(.button, .journey-card, .service-flow-card, .cinematic-copy) { transform: none !important; translate: none !important; }
+}

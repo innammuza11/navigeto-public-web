@@ -14,6 +14,8 @@ precision highp float;
 uniform vec2 resolution;
 uniform vec2 pointer;
 uniform float time;
+uniform float journey;
+uniform float scrollProgress;
 out vec4 fragColor;
 const vec3 SUN = vec3(0.52, 0.43, -0.735);
 float hash(vec3 p) {
@@ -192,6 +194,88 @@ float ellipsoidHit(vec3 ro,vec3 rd,vec3 scale) {
   float a=dot(d,d),b=dot(o,d),c=dot(o,o)-1.0,h=b*b-a*c;
   return h>0.0?(-b-sqrt(h))/a:1e5;
 }
+// Sky Journey: a cloud bank below the camera, high cirrus and a lit aircraft.
+float journeyDensity(vec3 p) {
+  p.xz += vec2(time*0.045, time*0.025);
+  float mass = noise(vec3(p.xz*0.19, 7.0));
+  float top = -0.6 + mass*4.4;
+  float envelope = smoothstep(-2.2,-1.3,p.y)*(1.0-smoothstep(top-0.8,top+0.3,p.y));
+  float billow = fbm(p*0.73);
+  return max(billow-0.32,0.0)*envelope*2.8;
+}
+vec3 journeyClouds(vec3 ro, vec3 rd) {
+  vec3 sky=atmosphere(rd);
+  // Thin high cloud catches the warm sun without another volume march.
+  if(rd.y>0.02) {
+    vec2 high=rd.xz/rd.y;
+    float cirrus=pow(noise(vec3(high*vec2(0.36,1.4)+time*0.008,12.0)),5.0);
+    sky=mix(sky,vec3(0.94,0.97,1.0),cirrus*0.34);
+  }
+  float start=0.0, end=0.0;
+  if(rd.y < -0.012) {
+    start=max(0.0,(3.2-ro.y)/rd.y);
+    end=min(65.0,(-2.2-ro.y)/rd.y);
+  }
+  vec4 sum=vec4(0.0);
+  float stepSize=max(end-start,0.0)/24.0;
+  if(stepSize>0.0) for(int i=0;i<24;i++) {
+    vec3 p=ro+rd*(start+(float(i)+0.5)*stepSize);
+    float d=journeyDensity(p);
+    if(d>0.012) {
+      float shadow=exp(-journeyDensity(p+SUN*0.75)*2.0);
+      float rim=pow(max(dot(rd,SUN),0.0),9.0);
+      vec3 light=mix(vec3(0.38,0.55,0.71),vec3(1.0,0.98,0.91),shadow);
+      light+=vec3(1.0,0.80,0.52)*rim*0.24*shadow;
+      light=mix(light,vec3(0.72,0.85,0.96),1.0-exp(-length(p-ro)*0.014));
+      float alpha=1.0-exp(-d*stepSize*1.8);
+      sum.rgb+=(1.0-sum.a)*light*alpha;
+      sum.a+=(1.0-sum.a)*alpha;
+      if(sum.a>0.985) break;
+    }
+  }
+  return sky*(1.0-sum.a)+sum.rgb;
+}
+void aircraftPart(vec3 ro,vec3 rd,vec3 offset,vec3 scale,vec3 paint,inout float nearest,inout vec3 color) {
+  vec3 origin=ro-offset;
+  float t=ellipsoidHit(origin,rd,scale);
+  if(t>0.0 && t<nearest) {
+    nearest=t;
+    vec3 normal=normalize((origin+rd*t)/(scale*scale));
+    float diffuse=max(dot(normal,normalize(vec3(-0.4,0.8,0.6))),0.0);
+    float specular=pow(max(dot(reflect(rd,normal),normalize(vec3(-0.4,0.8,0.6))),0.0),36.0);
+    color=paint*(0.52+0.48*diffuse)+vec3(1.0,0.91,0.75)*specular*0.45;
+  }
+}
+vec3 skyJourney(vec3 ro,vec3 rd) {
+  vec3 color=journeyClouds(ro,rd);
+  // A slow bank and forward drift, with no abrupt loop reset.
+  vec3 center=ro+vec3(3.2+sin(time*0.045)*1.0,0.4+sin(time*0.07)*0.12,-9.5);
+  vec3 q=ro-center, ray=rd;
+  float bank=0.13+sin(time*0.11)*0.055;
+  mat2 roll=mat2(cos(bank),-sin(bank),sin(bank),cos(bank));
+  q.xy=roll*q.xy; ray.xy=roll*ray.xy;
+  float yaw=-0.68;
+  mat2 turn=mat2(cos(yaw),-sin(yaw),sin(yaw),cos(yaw));
+  q.xz=turn*q.xz; ray.xz=turn*ray.xz;
+  float nearest=1e5;
+  vec3 aircraft=vec3(0.0),silver=vec3(0.89,0.94,0.98),blue=vec3(0.035,0.27,0.48);
+  aircraftPart(q,ray,vec3(0),vec3(0.10,0.105,0.82),silver,nearest,aircraft);
+  // Swept main wings, tailplanes, vertical stabilizer and two engines.
+  for(int side=-1;side<=1;side+=2) {
+    float sidef=float(side);
+    vec3 wing=q; wing.z-=abs(wing.x)*0.38;
+    vec3 wingRay=ray; wingRay.z-=sidef*wingRay.x*0.38;
+    aircraftPart(wing,wingRay,vec3(sidef*0.43,-0.015,0.08),vec3(0.48,0.025,0.20),silver,nearest,aircraft);
+    aircraftPart(q,ray,vec3(sidef*0.23,0.035,0.61),vec3(0.25,0.025,0.13),silver,nearest,aircraft);
+    aircraftPart(q,ray,vec3(sidef*0.30,-0.12,-0.04),vec3(0.065,0.075,0.20),blue,nearest,aircraft);
+  }
+  aircraftPart(q,ray,vec3(0,0.18,0.59),vec3(0.028,0.24,0.17),blue,nearest,aircraft);
+  aircraftPart(q,ray,vec3(0,0.071,-0.55),vec3(0.074,0.046,0.16),blue,nearest,aircraft);
+  if(nearest<100.0) color=mix(aircraft,atmosphere(rd),0.12);
+  // Atmospheric horizon glow ties the aircraft and cloud bank together.
+  color+=vec3(0.20,0.28,0.33)*exp(-abs(rd.y+0.015)*22.0)*0.12;
+  return color;
+}
 vec3 birds(vec3 ro,vec3 rd,vec3 color) {
   for(int i=0;i<5;i++) {
     float fi=float(i);
@@ -217,7 +301,11 @@ void main() {
   vec3 rd=normalize(vec3(uv.x+pointer.x*0.055,uv.y*0.85+0.13+pointer.y*0.025,-1.65));
   vec3 color;
 #if SCENE == 0
-  color=clouds(ro,rd,atmosphere(rd));
+  if(journey>0.5) {
+    ro=vec3(pointer.x*0.12,4.2,5.0-time*0.06);
+    rd=normalize(vec3(uv.x+pointer.x*0.065,uv.y*0.82+0.08-scrollProgress*0.12+pointer.y*0.04,-1.65));
+    color=skyJourney(ro,rd);
+  } else color=clouds(ro,rd,atmosphere(rd));
 #elif SCENE == 1
   color=universe(ro,rd);
 #elif SCENE == 2
@@ -242,6 +330,7 @@ export function mountNatureRenderer(
   theme: NatureTheme,
   surface: NatureSurface,
   onReady: (ready: boolean) => void,
+  hero?: HTMLElement,
 ): () => void {
   const gl = canvas.getContext("webgl2", { alpha: false, antialias: false, depth: false, stencil: false, powerPreference: "low-power" });
   if (!gl) return () => {};
@@ -257,13 +346,17 @@ export function mountNatureRenderer(
   let quality = 1;
   let slowFrames = 0;
   let targetX = 0, targetY = 0, x = 0, y = 0;
+  let scrollTarget = 0, scroll = 0;
+  const journey = Boolean(hero && theme === "sky" && surface === "public");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   const mobile = window.matchMedia("(max-width: 767px)").matches;
   const frameInterval = surface === "admin" || mobile ? 1000 / 20 : 1000 / 30;
-  const pixelBudget = mobile ? 210_000 : surface === "admin" ? 300_000 : 650_000;
+  const pixelBudget = mobile ? 180_000 : surface === "admin" ? 300_000 : journey ? 480_000 : 650_000;
   let uResolution: WebGLUniformLocation | null = null;
   let uTime: WebGLUniformLocation | null = null;
   let uPointer: WebGLUniformLocation | null = null;
+  let uJourney: WebGLUniformLocation | null = null;
+  let uScroll: WebGLUniformLocation | null = null;
 
   function release() {
     if (buffer) gl!.deleteBuffer(buffer);
@@ -292,9 +385,12 @@ export function mountNatureRenderer(
   }
   function draw() {
     if (!program || lost || disposed) return;
-    x += (targetX - x) * 0.045; y += (targetY - y) * 0.045;
+    x += (targetX - x) * 0.065; y += (targetY - y) * 0.065;
+    scroll += (scrollTarget - scroll) * 0.065;
     gl!.uniform2f(uResolution, canvas.width, canvas.height);
     gl!.uniform1f(uTime, reduced.matches ? 0 : elapsed);
+    gl!.uniform1f(uJourney, journey ? 1 : 0);
+    gl!.uniform1f(uScroll, reduced.matches ? 0 : scroll);
     gl!.uniform2f(uPointer, reduced.matches ? 0 : x, reduced.matches ? 0 : y);
     gl!.drawArrays(gl!.TRIANGLES, 0, 3);
   }
@@ -337,20 +433,28 @@ export function mountNatureRenderer(
       uResolution = gl!.getUniformLocation(program, "resolution");
       uTime = gl!.getUniformLocation(program, "time");
       uPointer = gl!.getUniformLocation(program, "pointer");
+      uJourney = gl!.getUniformLocation(program, "journey");
+      uScroll = gl!.getUniformLocation(program, "scrollProgress");
       resize(); draw(); onReady(true); resume();
     } catch {
       release(); onReady(false);
     }
   }
   function pointerMove(event: PointerEvent) {
-    if (event.pointerType !== "mouse" || reduced.matches) return;
+    if (event.pointerType !== "mouse" || reduced.matches || !visible) return;
     targetX = (event.clientX / Math.max(window.innerWidth, 1) - 0.5) * 2;
     targetY = (0.5 - event.clientY / Math.max(window.innerHeight, 1)) * 2;
+  }
+  function updateScroll() {
+    if (!hero || reduced.matches) return;
+    const bounds = hero.getBoundingClientRect();
+    scrollTarget = Math.max(0, Math.min(1, -bounds.top / Math.max(bounds.height, 1)));
   }
   function contextLost(event: Event) { event.preventDefault(); lost = true; cancelAnimationFrame(frame); onReady(false); }
   function contextRestored() { if (!disposed) { lost = false; release(); initialize(); } }
   const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; resume(); });
-  observer.observe(canvas);
+  observer.observe(hero ?? canvas);
+  if (hero) { window.addEventListener("scroll", updateScroll, { passive: true }); updateScroll(); }
   const sizeObserver = new ResizeObserver(resize);
   sizeObserver.observe(canvas);
   document.addEventListener("visibilitychange", resume);
@@ -364,6 +468,7 @@ export function mountNatureRenderer(
     observer.disconnect(); sizeObserver.disconnect();
     document.removeEventListener("visibilitychange", resume);
     window.removeEventListener("pointermove", pointerMove);
+    window.removeEventListener("scroll", updateScroll);
     reduced.removeEventListener("change", resume);
     canvas.removeEventListener("webglcontextlost", contextLost);
     canvas.removeEventListener("webglcontextrestored", contextRestored);
