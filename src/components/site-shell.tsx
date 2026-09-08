@@ -10,6 +10,7 @@ import { NaviChat } from "@/components/navi-chat";
 import { MarketingTracker } from "@/components/marketing-tracker";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 import { nav } from "@/lib/site-data";
+import { NatureTheme } from "@/components/nature/NatureTheme";
 
 const DEFAULT_CONFIG: PublicSiteConfig = {
   announcement_text: "Plan hotels, transfers and tours in one place.",
@@ -66,5 +67,5 @@ export function SiteShell({children, hideNavi = false}:{children:React.ReactNode
     liveApi.siteConfig().then((value) => { if (active) setConfig({ ...DEFAULT_CONFIG, ...value }); }).catch(() => undefined);
     return () => { active = false; };
   }, []);
-  return <><MarketingTracker config={config}/><Header config={config}/><main>{children}</main><Footer config={config}/>{!hideNavi && config.assistant_enabled !== false && <NaviChat/>}</>;
+  return <NatureTheme surface="public"><MarketingTracker config={config}/><Header config={config}/><main>{children}</main><Footer config={config}/>{!hideNavi && config.assistant_enabled !== false && <NaviChat/>}</NatureTheme>;
 }

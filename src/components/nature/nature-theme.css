@@ -1,0 +1,135 @@
+/* Presentation-only overrides. No module geometry, content, or interaction changes. */
+.nature-shell {
+  position: relative;
+  isolation: isolate;
+  --nature-accent: #087bb3;
+  --nature-deep: #123d58;
+  --nature-tint: #e7f5ff;
+  --nature-line: #cce4f2;
+  --nature-glow: #a5ddf4;
+  --nature-backdrop: linear-gradient(155deg, #87c7ed, #e2f4ff 58%, #b7dff2);
+  --nature-panel: #f5fbff;
+  --navy: var(--nature-deep);
+  --ink: #173b50;
+  --forest: var(--nature-deep);
+  --moss: #436d83;
+  --teal: var(--nature-accent);
+  --gold: #78d4f4;
+  --sun: #a7e6fa;
+  --sky: var(--nature-tint);
+  --pale: var(--nature-tint);
+  --cream: var(--nature-panel);
+  --paper: #f8fcff;
+  --muted: #526e80;
+  --line: var(--nature-line);
+  --shadow: 0 24px 70px #153f581c;
+  background: var(--nature-panel);
+  color: var(--ink);
+}
+.nature-shell[data-nature-theme="universe"] {
+  --nature-accent: #6264ba;
+  --nature-deep: #292d62;
+  --nature-tint: #eeefff;
+  --nature-line: #d9dcf4;
+  --nature-glow: #b1bdf6;
+  --nature-backdrop: radial-gradient(ellipse at 75% 25%, #5368a0, #172440 40%, #0c1930);
+  --nature-panel: #f6f7ff;
+}
+.nature-shell[data-nature-theme="beach"] {
+  --nature-accent: #087e8c;
+  --nature-deep: #154852;
+  --nature-tint: #e2f6f5;
+  --nature-line: #c6e6e6;
+  --nature-glow: #9adbdc;
+  --nature-backdrop: linear-gradient(#a9d9ef 0%, #d8f0f5 38%, #40a4b3 40%, #84d3cf 75%, #e8dcbf);
+  --nature-panel: #f3fcfb;
+}
+.nature-shell[data-nature-theme="hills"] {
+  --nature-accent: #287b69;
+  --nature-deep: #244a47;
+  --nature-tint: #e7f4ef;
+  --nature-line: #cde3da;
+  --nature-glow: #afcfc4;
+  --nature-backdrop: linear-gradient(160deg, #c4e5f2, #b2cecc 48%, #779889 65%, #33584a);
+  --nature-panel: #f4faf7;
+}
+.nature-shell[data-nature-theme="wildlife"] {
+  --nature-accent: #527536;
+  --nature-deep: #31452e;
+  --nature-tint: #eef4e6;
+  --nature-line: #d8e3ca;
+  --nature-glow: #c9d7a9;
+  --nature-backdrop: linear-gradient(145deg, #d5e7cf, #8ba281 48%, #2d563d);
+  --nature-panel: #f7faf3;
+}
+.nature-environment {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background: var(--nature-backdrop);
+  contain: strict;
+}
+.nature-canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 900ms ease; }
+[data-nature-ready="true"] > .nature-environment > .nature-canvas { opacity: 1; }
+.nature-light { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 45%, #f7fbff30); }
+
+/* Retain the original photograph as the first paint and no-WebGL fallback. */
+[data-nature-surface="public"] .cinematic-hero { background: transparent; }
+[data-nature-surface="public"][data-nature-ready="true"] .cinematic-hero-art { opacity: 0; }
+[data-nature-surface="public"] .cinematic-hero-art { transition: opacity 900ms ease; }
+[data-nature-surface="public"] .cinematic-hero .hero-shade {
+  background: linear-gradient(90deg, #092f4fe8 0%, #092f4fc9 34%, #092f4f45 67%, #092f4f05), linear-gradient(0deg, #092f4f99, transparent 45%);
+}
+[data-nature-surface="public"] .hero-film { opacity: .07; animation: none; }
+[data-nature-surface="public"] :is(.inner-hero, .commerce-hero, .module-search, .navi-page) {
+  background: linear-gradient(100deg, color-mix(in srgb, var(--nature-panel) 98%, transparent), color-mix(in srgb, var(--nature-panel) 88%, transparent) 52%, color-mix(in srgb, var(--nature-panel) 50%, transparent));
+}
+[data-nature-surface="public"] :is(.site-header, .mobile-nav) { background: var(--nature-panel); border-color: var(--nature-line); }
+[data-nature-surface="public"] .desktop-nav a { color: var(--nature-deep); }
+[data-nature-surface="public"] .pale { background: var(--nature-tint); }
+[data-nature-surface="public"] .cta { background: linear-gradient(120deg, var(--nature-tint), #e2f4ff); }
+[data-nature-surface="public"] :is(.marketplace-section, .section, .trust) { background-color: var(--nature-panel); }
+[data-nature-surface="public"] :is(.advanced-search, .filter-panel, .sticky-summary, .policy-card, .price-summary, .rich-card) { background-color: #fff; border-color: var(--nature-line); }
+[data-nature-surface="public"] .rich-card { background-image: linear-gradient(145deg, #fff, var(--nature-panel)); }
+[data-nature-surface="public"] .button-primary { background: var(--nature-deep); }
+
+/* Both existing admin shells inherit the same palette; card surfaces stay opaque. */
+[data-nature-surface="admin"] {
+  --primary: var(--nature-deep);
+  --primary-2: var(--nature-accent);
+  --accent: var(--nature-accent);
+  --accent-2: var(--nature-glow);
+  --bg: var(--nature-panel);
+  --border: var(--nature-line);
+  --muted: #526779;
+}
+[data-nature-surface="admin"] > .nature-environment > .nature-light {
+  background: color-mix(in srgb, var(--nature-panel) 87%, transparent);
+}
+[data-nature-surface="admin"] > :is(.bg-bg, [data-shell-theme="v2"]) { background: transparent; }
+[data-nature-entry="true"] > main { background: transparent; }
+[data-nature-entry="true"] > .nature-environment > .nature-light { background: #e7f5ff26; }
+[data-nature-surface="admin"] [data-shell-theme="v2"] {
+  --shell-background: var(--nature-panel);
+  --shell-surface: #fff;
+  --shell-surface-blue: var(--nature-tint);
+  --shell-surface-blue-light: var(--nature-line);
+  --shell-primary: var(--nature-accent);
+  --shell-primary-hover: var(--nature-deep);
+  --shell-text: #173b50;
+  --shell-heading: var(--nature-deep);
+  --shell-text-secondary: #49677d;
+  --shell-border: var(--nature-line);
+}
+[data-nature-surface="admin"] :is(.bg-white, .bg-shell-surface) { border-color: var(--nature-line); }
+/* Preserve semantic status colors, existing inbox dark mode, menus and focus rings. */
+@media (prefers-reduced-motion: reduce) {
+  .nature-shell *, .nature-shell *::before, .nature-shell *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+@media print {
+  .nature-environment { display: none !important; }
+  .nature-shell { background: white; }
+  [data-nature-surface="public"] .cinematic-hero-art { opacity: 1 !important; }
+}

@@ -4,6 +4,7 @@ import { CurrencyProvider } from "@/components/currency-context";
 import { SITE_URL } from "@/lib/seo";
 import "./globals.css";
 import "./tropical-motion.css";
+import "@/components/nature/nature-theme.css";
 
 const sans=Manrope({subsets:["latin"],variable:"--font-sans"});
 const serif=Cormorant_Garamond({subsets:["latin"],variable:"--font-serif",weight:["400","500","600"]});
