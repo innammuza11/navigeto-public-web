@@ -1,4 +1,5 @@
 "use client";
+import { tourDisplayName, tourDurationLabel } from "@/lib/tour-presentation";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -132,8 +133,8 @@ export function HomeMarketplace() {
       <MarketplaceHeading eyebrow="International tours" title="The world, planned from Colombo." copy="Only published international packages appear as bookable products. Until more pass review, start with a controlled custom trip request." href="/tours/international" action="Explore international tours"/>
       {loading ? <LoadingCards/> : state.internationalTours.length ? <div className="marketplace-grid">
         {state.internationalTours.map((tour, index) => <article className="market-card market-tour-card" key={tour.id}>
-          <Link className="market-card-art" href={`/tours/package/${tour.slug}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(24,19,78,.84)),url("${tour.hero_image_url || fallbackImages[index]}")` }}><span>{tour.duration_days || "Tailor-made"} days</span><b>{tour.country || "International"}</b></Link>
-          <div className="market-card-body"><h3>{tour.title}</h3><p>{tour.destinations.slice(0, 3).join(" · ") || tour.summary || "Private international journey"}</p>{tour.price_from ? <Money value={tour.price_from} currency={tour.currency} suffix="Starting from · selling price"/> : <small>Exact selling price checked for your dates</small>}<Link href={`/tours/package/${tour.slug}`}>View journey <span aria-hidden="true">→</span></Link></div>
+          <Link className="market-card-art" href={`/tours/package/${tour.slug}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(24,19,78,.84)),url("${tour.hero_image_url || fallbackImages[index]}")` }}><span>{tourDurationLabel(tour.duration_days, tour.duration_nights)}</span><b>{tour.country || "International"}</b></Link>
+          <div className="market-card-body"><h3 title={tour.title}>{tourDisplayName(tour)}</h3><p>{tour.destinations.slice(0, 3).join(" · ") || tour.summary || "Private international journey"}</p>{tour.price_from ? <Money value={tour.price_from} currency={tour.currency} suffix="Starting from · selling price"/> : <small>Exact selling price checked for your dates</small>}<Link href={`/tours/package/${tour.slug}`}>View journey <span aria-hidden="true">→</span></Link></div>
         </article>)}
       </div> : <div className="marketplace-grid">
         {preferredDestinations.map((destination, index) => <article className={`market-card destination-market-card destination-market-${index + 1}`} key={destination.country}>
@@ -146,8 +147,8 @@ export function HomeMarketplace() {
       <MarketplaceHeading eyebrow="Sri Lanka tours" title="Published island journeys, ready to shape." copy="Customer-safe selling prices and full day-by-day programmes from the live Tour Library." href="/tours/sri-lanka" action="See all Sri Lanka tours"/>
       {loading ? <LoadingCards/> : state.sriLankaTours.length ? <div className="marketplace-grid">
         {state.sriLankaTours.map((tour, index) => <article className="market-card market-tour-card" key={tour.id}>
-          <Link className="market-card-art" href={`/tours/package/${tour.slug}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(24,19,78,.82)),url("${tour.hero_image_url || fallbackImages[index]}")` }}><span>{tour.duration_days || "Private"} days</span><b>{tour.destinations[0] || "Sri Lanka"}</b></Link>
-          <div className="market-card-body"><h3>{tour.title}</h3><p>{tour.destinations.slice(0, 4).join(" · ") || tour.summary || "Private Sri Lanka journey"}</p>{tour.price_from ? <Money value={tour.price_from} currency={tour.currency} suffix="Starting from · selling price"/> : <small>Exact selling price checked for your dates</small>}<Link href={`/tours/package/${tour.slug}`}>View itinerary <span aria-hidden="true">→</span></Link></div>
+          <Link className="market-card-art" href={`/tours/package/${tour.slug}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(24,19,78,.82)),url("${tour.hero_image_url || fallbackImages[index]}")` }}><span>{tourDurationLabel(tour.duration_days, tour.duration_nights)}</span><b>{tour.destinations[0] || "Sri Lanka"}</b></Link>
+          <div className="market-card-body"><h3 title={tour.title}>{tourDisplayName(tour)}</h3><p>{tour.destinations.slice(0, 4).join(" · ") || tour.summary || "Private Sri Lanka journey"}</p>{tour.price_from ? <Money value={tour.price_from} currency={tour.currency} suffix="Starting from · selling price"/> : <small>Exact selling price checked for your dates</small>}<Link href={`/tours/package/${tour.slug}`}>View itinerary <span aria-hidden="true">→</span></Link></div>
         </article>)}
       </div> : <EmptyMarketplace title="Sri Lanka tour inventory is being refreshed." copy="Tell us the route, dates and travellers and the team will prepare a controlled quotation." href="/custom-trip" action="Build a Sri Lanka trip"/>}
     </div>
