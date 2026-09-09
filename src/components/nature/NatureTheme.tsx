@@ -25,11 +25,19 @@ export function NatureTheme({ children, surface }: { children: ReactNode; surfac
     if (connection?.saveData) return;
     const start = () => {
       if (cancelled) return;
-      void import("./nature-renderer").then(({ mountNatureRenderer }) => {
-        if (!cancelled) dispose = mountNatureRenderer(element, theme, surface, (ready) => {
-          container.dataset.natureReady = String(ready);
-        }, skyJourney ? container.querySelector<HTMLElement>(".cinematic-hero") ?? undefined : undefined);
-      }).catch(() => { if (!cancelled) container.dataset.natureReady = "false"; });
+      if (skyJourney) {
+        void import("./landscape-scene").then(({ mountLandscapeScene }) => {
+          if (!cancelled) dispose = mountLandscapeScene(element, container, ready => {
+            container.dataset.natureReady = String(ready);
+          });
+        }).catch(() => { if (!cancelled) container.dataset.natureReady = "false"; });
+      } else {
+        void import("./nature-renderer").then(({ mountNatureRenderer }) => {
+          if (!cancelled) dispose = mountNatureRenderer(element, theme, surface, ready => {
+            container.dataset.natureReady = String(ready);
+          });
+        }).catch(() => { if (!cancelled) container.dataset.natureReady = "false"; });
+      }
       if (skyJourney) void import("./sky-motion").then(({ mountSkyMotion }) => {
         if (!cancelled) disposeMotion = mountSkyMotion(container);
       }).catch(() => {});
@@ -49,7 +57,7 @@ export function NatureTheme({ children, surface }: { children: ReactNode; surfac
     };
   }, [theme, surface, skyJourney]);
 
-  return <div ref={shell} className="nature-shell" data-sky-journey={skyJourney ? "true" : undefined} data-nature-theme={theme} data-nature-surface={surface} data-nature-entry={surface === "admin" && pathname === "/login" ? "true" : undefined}>
+  return <div ref={shell} className="nature-shell" data-cinematic-journey={skyJourney ? "true" : undefined} data-nature-theme={theme} data-nature-surface={surface} data-nature-entry={surface === "admin" && pathname === "/login" ? "true" : undefined}>
     <div className="nature-environment" aria-hidden="true"><canvas ref={canvas} className="nature-canvas"/><div className="nature-light"/></div>
     {children}
   </div>;
