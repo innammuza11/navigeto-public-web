@@ -731,7 +731,7 @@ main{position:relative}
 .tour-editorial-badges span,.tour-editorial-badges small{padding:6px 9px;border:1px solid rgba(255,255,255,.32);border-radius:999px;background:rgba(24,19,78,.3);backdrop-filter:blur(12px);font-size:7px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .tour-editorial-art>div:last-child{position:relative;z-index:2;padding:0 8px 7px}
 .tour-editorial-art p{margin:0 0 8px;color:#8ee8ed;font-size:8px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tour-editorial-art h3{margin:0;color:#fff;font:500 clamp(31px,2.8vw,43px)/.94 var(--font-serif);letter-spacing:-.03em}
+.tour-editorial-art h3{margin:0;color:#fff;font:500 clamp(26px,2.3vw,34px)/1.12 var(--font-serif);letter-spacing:-.02em;overflow-wrap:anywhere;text-wrap:balance}
 .tour-editorial-body{min-height:315px;display:flex;flex-direction:column;padding:23px}
 .tour-editorial-body>p{display:-webkit-box;overflow:hidden;margin:0 0 16px;color:#687187;font-size:10px;line-height:1.7;-webkit-box-orient:vertical;-webkit-line-clamp:3}
 .tour-editorial-body ul{display:grid;gap:8px;margin:0;padding:0;list-style:none}
@@ -847,6 +847,14 @@ body:has(.tour-collection-redesign) .navi-launcher b,body:has(.tour-collection-r
 .market-card-art>b{font:500 22px var(--font-serif)}
 .market-card-body{min-height:245px;display:flex;flex-direction:column;padding:18px}
 .market-card-body h3{margin:2px 0 8px;font:500 25px/1.05 var(--font-serif)}
+.market-tour-card{display:flex;flex-direction:column}
+.tour-full-name{margin:16px 0;font-size:14px;line-height:1.6;overflow-wrap:anywhere}
+.tour-full-name summary{cursor:pointer;font-weight:600}
+.market-tour-card .market-card-body{flex:1}
+.market-tour-card .market-card-body h3{font-size:24px;line-height:1.2;min-height:3.6em;overflow-wrap:anywhere;text-wrap:balance;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.market-tour-card .market-card-body>p{font-size:14px;line-height:1.5}
+.market-tour-card .market-card-art>span{font-size:12px;letter-spacing:0}
+.market-tour-card .market-card-body>a{margin-top:auto;padding-top:16px;font-size:14px}
 .market-card-body>p{margin:0 0 16px;color:#68718d;font-size:10px;line-height:1.65}
 .market-card-body>b{margin-top:auto;font-size:17px}
 .market-card-body>small{display:block;margin-top:auto;color:#7b839a;font-size:8px;line-height:1.45}

@@ -4,6 +4,7 @@ Customer-facing website for [navigeto.com](https://navigeto.com), deployed as Ne
 
 ## Architecture
 
+- Tour heading rules: [Tour presentation](docs/TOUR_PRESENTATION.md).
 - Next.js 16 App Router UI under `src/app`
 - Next.js local development and production build
 - Netlify hosting
