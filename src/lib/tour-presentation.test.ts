@@ -1,6 +1,28 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { tourDisplayName, tourDurationLabel } from "./tour-presentation.ts";
+import { TOUR_NAMES } from "./tour-names.ts";
+
+test("published package names are short and distinct across both collections", () => {
+  const names = Object.values(TOUR_NAMES);
+  assert.equal(names.length, 163);
+  assert.equal(new Set(names.map(name => name.toLowerCase())).size, names.length);
+  for (const name of names) {
+    assert.ok(name.length > 0 && name.length <= 32, name);
+    assert.ok(!/[|…]/.test(name), name);
+  }
+});
+
+test("names stay tied to package identity when titles or list order change", () => {
+  const entries = Object.entries(TOUR_NAMES);
+  for (const [id, expected] of entries.reverse()) {
+    const tour = Object.freeze({ id, title: "Updated supplier title | 04 NIGHTS", destinations: ["Unchanged route"] });
+    assert.equal(tourDisplayName(tour), expected);
+    assert.equal(tour.title, "Updated supplier title | 04 NIGHTS");
+  }
+  assert.equal(tourDisplayName({id:"new-package",title:"New Island Journey | Supplier"}), "New Island Journey");
+  assert.equal(tourDisplayName({id:"toString",title:"New Island Journey"}), "New Island Journey");
+});
 
 test("separates supplier codes and route suffixes from public names", () => {
   assert.equal(tourDisplayName({title:"Tea Trails & Southern Shores — Bentota, Ella to Colombo | 05 NIGHTS 06 DAYS | 01 BEN"}), "Tea Trails & Southern Shores");

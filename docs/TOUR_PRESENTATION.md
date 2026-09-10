@@ -1,7 +1,12 @@
 # Tour name presentation
 
 Customer headings use the shared `tourDisplayName` helper on the homepage,
-tour collection and tour detail. Route suffixes and pipe-delimited internal
+tour collection and tour detail. The 163 published packages reviewed on
+2026-09-10 (97 Sri Lanka, 66 international) have individual names in
+`src/lib/tour-names.ts`, keyed by immutable package ID. Each name is unique
+and at most 30 characters. Names describe the published route or theme;
+duration variants receive distinct names, with durations displayed separately.
+New, unreviewed packages use the existing fallback: route suffixes and pipe-delimited internal
 night/city codes are removed from display headings only. Long names retain
 complete thematic phrases up to 56 characters, with a word-boundary fallback.
 
