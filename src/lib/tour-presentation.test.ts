@@ -13,6 +13,12 @@ test("published package names are short and distinct across both collections", (
   }
 });
 
+test("reviewed route names belong to the correct packages regardless of API ordering", () => {
+  assert.equal(tourDisplayName({id:"1422a290-a71b-4e5b-bbc6-968b293f0770",title:"Tea Country & Southern Shores",destinations:["Nuwara Eliya","Bentota"]}), "Tea & Tide");
+  assert.equal(tourDisplayName({id:"98f3daad-032e-4d57-a541-a5672a00ed20",title:"Explore Sri Lanka"}), "Island Introduction");
+  assert.equal(tourDisplayName({id:"cb88281a-9ee0-4e87-856d-825a3ed38b3d",title:"Singapore City, Sentosa & Free Days"}), "Singapore Slow Days");
+});
+
 test("names stay tied to package identity when titles or list order change", () => {
   const entries = Object.entries(TOUR_NAMES);
   for (const [id, expected] of entries.reverse()) {
