@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
+import { TransferShowcase, type TransferInterest } from "./transfer-showcase";
 import { BookingSearch } from "./booking-search";
 import { AvailableHotels } from "./available-hotels";
 import { HomeMarketplace } from "./home-marketplace";
@@ -16,21 +17,24 @@ type Data={
  cards:readonly (readonly [string,string])[];
 };
 export function ProductPage({data,kind}:{data:Data;kind:string}) {
+  const [transferInterest, setTransferInterest] = useState<TransferInterest | null>(null);
   const searchType = ({ flights:"flight", hotels:"hotel", visas:"visa", transfers:"transfer" } as Record<string,SearchType>)[kind];
   const primaryHref=kind==="flight"?"/flights/search":kind==="hotel"?"/hotels/search":kind==="tour"?"/tours/sri-lanka":kind==="visa"?"/visas/apply":kind==="transfer"?"/transfers/search":"#enquire";
   return <>
     {searchType?<ModuleSearch type={searchType}/>:<section className="inner-hero"><div className="shell inner-grid"><div><p className="eyebrow">{data.eyebrow}</p><h1>{data.title}</h1><p className="lede">{data.copy}</p><div className="hero-actions"><Link href={primaryHref} className="button button-gold">{data.action}</Link><a href="https://wa.me/94774206166" className="button button-soft">Talk to a specialist</a></div></div><div className="glass-orb"><span>{kind.slice(0,1).toUpperCase()}</span><small>Navigeto<br/>TravelOS connected</small></div></div></section>}
+    {kind === "transfers" && <TransferShowcase onSelect={setTransferInterest}/>}
     <section className="stats shell">{data.stats.map(([label,value])=><div key={label}><strong>{value}</strong><span>{label}</span></div>)}</section>
     {kind === "about" && <AboutMeSection/>}
     {kind==="hotels" && <AvailableHotels title="Published stays, priced clearly from the start." limit={8}/>}
     <section className="section shell"><div className="section-title"><p className="eyebrow">Designed around real travel</p><h2>Everything important, clearly handled.</h2></div><div className="card-grid">{data.cards.map(([title,copy],i)=><article className="rich-card" key={title}><span>0{i+1}</span><h3>{title}</h3><p>{copy}</p><a href="#enquire">Learn more →</a></article>)}</div></section>
     <section className="section pale"><div className="shell split"><div><p className="eyebrow">Why Navigeto Travels</p><h2>Modern tools behind the scenes. Real people when it matters.</h2><p>TravelOS keeps rates, enquiries and operational handovers organised. Your experience stays simple, transparent and personal.</p></div><div className="check-list">{["Approved public selling information only","Clear inclusions and next steps","Sri Lanka-based support","No supplier costs or internal data exposed"].map(x=><div key={x}><span>✓</span>{x}</div>)}</div></div></section>
-    <section className="section shell" id="enquire"><div className="enquiry-card"><div><p className="eyebrow">Start planning</p><h2>Tell us what you need.</h2><p>Share a few details and our team will turn them into a useful next step.</p></div><ConnectedEnquiryForm kind={kind}/></div></section>
+    <section className="section shell" id="enquire"><div className="enquiry-card"><div><p className="eyebrow">Start planning</p><h2>Tell us what you need.</h2><p>Share a few details and our team will turn them into a useful next step.</p></div><ConnectedEnquiryForm kind={kind} transferInterest={transferInterest}/></div></section>
     <section className="cta"><div className="shell"><div><p className="eyebrow">A better way to plan</p><h2>Ready to go further?</h2></div><Link className="button button-gold" href="/custom-trip">Build my private trip</Link></div></section>
   </>;
 }
 
-function ConnectedEnquiryForm({ kind }: { kind: string }) {
+function ConnectedEnquiryForm({ kind, transferInterest }: { kind: string; transferInterest?: TransferInterest | null }) {
+  const transferNotes = transferInterest ? [transferInterest.origin && `From: ${transferInterest.origin}`, transferInterest.destination && `To: ${transferInterest.destination}`, `Vehicle requested: ${transferInterest.vehicle}`, transferInterest.indicative_amount && `Indicative price: LKR ${transferInterest.indicative_amount.toLocaleString("en-US")} per vehicle, one way; subject to confirmation.`, "Travel date and pickup time: ", "Passengers and luggage: "].filter(Boolean).join("\n") : "";
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [reference, setReference] = useState("");
@@ -46,6 +50,7 @@ function ConnectedEnquiryForm({ kind }: { kind: string }) {
         whatsapp: String(form.get("contact") || ""),
         subject: `${kind.replaceAll("-", " ")} website enquiry`,
         notes: String(form.get("details") || ""),
+        ...(transferInterest ? { details: { transfer_interest: transferInterest, price_status: "indicative_pending_confirmation" } } : {}),
         consent_contact: true,
       });
       setReference(result.enquiry.public_ref);
@@ -55,7 +60,7 @@ function ConnectedEnquiryForm({ kind }: { kind: string }) {
     } finally { setPending(false); }
   }
   if (reference) return <div className="reference-box"><span>TravelOS reference</span><strong>{reference}</strong><p>Your request is saved for the Navigeto team.</p><EnquiryRecoveryActions onReset={()=>{setReference("");setError("");}}/></div>;
-  return <form onSubmit={submit}><input name="name" aria-label="Name" placeholder="Your name" required/><input name="contact" aria-label="WhatsApp number" placeholder="WhatsApp number with country code" required/><textarea name="details" aria-label="Trip details" placeholder="Dates, destination and what matters to you" rows={4}/>{error && <><p role="alert">{error}</p><EnquiryRecoveryActions disabled={pending} onReset={()=>setError("")}/></>}<button className="button button-gold" type="submit" disabled={pending}>{pending ? "Sending to TravelOS…" : "Send enquiry"}</button></form>;
+  return <form onSubmit={submit}><input name="name" aria-label="Name" placeholder="Your name" required/><input name="contact" aria-label="WhatsApp number" placeholder="WhatsApp number with country code" required/><textarea key={transferNotes} defaultValue={transferNotes} name="details" aria-label="Trip details" placeholder="Dates, destination and what matters to you" rows={4}/>{error && <><p role="alert">{error}</p><EnquiryRecoveryActions disabled={pending} onReset={()=>setError("")}/></>}<button className="button button-gold" type="submit" disabled={pending}>{pending ? "Sending to TravelOS…" : "Send enquiry"}</button></form>;
 }
 
 export function LegalPage({kind}:{kind:"privacy"|"terms"}) {
