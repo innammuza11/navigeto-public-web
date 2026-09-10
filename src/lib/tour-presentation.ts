@@ -1,7 +1,10 @@
-type TourName = { title: string; destinations?: string[] };
+import { TOUR_NAMES } from "./tour-names.ts";
+
+type TourName = { id?: string; title: string; destinations?: string[] };
 
 /** Display-only: never change the source title, slug, booking payload or SEO identity. */
 export function tourDisplayName(tour: TourName): string {
+  if (tour.id && Object.hasOwn(TOUR_NAMES, tour.id)) return TOUR_NAMES[tour.id];
   const primary = tour.title.split("|")[0].split(/\s+[—–]\s+/)[0].replace(/\s+/g, " ").trim();
   const name = primary || "Private journey";
   if (name.length <= 56) return name;
