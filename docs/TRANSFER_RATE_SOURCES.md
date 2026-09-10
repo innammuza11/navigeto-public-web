@@ -16,12 +16,21 @@ The source says its rates include tolls, parking and taxes. Navigeto's supplier 
 
 ## Photos
 
-Two vehicle-only captures from supplier media shared on 25 August 2026 in the user-identified WhatsApp conversation:
+The user identified the supplier WhatsApp conversation and explicitly requested vehicle photos for the website. The available media gallery was reviewed on 10 September 2026, including the June albums that had not loaded during the first pass. Seven distinct vehicle types are represented:
 
-- `public/media/transfers/prado.png`: Toyota Land Cruiser Prado, exterior; displayed image capture, 746 x 560.
-- `public/media/transfers/land-cruiser.png`: Toyota Land Cruiser, exterior; displayed image capture, 266 x 560.
+| File under public/media/transfers | Vehicle | Source message | Capture dimensions |
+| --- | --- | --- | --- |
+| mercedes-sedan.png | Mercedes-Benz sedan | 20 June 2026, 20:17 | 922 x 615 |
+| vito.png | Mercedes-Benz Vito | 24 June 2026, 12:08 | 820 x 615 |
+| hiace.png | Toyota Hiace passenger van | 20 June 2026, 20:17 | 994 x 560 |
+| alphard.png | Toyota Alphard | 20 June 2026, 20:17 | 746 x 560 |
+| prado.png | Toyota Land Cruiser Prado | 25 August 2026, 16:44 | 746 x 560 |
+| land-cruiser.png | Toyota Land Cruiser | 25 August 2026, 16:41 | 266 x 560 |
+| range-rover.png | Range Rover | 25 August 2026, 16:43 | 1094 x 615 |
 
-The user asked to use the supplier conversation for the website fleet. These captures contain no chat interface, names, contact details or payment messages. Original downloads did not yield usable files. Older albums could not be fully reviewed when the browser tab became unavailable. This is not a complete supplier fleet inventory. Replace with higher-resolution originals when available. No model years, passenger capacities, ownership or current availability are asserted.
+Photos are vehicle-only captures of the displayed supplier media, not original file downloads. The download control did not return usable originals. Captures exclude the chat interface, private contact details and payment messages. The Toyota Alphard rear badge was inspected to verify the model. The Mercedes sedan is deliberately described without asserting an unverified trim or model year.
+
+Multiple angles and interiors of the same type are represented by one exterior image per type. Source albums contain other vehicles in backgrounds, duplicate angles and screenshots; these are not additional fleet offerings. No model years, seat capacities, ownership, current availability or fleet completeness beyond the available gallery are asserted. Rates for these vehicle requests must be confirmed separately. The existing generic live vehicle search and its pricing engine are preserved.
 
 ## Behaviour and publication
 

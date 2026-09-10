@@ -12,8 +12,13 @@ const airportRoutes = [
   { destination: "Sigiriya / Dambulla", vehicle: "Executive Sedan", duration: "4 hours", amount: 22000 },
 ];
 const fleet = [
+  { name: "Mercedes-Benz Sedan", image: "mercedes-sedan", copy: "A chauffeur-driven sedan for airport arrivals, city transfers and business travel." },
+  { name: "Mercedes-Benz Vito", image: "vito", copy: "A private passenger van for family transfers and journeys with your group." },
+  { name: "Toyota Hiace", image: "hiace", copy: "A passenger van option for group transfers and private touring." },
+  { name: "Toyota Alphard", image: "alphard", copy: "A luxury MPV option for private transfers and comfortable chauffeur-driven journeys." },
   { name: "Toyota Land Cruiser Prado", image: "prado", copy: "A private SUV option for airport transfers and journeys through Sri Lanka." },
   { name: "Toyota Land Cruiser", image: "land-cruiser", copy: "Travel between cities or plan a longer journey with a private chauffeur." },
+  { name: "Range Rover", image: "range-rover", copy: "A premium SUV option for private airport transfers and touring." },
 ];
 
 export type TransferInterest = { origin?: string; destination?: string; vehicle: string; indicative_amount?: number; currency?: string; trip_type?: string };
@@ -34,10 +39,10 @@ export function TransferShowcase({ onSelect }: { onSelect: (selection: TransferI
       <p className="transfer-terms">Travel times vary with traffic. Your final quotation will confirm vehicle availability, tolls, parking, taxes, waiting time and any additional stops.</p>
     </section>
     <section className="section pale" aria-labelledby="transfer-fleet-heading"><div className="shell">
-      <div className="section-title"><p className="eyebrow">Choose your vehicle</p><h2 id="transfer-fleet-heading">Private SUVs, pictured for you.</h2><p>Request your preferred model. We will confirm passenger and luggage capacity, availability and the price for your journey.</p></div>
+      <div className="section-title"><p className="eyebrow">Choose your vehicle</p><h2 id="transfer-fleet-heading">Find the right vehicle for your journey.</h2><p>Request your preferred model. We will confirm passenger and luggage capacity, availability and the price for your journey.</p></div>
       <div className="transfer-fleet-grid">{fleet.map((vehicle) => <article className="transfer-vehicle-card" key={vehicle.name}>
         <div className="transfer-vehicle-image"><Image src={`/media/transfers/${vehicle.image}.png`} alt={`${vehicle.name} exterior`} fill sizes="(max-width: 700px) 100vw, 50vw" /></div>
-        <div className="transfer-vehicle-copy"><h3>{vehicle.name}</h3><p>{vehicle.copy}</p><button type="button" className="button button-primary" onClick={() => choose({ vehicle: vehicle.name })}>Request this vehicle</button></div>
+        <div className="transfer-vehicle-copy"><h3>{vehicle.name}</h3><p>{vehicle.copy}</p><p className="transfer-vehicle-rate">Rate on request</p><button type="button" className="button button-primary" onClick={() => choose({ vehicle: vehicle.name })}>Request this vehicle</button></div>
       </article>)}</div>
     </div></section>
   </div>;
