@@ -7,6 +7,7 @@ import { AvailableHotels } from "./available-hotels";
 import { HomeMarketplace } from "./home-marketplace";
 import { ModuleSearch, type SearchType } from "./module-search";
 import { ReviewShowcase } from "./review-showcase";
+import { AboutMeSection } from "./about-me";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
 type Data={
@@ -20,6 +21,7 @@ export function ProductPage({data,kind}:{data:Data;kind:string}) {
   return <>
     {searchType?<ModuleSearch type={searchType}/>:<section className="inner-hero"><div className="shell inner-grid"><div><p className="eyebrow">{data.eyebrow}</p><h1>{data.title}</h1><p className="lede">{data.copy}</p><div className="hero-actions"><Link href={primaryHref} className="button button-gold">{data.action}</Link><a href="https://wa.me/94774206166" className="button button-soft">Talk to a specialist</a></div></div><div className="glass-orb"><span>{kind.slice(0,1).toUpperCase()}</span><small>Navigeto<br/>TravelOS connected</small></div></div></section>}
     <section className="stats shell">{data.stats.map(([label,value])=><div key={label}><strong>{value}</strong><span>{label}</span></div>)}</section>
+    {kind === "about" && <AboutMeSection/>}
     {kind==="hotels" && <AvailableHotels title="Published stays, priced clearly from the start." limit={8}/>}
     <section className="section shell"><div className="section-title"><p className="eyebrow">Designed around real travel</p><h2>Everything important, clearly handled.</h2></div><div className="card-grid">{data.cards.map(([title,copy],i)=><article className="rich-card" key={title}><span>0{i+1}</span><h3>{title}</h3><p>{copy}</p><a href="#enquire">Learn more →</a></article>)}</div></section>
     <section className="section pale"><div className="shell split"><div><p className="eyebrow">Why Navigeto Travels</p><h2>Modern tools behind the scenes. Real people when it matters.</h2><p>TravelOS keeps rates, enquiries and operational handovers organised. Your experience stays simple, transparent and personal.</p></div><div className="check-list">{["Approved public selling information only","Clear inclusions and next steps","Sri Lanka-based support","No supplier costs or internal data exposed"].map(x=><div key={x}><span>✓</span>{x}</div>)}</div></div></section>
@@ -136,6 +138,7 @@ export function HomeSections(){
     <div className="service-flow-grid">{services.map(([kind,number,title,copy,href])=><Link className={`service-flow-card service-flow-${kind}`} href={href} key={title}><span>{number}</span><div><h3>{title}</h3><p>{copy}</p></div><b>Explore <i aria-hidden="true">↗</i></b></Link>)}</div>
    </div>
   </section>
+  <AboutMeSection compact/>
   <ReviewShowcase/>
   <section className="trust shell">{[["TravelOS connected","Live public selling information"],["Human support","Real people when it matters"],["Clear pricing","Transparent selling rates"],["Flexible planning","Thoughtfully handled changes"]].map(([h,p],index)=><div key={h}><span>0{index+1}</span><p><b>{h}</b><small>{p}</small></p></div>)}</section>
  </>;
