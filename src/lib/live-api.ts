@@ -1,5 +1,6 @@
 import { trackTravelosConversion } from "@/lib/marketing";
 import { EnquiryRequestSession } from "@/lib/enquiry-request-session";
+import type { PublicPaymentLink, PublicPaymentOption } from "@/lib/public-payment";
 const enquirySession = new EnquiryRequestSession(() => sessionStorage);
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://drtunalervcihvyxtxbi.supabase.co";
@@ -327,6 +328,10 @@ export const liveApi = {
     message: string;
     history?: Array<{ role: "user" | "assistant"; content: string }>;
   }) => invoke<NaviResponse>("public-travel-api", payload, "assistant"),
+  paymentOptions: (payload: { bookingReference: string; email: string }) =>
+    invoke<{ payments: PublicPaymentOption[] }>("public-travel-api", payload, "payment-lookup"),
+  createPaymentLink: (payload: { bookingReference: string; email: string; paymentId: string }) =>
+    invoke<PublicPaymentLink>("public-travel-api", payload, "payment-link"),
 };
 
 export function saveSelection(type: string, value: unknown) {

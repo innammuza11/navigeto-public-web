@@ -1,7 +1,7 @@
 export const nav = [
   ["Flights", "/flights"], ["Hotels", "/hotels"], ["Tours", "/tours"],
   ["Holidays", "/holidays"], ["Visas", "/visas"], ["Transfers", "/transfers"],
-  ["Custom Trip", "/custom-trip"], ["Corporate", "/corporate"],
+  ["Custom Trip", "/custom-trip"], ["Corporate", "/corporate"], ["Pay Online", "/pay"],
 ] as const;
 
 export const pages = {

@@ -14,6 +14,7 @@ export const STATIC_SEO: Record<string, { title: string; description: string }> 
   "/flights": { title: "Flight Reservations & Fare Support | Navigeto", description: "Request regional and international flight options with route, baggage and fare-condition support from a travel consultant." },
   "/holidays": { title: "International Holiday Packages | Navigeto Travels", description: "Plan Maldives, Dubai, Thailand and worldwide holidays with flights, hotels, transfers and experiences connected in one itinerary." },
   "/hotels": { title: "Sri Lanka Hotels & Live Rates | Navigeto Travels", description: "Explore approved Sri Lanka hotels, published property profiles and live customer-ready rates with local support." },
+  "/pay": { title: "Secure Online Payment | Navigeto Travels", description: "Pay an open Navigeto reservation payment through the secure Marx hosted payment gateway." },
   "/privacy": { title: "Privacy Policy | Navigeto Travels", description: "Learn how Navigeto Travels handles website enquiries, customer contact details, consent and travel-service information." },
   "/terms": { title: "Booking Terms | Navigeto Travels", description: "Read the important terms for Navigeto hotel, transfer, tour, flight, visa and travel-service requests." },
   "/tours": { title: "Sri Lanka Tours & Tailor-made Holidays | Navigeto", description: "Explore cinematic private Sri Lanka tours and personalise the route, hotels, pace and experiences with local specialists." },
