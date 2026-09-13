@@ -899,3 +899,28 @@ body:has(.tour-collection-redesign) .navi-launcher b,body:has(.tour-collection-r
 
 @media(max-width:1050px){.marketplace-grid{grid-template-columns:repeat(5,minmax(230px,1fr));overflow-x:auto;padding:0 0 18px;scroll-snap-type:x proximity}.market-card{scroll-snap-align:start}.marketplace-grid::-webkit-scrollbar{height:6px}.marketplace-grid::-webkit-scrollbar-thumb{border-radius:999px;background:#c4d4de}.review-layout{grid-template-columns:1fr}.review-source-grid{max-width:850px}}
 @media(max-width:720px){.marketplace-section{padding-top:80px}.marketplace-intro,.marketplace-heading{grid-template-columns:1fr;gap:22px}.marketplace-intro{margin-bottom:70px}.marketplace-intro>.eyebrow{grid-column:auto;margin-bottom:-8px}.marketplace-heading>div:last-child{justify-self:start}.marketplace-row{padding-bottom:76px}.marketplace-grid{margin-right:-15px}.marketplace-empty{align-items:flex-start;flex-direction:column;padding:28px}.review-section{padding:80px 0}.review-layout{gap:42px}.review-source-grid{grid-template-columns:repeat(3,minmax(220px,1fr));overflow-x:auto;padding-bottom:16px}.review-source-card{scroll-snap-align:start}}
+
+/* Preserve readable text on the international section's navy surface. */
+.world-section { position: relative; }
+.world-copy > p { color: #d5e6ef; }
+.destination-board-head span { color: #d5e6ef; font-size: 11px; }
+.destination-board-head i { font-size: 10px; }
+.destination-line div small { color: #d5e6ef; font-size: 12px; line-height: 1.6; }
+.world-section .button-dark-soft { color: #fff; border-color: #a5c7da; }
+.world-section .button-dark-soft:hover { background: #ffffff18; }
+.world-section a:focus-visible, .review-source-card:focus-visible { outline: 3px solid #a7e6fa; outline-offset: 4px; }
+.review-section { scroll-margin-top: 110px; }
+.review-source-card > small { font-size: 12px; line-height: 1.7; color: #d5e6ef; }
+.review-source-card > p { font-size: 13px; }
+.review-source-card > b:last-child { font-size: 10px; }
+.review-score span { color: #ffe19a; }
+@media (max-width: 720px) {
+  .review-source-grid { grid-template-columns: 1fr; overflow: visible; }
+  .review-source-card { min-height: 300px; }
+}
+@media (min-width: 1051px) {
+  .desktop-nav { gap: 12px; }
+}
+@media (min-width: 1051px) and (max-width: 1449px) {
+  .desktop-nav { display: none; }
+}

@@ -121,6 +121,7 @@ export function HomeSections(){
   <section className="experience-ribbon" aria-label="Navigeto experiences">
    <div><span>THE INDIAN OCEAN</span><i>—</i><span>ELLA BY RAIL</span><i>—</i><span>WILD ENCOUNTERS</span><i>—</i><span>ANCIENT KINGDOMS</span><i>—</i><span>THE WORLD BEYOND</span><i>—</i><span aria-hidden="true">THE INDIAN OCEAN</span><i aria-hidden="true">—</i><span aria-hidden="true">ELLA BY RAIL</span><i aria-hidden="true">—</i></div>
   </section>
+  <ReviewShowcase/>
   <HomeMarketplace/>
   <section className="section journey-section">
    <div className="shell">
@@ -144,7 +145,6 @@ export function HomeSections(){
    </div>
   </section>
   <AboutMeSection compact/>
-  <ReviewShowcase/>
   <section className="trust shell">{[["TravelOS connected","Live public selling information"],["Human support","Real people when it matters"],["Clear pricing","Transparent selling rates"],["Flexible planning","Thoughtfully handled changes"]].map(([h,p],index)=><div key={h}><span>0{index+1}</span><p><b>{h}</b><small>{p}</small></p></div>)}</section>
  </>;
 }
