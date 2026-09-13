@@ -7,6 +7,7 @@ export const STATIC_SEO: Record<string, { title: string; description: string }> 
     title: "Navigeto Travels | Sri Lanka & Worldwide Journeys",
     description: "Bespoke Sri Lanka holidays, international flights, hotels, private tours, transfers and visa support—beautifully connected by Navigeto Travels.",
   },
+  "/reviews": { title: "Customer Reviews | Navigeto Travels", description: "Read independent Navigeto Travels reviews on Google, Tripadvisor and Trustpilot, and explore ratings from travellers." },
   "/about": { title: "About Navigeto Travels | Sri Lanka Travel Experts", description: "Meet the Colombo-based team combining local travel expertise with connected operations for Sri Lanka and worldwide journeys." },
   "/contact": { title: "Contact Navigeto Travels | Plan Your Journey", description: "Contact Navigeto Travels for Sri Lanka hotels, private tours, transfers, flights, visas and tailor-made holiday planning." },
   "/corporate": { title: "Corporate & Group Travel | Navigeto Travels", description: "Coordinate corporate travel, MICE, incentive groups, flights, hotels and ground operations with one accountable Sri Lanka team." },

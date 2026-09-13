@@ -30,7 +30,7 @@ export function Header({ config = DEFAULT_CONFIG }: { config?: PublicSiteConfig 
   const { currency, setCurrency, updatedAt } = useCurrency();
   return <>
     <div className="announcement"><div className="announcement-track"><span>{config.announcement_text || DEFAULT_CONFIG.announcement_text}</span><span aria-hidden="true">SRI LANKA · BEAUTIFULLY CONNECTED · WORLDWIDE</span><span aria-hidden="true">{config.announcement_text || DEFAULT_CONFIG.announcement_text}</span><span aria-hidden="true">SRI LANKA · BEAUTIFULLY CONNECTED · WORLDWIDE</span></div></div>
-    <header className="site-header">
+    <header className="site-header brand-signature">
       <div className="shell header-inner">
         <Link href="/" aria-label="Navigeto Travels home"><img src="/media/navigeto-logo.webp" width={2000} height={655} fetchPriority="high" decoding="async" alt="Navigeto Travels" className="brand-logo"/></Link>
         <nav className="desktop-nav" aria-label="Main navigation">{nav.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav>
@@ -51,10 +51,10 @@ export function Header({ config = DEFAULT_CONFIG }: { config?: PublicSiteConfig 
 }
 
 export function Footer({ config = DEFAULT_CONFIG }: { config?: PublicSiteConfig }) {
-  return <footer className="footer"><div className="footer-sun" aria-hidden="true"/><div className="shell footer-intro"><p className="eyebrow">Where will you go next?</p><h2>The world is waiting.<br/><em>Let&apos;s make it yours.</em></h2><Link className="button button-gold" href="/custom-trip">Begin a private journey ↗</Link></div><div className="shell footer-grid">
+  return <footer className="footer brand-signature"><div className="footer-sun" aria-hidden="true"/><div className="shell footer-intro"><p className="eyebrow">Where will you go next?</p><h2>The world is waiting.<br/><em>Let&apos;s make it yours.</em></h2><Link className="button button-gold" href="/custom-trip">Begin a private journey ↗</Link></div><div className="shell footer-grid">
     <div className="footer-brand"><img src="/media/navigeto-logo.webp" width={2000} height={655} loading="lazy" decoding="async" alt="Navigeto Travels"/><p>{config.tagline || DEFAULT_CONFIG.tagline}</p><a href={whatsappHref(config.whatsapp_number)}>Chat on WhatsApp →</a></div>
     <div><h4>Book with us</h4><Link href="/hotels">Hotels</Link><Link href="/transfers">Private Transfers</Link><Link href="/tours">All Tours</Link><Link href="/custom-trip">Custom Trip</Link><Link href="/pay">Pay Online</Link></div>
-    <div><h4>Company</h4><Link href="/about">About Navigeto</Link><Link href="/contact">Contact</Link><Link href="/privacy">Privacy</Link><Link href="/mobile-privacy">App privacy</Link><Link href="/delete-account">Delete account</Link><Link href="/terms">Terms</Link></div>
+    <div><h4>Company</h4><Link href="/about">About Navigeto</Link><Link href="/reviews">Reviews</Link><Link href="/contact">Contact</Link><Link href="/privacy">Privacy</Link><Link href="/mobile-privacy">App privacy</Link><Link href="/delete-account">Delete account</Link><Link href="/terms">Terms</Link></div>
     <div><h4>Partner login</h4><a href="https://admin.navigeto.com/partner/login?as=driver">Driver Login</a><a href="https://admin.navigeto.com/partner/login?as=hotel">Hotel Login</a><a href="https://admin.navigeto.com/partner/login?as=agent">Travel Agent (B2B)</a></div>
     <div><h4>Contact</h4><a href={`tel:${String(config.phone || DEFAULT_CONFIG.phone).replace(/[^+\d]/g, "")}`}>{config.phone || DEFAULT_CONFIG.phone}</a><a href={`mailto:${config.email || DEFAULT_CONFIG.email}`}>{config.email || DEFAULT_CONFIG.email}</a><span>{config.office_address || DEFAULT_CONFIG.office_address}</span></div>
   </div><div className="shell footer-bottom"><span>© 2026 Navigeto Travels (Pvt) Ltd.</span><span>Live services powered by Navigeto TravelOS Enterprise.</span></div></footer>;
