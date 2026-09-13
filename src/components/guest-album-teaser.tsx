@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages -- The guest album is a standalone HTML document and needs full-page navigation. */
 /* eslint-disable @next/next/no-img-element */
 import styles from './guest-album-teaser.module.css';
 
