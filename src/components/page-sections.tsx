@@ -8,6 +8,7 @@ import { AvailableHotels } from "./available-hotels";
 import { HomeMarketplace } from "./home-marketplace";
 import { ModuleSearch, type SearchType } from "./module-search";
 import { ReviewShowcase } from "./review-showcase";
+import { GuestAlbumTeaser } from "./guest-album-teaser";
 import { AboutMeSection } from "./about-me";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
@@ -121,6 +122,7 @@ export function HomeSections(){
   <section className="experience-ribbon" aria-label="Navigeto experiences">
    <div><span>THE INDIAN OCEAN</span><i>—</i><span>ELLA BY RAIL</span><i>—</i><span>WILD ENCOUNTERS</span><i>—</i><span>ANCIENT KINGDOMS</span><i>—</i><span>THE WORLD BEYOND</span><i>—</i><span aria-hidden="true">THE INDIAN OCEAN</span><i aria-hidden="true">—</i><span aria-hidden="true">ELLA BY RAIL</span><i aria-hidden="true">—</i></div>
   </section>
+  <GuestAlbumTeaser/>
   <ReviewShowcase/>
   <HomeMarketplace/>
   <section className="section journey-section">
