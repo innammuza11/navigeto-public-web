@@ -2,6 +2,17 @@ import { TOUR_NAMES } from "./tour-names.ts";
 
 type TourName = { id?: string; title: string; destinations?: string[] };
 
+/** Display copy only: never rewrite source descriptions or itinerary records. */
+export function publicTourSummary(summary: string | null | undefined, destinations: string[], duration?: number): string {
+  const clean = (summary || "").replace(/\s+/g, " ").trim();
+  if (clean && !/staff|supplier|holiday raptors|internal|preserved|approval|travelos|customer.safe/i.test(clean)) {
+    return clean.length > 190 ? `${clean.slice(0, 187).replace(/\s+\S*$/, "")}…` : clean;
+  }
+  const places = destinations.filter(Boolean).slice(0, 4);
+  const days = Number.isInteger(duration) && duration! > 0 ? `${duration}-day ` : "";
+  return `A ${days}private journey${places.length ? ` through ${places.join(", ")}` : ""}, shaped around your pace.`;
+}
+
 /** Display-only: never change the source title, slug, booking payload or SEO identity. */
 export function tourDisplayName(tour: TourName): string {
   if (tour.id && Object.hasOwn(TOUR_NAMES, tour.id)) return TOUR_NAMES[tour.id];

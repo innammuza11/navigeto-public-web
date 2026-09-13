@@ -1,7 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { tourDisplayName, tourDurationLabel } from "./tour-presentation.ts";
+import { tourDisplayName, tourDurationLabel, publicTourSummary } from "./tour-presentation.ts";
 import { TOUR_NAMES } from "./tour-names.ts";
+
+test("public summaries replace internal review text without changing source records", () => {
+  const source = Object.freeze({ summary: "Original Holiday Raptors programme preserved for staff review.", destinations: ["Kandy", "Ella"] });
+  assert.equal(publicTourSummary(source.summary, source.destinations, 6), "A 6-day private journey through Kandy, Ella, shaped around your pace.");
+  assert.match(source.summary, /staff review/);
+  assert.equal(publicTourSummary("Explore tea country and the coast.", [], 6), "Explore tea country and the coast.");
+  assert.equal(publicTourSummary(null, [], -1), "A private journey, shaped around your pace.");
+});
 
 test("published package names are short and distinct across both collections", () => {
   const names = Object.values(TOUR_NAMES);
