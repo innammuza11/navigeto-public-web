@@ -18,21 +18,22 @@ function stable(value:unknown):unknown {
 export class EnquiryRequestSession {
  private busy=false;
  private storage:()=>Storage;
- constructor(storage:()=>Storage){this.storage=storage;}
+ private storageKey:string;
+ constructor(storage:()=>Storage, storageKey=ENQUIRY_REQUEST_STORAGE){this.storage=storage;this.storageKey=storageKey;}
  private read():Pending|null {
   try {
-   const raw=this.storage().getItem(ENQUIRY_REQUEST_STORAGE);if(raw===null)return null;
+   const raw=this.storage().getItem(this.storageKey);if(raw===null)return null;
    const value=JSON.parse(raw) as Pending;
    if(!value || typeof value.id!=='string' || !uuid.test(value.id) || typeof value.fingerprint!=='string' || !/^[a-f0-9]{64}$/.test(value.fingerprint))throw new Error();
    if(value.receipt)value.receipt=receipt(value.receipt);
    return value;
   }catch{throw new Error('Enquiry recovery storage is unavailable or invalid. Enable browser storage, or contact Navigeto before starting a separate request.');}
  }
- private write(pending:Pending){const text=JSON.stringify(pending);this.storage().setItem(ENQUIRY_REQUEST_STORAGE,text);if(this.storage().getItem(ENQUIRY_REQUEST_STORAGE)!==text)throw new Error('Storage write failed');}
+ private write(pending:Pending){const text=JSON.stringify(pending);this.storage().setItem(this.storageKey,text);if(this.storage().getItem(this.storageKey)!==text)throw new Error('Storage write failed');}
  startSeparateRequest(){
   if(this.busy)throw new Error('Please wait for the current request to finish.');
-  this.storage().removeItem(ENQUIRY_REQUEST_STORAGE);
-  if(this.storage().getItem(ENQUIRY_REQUEST_STORAGE)!==null)throw new Error('Could not reset enquiry recovery storage.');
+  this.storage().removeItem(this.storageKey);
+  if(this.storage().getItem(this.storageKey)!==null)throw new Error('Could not reset enquiry recovery storage.');
  }
  async submit(payload:Record<string,unknown>,send:(payload:Record<string,unknown>)=>Promise<EnquiryReceipt>,validateNew:()=>void=()=>{},onReceipt:(value:EnquiryReceipt)=>void=()=>{}) {
   if(this.busy)throw new Error('Your enquiry is already being sent.');

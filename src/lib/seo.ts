@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://navigeto.com").replace(/\/$/, "");
 
 export const STATIC_SEO: Record<string, { title: string; description: string }> = {
+  "/travelos": { title: "TravelOS by Navigeto | Travel Agency Software & B2B Services", description: "Bring tour costing, branded quotations, itineraries and reservation operations together. Explore TravelOS by Navigeto and request an agency pilot demo." },
   "/": {
     title: "Navigeto Travels | Sri Lanka & Worldwide Journeys",
     description: "Bespoke Sri Lanka holidays, international flights, hotels, private tours, transfers and visa support—beautifully connected by Navigeto Travels.",

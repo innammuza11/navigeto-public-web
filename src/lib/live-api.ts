@@ -2,6 +2,7 @@ import { trackTravelosConversion } from "@/lib/marketing";
 import { EnquiryRequestSession } from "@/lib/enquiry-request-session";
 import type { PublicPaymentLink, PublicPaymentOption } from "@/lib/public-payment";
 const enquirySession = new EnquiryRequestSession(() => sessionStorage);
+const demoSession = new EnquiryRequestSession(() => sessionStorage, "navigeto:travelos-demo:v1");
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://drtunalervcihvyxtxbi.supabase.co";
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_uuG7Eh-Kyijjd5cYsm_jIA_2QdwCo7u";
@@ -9,7 +10,7 @@ const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publish
 const functionUrl = (name: string, action?: string) =>
   `${SUPABASE_URL}/functions/v1/${name}${action ? `?action=${action}` : ""}`;
 
-async function invoke<T>(name: string, payload: unknown, action?: string): Promise<T> {
+async function invoke<T>(name: string, payload: unknown, action?: string, signal?: AbortSignal): Promise<T> {
   const response = await fetch(functionUrl(name, action), {
     method: "POST",
     headers: {
@@ -18,6 +19,7 @@ async function invoke<T>(name: string, payload: unknown, action?: string): Promi
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
+    signal,
   });
   const result = await response.json().catch(() => ({}));
   if (!response.ok || result?.error) {
@@ -317,6 +319,13 @@ export const liveApi = {
   transferQuote: (payload: Record<string, unknown>) =>
     invoke<TransferQuote>("public-travel-api", payload, "transfer-quote"),
   startSeparateEnquiry: () => enquirySession.startSeparateRequest(),
+  startSeparateTravelosDemo: () => demoSession.startSeparateRequest(),
+  travelosDemo: (payload: Record<string, unknown>) =>
+    demoSession.submit(payload, async data => {
+      const ready = await invoke<{ enquiry_receipts?: number }>("public-travel-api", {}, "enquiry-capabilities", AbortSignal.timeout(15000));
+      if (ready.enquiry_receipts !== 1) throw new Error("Demo requests are temporarily unavailable. Please contact us on WhatsApp.");
+      return invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", data, "enquiry", AbortSignal.timeout(20000));
+    }),
   enquiry: (payload: Record<string, unknown>, validateNew: () => void = () => {}) =>
     enquirySession.submit(payload, async data => {
       const ready = await invoke<{ enquiry_receipts?: number }>("public-travel-api", {}, "enquiry-capabilities");

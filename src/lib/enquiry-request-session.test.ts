@@ -61,3 +61,15 @@ test('payload is snapshotted before hashing; consent changes are distinct',async
 test('new validation failure sends nothing and leaves no key',async()=>{
  const {session,data}=setup();await assert.rejects(session.submit(payload,async()=>response,()=>{throw Error('invalid date');}),/invalid date/);assert.equal(data.size,0);
 });
+test('software demo retries and resets are isolated from a pending travel enquiry',async()=>{
+ const {session,storage,data}=setup();let travelId:unknown,demoId:unknown;
+ await assert.rejects(session.submit(payload,async p=>{travelId=p.request_id;throw Error('lost travel response');}));
+ const demoKey='navigeto:travelos-demo:v1';
+ const demo=new EnquiryRequestSession(()=>storage,demoKey);
+ const demoPayload={...payload,subject:'Software demo'};
+ await assert.rejects(demo.submit(demoPayload,async p=>{demoId=p.request_id;throw Error('lost demo response');}));
+ assert.notEqual(travelId,demoId);
+ await new EnquiryRequestSession(()=>storage,demoKey).submit(demoPayload,async p=>{assert.equal(p.request_id,demoId);return response;});
+ demo.startSeparateRequest();assert.equal(data.has(demoKey),false);assert.equal(data.has(ENQUIRY_REQUEST_STORAGE),true);
+ await session.submit(payload,async p=>{assert.equal(p.request_id,travelId);return response;});
+});
