@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { TransportPackageLoader } from "./transport-packages/TransportPackageLoader";
+import type { TransportSelection } from "./transport-packages/TransportPackages";
 
 // Public reference: https://biataxi.lk/airport-transfers, checked 2026-09-10.
 // Indicative selling proposals, not approved supplier costs or automatic quotes.
@@ -21,7 +23,7 @@ const fleet = [
   { name: "Range Rover", image: "range-rover", copy: "A premium SUV option for private airport transfers and touring." },
 ];
 
-export type TransferInterest = { origin?: string; destination?: string; vehicle: string; indicative_amount?: number; currency?: string; trip_type?: string };
+export type TransferInterest = { origin?: string; destination?: string; vehicle: string; indicative_amount?: number; currency?: string; trip_type?: string; transport_package?: TransportSelection };
 
 export function TransferShowcase({ onSelect }: { onSelect: (selection: TransferInterest) => void }) {
   function choose(selection: TransferInterest) {
@@ -29,6 +31,7 @@ export function TransferShowcase({ onSelect }: { onSelect: (selection: TransferI
     document.getElementById("enquire")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
   return <div className="transfer-showcase">
+    <section className="section shell"><TransportPackageLoader onSelect={selection=>choose({vehicle:selection.vehicle,trip_type:selection.mode==='round'?'round_tour':'day_service',transport_package:selection})}/></section>
     <section className="section shell" aria-labelledby="airport-routes-heading">
       <div className="section-title"><p className="eyebrow">From Bandaranaike International Airport</p><h2 id="airport-routes-heading">Popular airport transfers.</h2><p>Indicative prices per private vehicle, one way. Share your dates and group details for a confirmed quotation.</p></div>
       <div className="airport-route-grid">{airportRoutes.map((route) => <article className="airport-route-card" key={route.destination}>
@@ -40,7 +43,7 @@ export function TransferShowcase({ onSelect }: { onSelect: (selection: TransferI
     </section>
     <section className="section pale" aria-labelledby="transfer-fleet-heading"><div className="shell">
       <div className="section-title"><p className="eyebrow">Choose your vehicle</p><h2 id="transfer-fleet-heading">Find the right vehicle for your journey.</h2><p>Request your preferred model. We will confirm passenger and luggage capacity, availability and the price for your journey.</p></div>
-      <div className="transfer-fleet-grid">{fleet.map((vehicle) => <article className="transfer-vehicle-card" key={vehicle.name}>
+      <div className="transfer-fleet-grid">{fleet.filter(vehicle=>!['vito','alphard','hiace'].includes(vehicle.image)).map((vehicle) => <article className="transfer-vehicle-card" key={vehicle.name}>
         <div className="transfer-vehicle-image"><Image src={`/media/transfers/${vehicle.image}.png`} alt={`${vehicle.name} exterior`} fill sizes="(max-width: 700px) 100vw, 50vw" /></div>
         <div className="transfer-vehicle-copy"><h3>{vehicle.name}</h3><p>{vehicle.copy}</p><p className="transfer-vehicle-rate">Rate on request</p><button type="button" className="button button-primary" onClick={() => choose({ vehicle: vehicle.name })}>Request this vehicle</button></div>
       </article>)}</div>
