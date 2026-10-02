@@ -1,5 +1,5 @@
 "use client";
-import { tourDisplayName, tourDurationLabel } from "@/lib/tour-presentation";
+import { tourDisplayName, tourDurationLabel, publicTourSummary } from "@/lib/tour-presentation";
 import Link from "next/link";
 import { HotelManualQuote } from "@/components/hotel-manual-quote";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
@@ -119,10 +119,7 @@ const tourImage = (tour: TourPresentation & Pick<PublicTour, "hero_image_url">, 
 };
 
 const conciseTourSummary = (tour: TourPresentation, duration?: number) => {
-  const summary = tour.summary?.replace(/\s+/g, " ").trim();
-  if (summary) return summary.length > 190 ? `${summary.slice(0, 187).replace(/\s+\S*$/, "")}…` : summary;
-  const places = tourPlaces(tour).slice(0, 4);
-  return `${duration ? `${duration}-day ` : ""}private journey${places.length ? ` through ${places.join(", ")}` : " across Sri Lanka"}, shaped around your pace.`;
+  return publicTourSummary(tour.summary, tourPlaces(tour), duration);
 };
 
 const cleanDayTitle = (value: string) => {
