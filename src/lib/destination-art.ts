@@ -1,3 +1,4 @@
+import {productArtwork, countryArtwork} from './product-artwork.ts';
 export type Motif = 'palm'|'train'|'rock'|'elephant'|'stupa'|'lighthouse'|'towers'|'marina'|'pagoda'|'sail'|'burj'|'torii'|'eiffel'|'clock'|'colosseum'|'opera'|'taj'|'pyramid'|'island'|'globe'|'mountain'|'cn'|'liberty'|'mosque'|'wall'|'skyline';
 export type CoverInput = { identity: string; country: string; title?: string; places?: readonly string[] };
 const countryScenes: Array<[RegExp, Motif[]]> = [
@@ -48,6 +49,7 @@ export function destinationArtPlan(input: CoverInput) {
 
 /** Choose a painted scene from the destination and actual route, never an unrelated country. */
 export function destinationArtwork(input: CoverInput): string {
+  if (Object.hasOwn(productArtwork, input.identity)) return productArtwork[input.identity];
   const country = input.country.trim();
   const text = [input.identity, input.title || '', ...(input.places || [])].join(' ').toLowerCase();
   if (/sri\s*lanka|^lk$/i.test(country)) {
@@ -66,6 +68,7 @@ export function destinationArtwork(input: CoverInput): string {
     if (/02-nights|city-leisure/.test(text)) return 'malaysia-heritage';
     return 'malaysia';
   }
+  if (countryArtwork[country.toLowerCase()]) return countryArtwork[country.toLowerCase()];
   if (/japan|^jp$/i.test(country)) return 'japan-visa';
   if (/thailand|^th$/i.test(country)) return 'thailand';
   if (/united arab|dubai|^ae$|^uae$/i.test(country)) return 'dubai';

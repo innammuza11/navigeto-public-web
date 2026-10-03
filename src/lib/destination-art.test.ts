@@ -1,6 +1,19 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {destinationArtPlan} from './destination-art.ts';
+import {productArtwork} from './product-artwork.ts';
+import {existsSync, readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+test('all 158 catalogue products have separate existing cover paintings',()=>{
+ const products=Object.entries(productArtwork).filter(([identity])=>!identity.startsWith('visa-country-'));
+ assert.equal(products.length,158);
+ const hashes=products.map(([,art])=>{
+  const file=new URL(`../../public/art/watercolour/${art}.webp`,import.meta.url);
+  assert.ok(existsSync(file),`Missing cover: ${art}`);
+  return createHash('sha256').update(readFileSync(file)).digest('hex');
+ });
+ assert.equal(new Set(hashes).size,158,'Product covers must be original individual paintings');
+});
 test('cover identity is stable across display ordering and creates individual editions',()=>{
  const input={identity:'malaysia-visa-tourism',country:'Malaysia'};
  assert.deepEqual(destinationArtPlan(input),destinationArtPlan(input));
