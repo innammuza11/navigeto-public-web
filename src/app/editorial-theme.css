@@ -765,9 +765,30 @@ surrounding UI stays quiet. */
 .tour-anchor-nav{
   background:var(--paper)
 }
+/* Published seasonal bands must keep dark ink on the white editorial surface. */
 .tour-rates-section{
-  background:var(--pale)
+  background:var(--pale);
+  color:var(--ink)
 }
+.tour-rates-section::before{display:none}
+.tour-rates-heading h2,.tour-rate-group>summary b,.tour-rate-card h3,.tour-rate-values b{
+  color:var(--ink)
+}
+.tour-rates-heading>p,.tour-rate-group>summary em,.tour-rate-card header>span,.tour-rate-validity,.tour-rate-values span,.tour-rates-note{
+  color:var(--muted)
+}
+.tour-rate-group{
+  background:var(--paper);
+  backdrop-filter:none
+}
+.tour-rate-group>summary i,.tour-rate-card header>span,.tour-rate-values>div{
+  border-color:var(--line)
+}
+.tour-rate-group>summary i{color:var(--ink)}
+.tour-rate-group[open]>summary i{background:var(--sky);color:var(--teal)}
+.tour-rate-card{background:var(--paper)}
+.tour-rate-values>div{background:var(--sky)}
+.tour-rate-values b{font-family:var(--font-sans),sans-serif;font-variant-numeric:tabular-nums}
 .tour-rate-values strong,.money,.price-summary strong{
   font-family:var(--font-sans),sans-serif
 }
