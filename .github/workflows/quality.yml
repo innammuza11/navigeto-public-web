@@ -2,7 +2,7 @@ name: Public website quality
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, codex/white-sketchbook-preview]
   workflow_dispatch:
 
 permissions:

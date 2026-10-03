@@ -49,6 +49,14 @@ configuration and Worker entry point remain recoverable in Git history.
 
 ## Release safety
 
+The Next.js lint plugin's `fast-glob` dependency is scoped to the pinned
+`tinyglobby` npm alias in `package.json` to remove the unpatched `braces`
+dependency (GHSA-vfj7-8cjw-p6xm). Next uses only `globSync` with
+`onlyDirectories`; the root-discovery regression test covers directory globs,
+multiple roots, and actual enforcement of the internal-navigation lint rule.
+Review this override when updating Next's lint plugin. Keep the full dependency
+audit enabled.
+
 1. Merge only after the quality workflow passes.
 2. Inspect a Netlify preview for `navigeto-b2c`.
 3. Exercise hotel, tour, transfer, flight, and Visa journeys.
