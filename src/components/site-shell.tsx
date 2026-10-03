@@ -12,6 +12,7 @@ import { NaviChat } from "@/components/navi-chat";
 import { MarketingTracker } from "@/components/marketing-tracker";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 import { nav } from "@/lib/site-data";
+import access from "@/components/partner-access.module.css";
 
 const DEFAULT_CONFIG: PublicSiteConfig = {
   announcement_text: "Plan hotels, transfers and tours in one place.",
@@ -52,6 +53,15 @@ export function Header({ config = DEFAULT_CONFIG }: { config?: PublicSiteConfig 
   return <>
     <div className="announcement"><div className="announcement-track"><span>{config.announcement_text || DEFAULT_CONFIG.announcement_text}</span><span aria-hidden="true">SRI LANKA · BEAUTIFULLY CONNECTED · WORLDWIDE</span><span aria-hidden="true">{config.announcement_text || DEFAULT_CONFIG.announcement_text}</span><span aria-hidden="true">SRI LANKA · BEAUTIFULLY CONNECTED · WORLDWIDE</span></div></div>
     <header ref={headerRef} className="site-header brand-signature">
+      <div className={access.bar}>
+        <nav className={`shell ${access.barInner}`} aria-label="Partner account">
+          <Link className={access.label} href="/partners">Partner portal <span>· Agents, hotels &amp; drivers</span></Link>
+          <div className={access.actions}>
+            <a href="https://admin.navigeto.com/partner/login">Sign in <span aria-hidden="true">↗</span></a>
+            <Link className={access.register} href="/partners">Register <span aria-hidden="true">→</span></Link>
+          </div>
+        </nav>
+      </div>
       <div className="shell header-inner">
         <Link href="/" aria-label="Navigeto Travels home"><img src="/media/navigeto-logo.webp" width={2000} height={655} fetchPriority="high" decoding="async" alt="Navigeto Travels" className="brand-logo"/></Link>
         <nav className="desktop-nav" aria-label="Main navigation">{primaryNav.map(([label, href]) => <Link key={href} href={href} aria-current={isCurrent(href) ? "page" : undefined}>{label}</Link>)}</nav>
@@ -76,7 +86,7 @@ export function Footer({ config = DEFAULT_CONFIG }: { config?: PublicSiteConfig 
     <div className="footer-brand"><img src="/media/navigeto-logo.webp" width={2000} height={655} loading="lazy" decoding="async" alt="Navigeto Travels"/><p>{config.tagline || DEFAULT_CONFIG.tagline}</p><a href={whatsappHref(config.whatsapp_number)}>Chat on WhatsApp →</a></div>
     <div><h4>Book with us</h4><Link href="/hotels">Hotels</Link><Link href="/transfers">Private Transfers</Link><Link href="/tours">All Tours</Link><Link href="/custom-trip">Custom Trip</Link><Link href="/pay">Pay Online</Link></div>
     <div><h4>Company</h4><Link href="/about">About Navigeto</Link><a href="/guest-album">Guest album</a><Link href="/reviews">Reviews</Link><Link href="/contact">Contact</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link></div>
-    <div><h4>Partners &amp; TravelOS</h4><Link href="/travelos">TravelOS for agencies</Link><a href="https://admin.navigeto.com/partner/login?as=driver">Driver Login</a><a href="https://admin.navigeto.com/partner/login?as=hotel">Hotel Login</a><a href="https://admin.navigeto.com/partner/login?as=agent">Travel Agent (B2B)</a></div>
+    <div><h4>Partners &amp; TravelOS</h4><Link href="/partners">Register as a partner</Link><a href="https://admin.navigeto.com/partner/login">Partner sign in</a><Link href="/travelos">TravelOS for agencies</Link></div>
     <div><h4>Contact</h4><a href={`tel:${String(config.phone || DEFAULT_CONFIG.phone).replace(/[^+\d]/g, "")}`}>{config.phone || DEFAULT_CONFIG.phone}</a><a href={`mailto:${config.email || DEFAULT_CONFIG.email}`}>{config.email || DEFAULT_CONFIG.email}</a><span>{config.office_address || DEFAULT_CONFIG.office_address}</span></div>
   </div><div className="shell footer-bottom"><span>© 2026 Navigeto Travels (Pvt) Ltd.</span><span>Live services powered by Navigeto TravelOS Enterprise.</span></div></footer>;
 }
