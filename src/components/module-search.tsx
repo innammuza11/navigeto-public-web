@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { visaDestinations } from "@/lib/live-api";
 
 export type SearchType = "flight" | "hotel" | "tour" | "visa" | "transfer";
@@ -24,7 +25,7 @@ const defaults: Record<SearchType, Values> = {
 const actions: Record<SearchType, string> = {
   flight: "/flights/search",
   hotel: "/hotels/search",
-  tour: "/tours/sri-lanka",
+  tour: "/tours",
   visa: "/visas/apply",
   transfer: "/transfers/search",
 };
@@ -54,20 +55,20 @@ function Choice({ label, copy, checked, onChange }: { label: string; copy: strin
   return <label className="module-choice"><input name="direct_only" type="checkbox" value="true" checked={checked} onChange={(event) => onChange(event.target.checked)}/><span aria-hidden="true"/><div><b>{label}</b><small>{copy}</small></div></label>;
 }
 
-export function AdvancedSearchForm({ type, surface = "module" }: { type: SearchType; surface?: SearchSurface }) {
-  const [values, setValues] = useState<Values>({ ...defaults[type] });
-  const [advanced, setAdvanced] = useState(true);
+export function AdvancedSearchForm({ type, surface = "module", international = false }: { type: SearchType; surface?: SearchSurface; international?: boolean }) {
+  const [values, setValues] = useState<Values>({ ...defaults[type], ...(type === "tour" && international ? { country: "" } : {}) });
+  const [advanced, setAdvanced] = useState(surface !== "home");
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       const params = new URLSearchParams(window.location.search);
-      const next = { ...defaults[type] };
+      const next: Values = { ...defaults[type], ...(type === "tour" && international ? { country: "" } : {}) };
       for (const key of Object.keys(next)) if (params.get(key)) next[key] = params.get(key) as string;
       if (params.get("direct_only") === "true") next.direct_only = "true";
       setValues(next);
     });
     return () => cancelAnimationFrame(frame);
-  }, [type]);
+  }, [type, international]);
 
   const set = (key: string, value: string) => setValues((current) => {
     const next = { ...current, [key]: value };
@@ -122,7 +123,7 @@ export function AdvancedSearchForm({ type, surface = "module" }: { type: SearchT
         </>}
         <button className="button button-gold module-submit" type="submit">{submitLabel} <span aria-hidden="true">→</span></button>
       </div>
-      {advanced && <div className="search-advanced-fields">
+      {<div className="search-advanced-fields" hidden={!advanced}>
         {type === "flight" && <>
           <Field label="Adults"><select name="adults" value={values.adults} onChange={(event) => set("adults", event.target.value)}>{[1,2,3,4,5,6,7,8,9].map((count) => <option key={count}>{count}</option>)}</select></Field>
           <Field label="Children (2–11)"><select name="children" value={values.children} onChange={(event) => set("children", event.target.value)}>{[0,1,2,3,4,5,6].map((count) => <option key={count}>{count}</option>)}</select></Field>
@@ -157,11 +158,11 @@ export function AdvancedSearchForm({ type, surface = "module" }: { type: SearchT
   </div>;
 }
 
-export function ModuleSearch({ type }: { type: SearchType }) {
+export function ModuleSearch({ type, international = false }: { type: SearchType; international?: boolean }) {
   return <section className={`module-search module-search-${type}`}>
     <div className="shell">
-      <div className="module-search-heading"><p className="eyebrow">Navigeto Travels · {type}</p><h1>{headings[type][0]}</h1><p>{headings[type][1]}</p></div>
-      <AdvancedSearchForm type={type}/>
+      <div className="module-search-heading"><Image className="module-watercolour" src={`/art/watercolour/${type === "hotel" ? "hotel-retreat" : type === "transfer" ? "transfer-journey" : type === "tour" && !international ? "sri-lanka" : "world-journey"}.webp`} width={600} height={400} alt=""/><p className="eyebrow">Navigeto Travels · {type}</p><h1>{headings[type][0]}</h1><p>{headings[type][1]}</p></div>
+      <AdvancedSearchForm type={type} international={international}/>
     </div>
   </section>;
 }

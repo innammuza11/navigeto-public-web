@@ -5,13 +5,13 @@
 /* The deployed Vinext image optimizer does not serve this original brand asset
    reliably, so the logo intentionally uses a direct browser request. */
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { displayCurrencies, useCurrency } from "@/components/currency-context";
 import { NaviChat } from "@/components/navi-chat";
 import { MarketingTracker } from "@/components/marketing-tracker";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 import { nav } from "@/lib/site-data";
-import { NatureTheme } from "@/components/nature/NatureTheme";
 
 const DEFAULT_CONFIG: PublicSiteConfig = {
   announcement_text: "Plan hotels, transfers and tours in one place.",
@@ -29,12 +29,32 @@ function whatsappHref(number?: string) {
 export function Header({ config = DEFAULT_CONFIG }: { config?: PublicSiteConfig }) {
   const [open, setOpen] = useState(false);
   const { currency, setCurrency, updatedAt } = useCurrency();
+  const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLButtonElement>(null);
+  const primaryNav = nav.filter(([, href]) => ["/flights", "/hotels", "/tours", "/visas", "/transfers", "/custom-trip"].includes(href));
+  const isCurrent = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  useEffect(() => {
+    if (!open) return;
+    function dismiss(event: PointerEvent) {
+      if (!headerRef.current?.contains(event.target as Node)) setOpen(false);
+    }
+    function escape(event: KeyboardEvent) {
+      if (event.key === "Escape") { setOpen(false); menuRef.current?.focus(); }
+    }
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [open]);
   return <>
     <div className="announcement"><div className="announcement-track"><span>{config.announcement_text || DEFAULT_CONFIG.announcement_text}</span><span aria-hidden="true">SRI LANKA · BEAUTIFULLY CONNECTED · WORLDWIDE</span><span aria-hidden="true">{config.announcement_text || DEFAULT_CONFIG.announcement_text}</span><span aria-hidden="true">SRI LANKA · BEAUTIFULLY CONNECTED · WORLDWIDE</span></div></div>
-    <header className="site-header brand-signature">
+    <header ref={headerRef} className="site-header brand-signature">
       <div className="shell header-inner">
         <Link href="/" aria-label="Navigeto Travels home"><img src="/media/navigeto-logo.webp" width={2000} height={655} fetchPriority="high" decoding="async" alt="Navigeto Travels" className="brand-logo"/></Link>
-        <nav className="desktop-nav" aria-label="Main navigation">{nav.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav>
+        <nav className="desktop-nav" aria-label="Main navigation">{primaryNav.map(([label, href]) => <Link key={href} href={href} aria-current={isCurrent(href) ? "page" : undefined}>{label}</Link>)}</nav>
         <div className="header-actions">
           <label className="currency-control" title={updatedAt ? `Display rates updated ${updatedAt}` : "Loading current exchange rates"}>
             <span>Currency</span>
@@ -43,10 +63,10 @@ export function Header({ config = DEFAULT_CONFIG }: { config?: PublicSiteConfig 
             </select>
           </label>
           <a className="button button-primary desktop-only" href={whatsappHref(config.whatsapp_number)} target="_blank" rel="noreferrer">● WhatsApp</a>
-          <button className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? "Close navigation" : "Open navigation"}><span/><span/><span/></button>
+          <button ref={menuRef} type="button" aria-controls="site-navigation" className="menu-button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? "Close navigation" : "Open navigation"}><span/><span/><span/></button>
         </div>
       </div>
-      {open && <nav className="mobile-nav" aria-label="Mobile navigation">{nav.map(([label, href]) => <Link onClick={() => setOpen(false)} key={href} href={href}>{label}<span>→</span></Link>)}</nav>}
+      {open && <nav id="site-navigation" className="mobile-nav" aria-label="All navigation" onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget) && event.relatedTarget !== menuRef.current) setOpen(false); }}>{nav.map(([label, href]) => <Link onClick={() => setOpen(false)} key={href} href={href} aria-current={isCurrent(href) ? "page" : undefined}>{label}<span aria-hidden="true">→</span></Link>)}</nav>}
     </header>
   </>;
 }
@@ -68,5 +88,5 @@ export function SiteShell({children, hideNavi = false}:{children:React.ReactNode
     liveApi.siteConfig().then((value) => { if (active) setConfig({ ...DEFAULT_CONFIG, ...value }); }).catch(() => undefined);
     return () => { active = false; };
   }, []);
-  return <NatureTheme surface="public"><MarketingTracker config={config}/><Header config={config}/><main>{children}</main><Footer config={config}/>{!hideNavi && config.assistant_enabled !== false && <NaviChat/>}</NatureTheme>;
+  return <div className="editorial-site"><a className="skip-link" href="#main-content">Skip to content</a><MarketingTracker config={config}/><Header config={config}/><main id="main-content" tabIndex={-1}>{children}</main><Footer config={config}/>{!hideNavi && config.assistant_enabled !== false && <NaviChat/>}</div>;
 }

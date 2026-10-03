@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { DestinationCover } from "./destination-cover";
 import { Money } from "@/components/money";
 
 type VisaProduct = {
@@ -175,7 +176,7 @@ export function VisaStorefront() {
               Explore Visa services →
             </a>
           </div>
-          <div className="visa-trust-panel">
+          <div className="visa-trust-panel"><DestinationCover identity="visa-intro" country="Worldwide" title="Your next chapter"/>
             <b>Built around verified requirements</b>
             <span>✓ Live TravelOS Visa products</span>
             <span>✓ Private document handling</span>
@@ -230,7 +231,7 @@ export function VisaStorefront() {
               className="visa-product-card visa-country-card"
               key={item.code}
             >
-              <div className="visa-product-top">
+              <DestinationCover identity={`visa-country-${item.code}`} country={item.name} title={`${item.name} Visa services`}/><div className="visa-product-top">
                 <span>{item.flag || item.code}</span>
                 <small>{item.region || "International"}</small>
               </div>
@@ -406,7 +407,7 @@ function VisaCountryRates({
         <div className="visa-rate-list">
           {country.products.map((product) => (
             <article key={product.id}>
-              <div className="visa-rate-main">
+              <div className="visa-rate-main"><DestinationCover className="visa-individual-cover" identity={product.id} country={product.destination} title={product.packageName}/>
                 <p className="eyebrow">{product.resultLabel}</p>
                 <h3>{product.packageName}</h3>
                 <div className="visa-rate-facts">

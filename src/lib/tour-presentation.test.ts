@@ -59,3 +59,21 @@ test("formats valid durations without inventing nights", () => {
   assert.equal(tourDurationLabel(undefined), "Flexible duration");
   assert.equal(tourDurationLabel(-1,NaN), "Flexible duration");
 });
+
+test("public summaries fall back for operational copy without changing source data", async () => {
+  const { customerTourSummary } = await import("./tour-presentation.ts");
+  assert.equal(customerTourSummary("  Explore   Kandy and the coast.  "), "Explore Kandy and the coast.");
+  for (const text of ["A journey. Preserved for staff review.", "Supplier-priced Singapore package", "Neskop B2B package", "Extended using extra-night rates."]) {
+    assert.equal(customerTourSummary(text), "");
+  }
+  assert.equal(customerTourSummary(undefined), "");
+});
+
+test("journey search matches all terms across display name, route and country", async () => {
+  const { matchesTourQuery } = await import("./tour-presentation.ts");
+  const tour = { title: "Tea & Coast", country: "Sri Lanka", destinations: ["Ella", "Mirissa"], tags: ["Beach"] };
+  assert.equal(matchesTourQuery(tour, "  ELLA beach "), true);
+  assert.equal(matchesTourQuery(tour, "Sri Lanka"), true);
+  assert.equal(matchesTourQuery(tour, "Ella Singapore"), false);
+  assert.equal(matchesTourQuery(tour, "   "), true);
+});

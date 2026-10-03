@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { TransferShowcase, type TransferInterest } from "./transfer-showcase";
+import { DestinationCover } from "./destination-cover";
+import { SketchArt } from "./sketch-art";
+import { HolidaySketchCollections } from "./holiday-sketch-collections";
 import { BookingSearch } from "./booking-search";
 import { AvailableHotels } from "./available-hotels";
 import { HomeMarketplace } from "./home-marketplace";
@@ -22,10 +25,11 @@ export function ProductPage({data,kind}:{data:Data;kind:string}) {
   const searchType = ({ flights:"flight", hotels:"hotel", visas:"visa", transfers:"transfer" } as Record<string,SearchType>)[kind];
   const primaryHref=kind==="flight"?"/flights/search":kind==="hotel"?"/hotels/search":kind==="tour"?"/tours/sri-lanka":kind==="visa"?"/visas/apply":kind==="transfer"?"/transfers/search":"#enquire";
   return <>
-    {searchType?<ModuleSearch type={searchType}/>:<section className="inner-hero"><div className="shell inner-grid"><div><p className="eyebrow">{data.eyebrow}</p><h1>{data.title}</h1><p className="lede">{data.copy}</p><div className="hero-actions"><Link href={primaryHref} className="button button-gold">{data.action}</Link><a href="https://wa.me/94774206166" className="button button-soft">Talk to a specialist</a></div></div><div className="glass-orb"><span>{kind.slice(0,1).toUpperCase()}</span><small>Navigeto<br/>TravelOS connected</small></div></div></section>}
+    {searchType?<ModuleSearch type={searchType}/>:<section className="inner-hero"><div className="shell inner-grid"><div><p className="eyebrow">{data.eyebrow}</p><h1>{data.title}</h1><p className="lede">{data.copy}</p><div className="hero-actions"><Link href={primaryHref} className="button button-gold">{data.action}</Link><a href="https://wa.me/94774206166" className="button button-soft">Talk to a specialist</a></div></div><div className="editorial-intro-art">{kind==="holidays"||kind==="corporate"?<DestinationCover identity={`intro-${kind}`} country="Worldwide" title={data.title}/>:<SketchArt variant="island"/>}</div></div></section>}
     {kind === "transfers" && <TransferShowcase onSelect={setTransferInterest}/>}
     <section className="stats shell">{data.stats.map(([label,value])=><div key={label}><strong>{value}</strong><span>{label}</span></div>)}</section>
     {kind === "about" && <AboutMeSection/>}
+    {kind === "holidays" && <HolidaySketchCollections/>}
     {kind==="hotels" && <AvailableHotels title="Published stays, priced clearly from the start." limit={8}/>}
     <section className="section shell"><div className="section-title"><p className="eyebrow">Designed around real travel</p><h2>Everything important, clearly handled.</h2></div><div className="card-grid">{data.cards.map(([title,copy],i)=><article className="rich-card" key={title}><span>0{i+1}</span><h3>{title}</h3><p>{copy}</p><a href="#enquire">Learn more →</a></article>)}</div></section>
     <section className="section pale"><div className="shell split"><div><p className="eyebrow">Why Navigeto Travels</p><h2>Modern tools behind the scenes. Real people when it matters.</h2><p>TravelOS keeps rates, enquiries and operational handovers organised. Your experience stays simple, transparent and personal.</p></div><div className="check-list">{["Approved public selling information only","Clear inclusions and next steps","Sri Lanka-based support","No supplier costs or internal data exposed"].map(x=><div key={x}><span>✓</span>{x}</div>)}</div></div></section>
@@ -35,6 +39,10 @@ export function ProductPage({data,kind}:{data:Data;kind:string}) {
 }
 
 function ConnectedEnquiryForm({ kind, transferInterest }: { kind: string; transferInterest?: TransferInterest | null }) {
+  const nameRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (transferInterest) nameRef.current?.focus({ preventScroll: true });
+  }, [transferInterest]);
   const packageSelection = transferInterest?.transport_package;
   const transferNotes = packageSelection ? [`Vehicle requested: ${packageSelection.vehicle}`, `Service: ${packageSelection.mode === "round" ? "Round-tour planning estimate" : "100 km day service"} · ${packageSelection.days} day(s)`, `Planning mileage: ${packageSelection.indicativeKm} km`, `Estimate: LKR ${packageSelection.sellingLkr.toFixed(2)} / USD ${packageSelection.sellingUsd.toFixed(2)} (310 LKR/USD)`, "Includes driver batta and accommodation. Final itinerary mileage and availability must be checked before quotation and booking.", "Travel dates: ", "Passengers and luggage: ", "Day-by-day route / pickup / drop-off: "].join("\n") : transferInterest ? [transferInterest.origin && `From: ${transferInterest.origin}`, transferInterest.destination && `To: ${transferInterest.destination}`, `Vehicle requested: ${transferInterest.vehicle}`, transferInterest.indicative_amount && `Indicative price: LKR ${transferInterest.indicative_amount.toLocaleString("en-US")} per vehicle, one way; subject to confirmation.`, "Travel date and pickup time: ", "Passengers and luggage: "].filter(Boolean).join("\n") : "";
   const [pending, setPending] = useState(false);
@@ -62,7 +70,7 @@ function ConnectedEnquiryForm({ kind, transferInterest }: { kind: string; transf
     } finally { setPending(false); }
   }
   if (reference) return <div className="reference-box"><span>TravelOS reference</span><strong>{reference}</strong><p>Your request is saved for the Navigeto team.</p><EnquiryRecoveryActions onReset={()=>{setReference("");setError("");}}/></div>;
-  return <form onSubmit={submit}><input name="name" aria-label="Name" placeholder="Your name" required/><input name="contact" aria-label="WhatsApp number" placeholder="WhatsApp number with country code" required/><textarea key={transferNotes} defaultValue={transferNotes} name="details" aria-label="Trip details" placeholder="Dates, destination and what matters to you" rows={4}/>{error && <><p role="alert">{error}</p><EnquiryRecoveryActions disabled={pending} onReset={()=>setError("")}/></>}<button className="button button-gold" type="submit" disabled={pending}>{pending ? "Sending to TravelOS…" : "Send enquiry"}</button></form>;
+  return <form onSubmit={submit}>{transferInterest&&<p className="enquiry-selection" role="status"><strong>{transferInterest.vehicle}</strong> selected. Add your contact and travel details to request a quote. Availability is confirmed by our team.</p>}<input ref={nameRef} autoComplete="name" name="name" aria-label="Name" placeholder="Your name" required/><input type="tel" autoComplete="tel" name="contact" aria-label="WhatsApp number" placeholder="WhatsApp number with country code" required/><textarea key={transferNotes} defaultValue={transferNotes} name="details" aria-label="Trip details" placeholder="Dates, destination and what matters to you" rows={4}/>{error && <><p role="alert">{error}</p><EnquiryRecoveryActions disabled={pending} onReset={()=>setError("")}/></>}<button className="button button-gold" type="submit" disabled={pending}>{pending ? "Sending to TravelOS…" : "Send enquiry"}</button></form>;
 }
 
 export function LegalPage({kind}:{kind:"privacy"|"terms"}) {
@@ -100,28 +108,29 @@ export function HomeSections(){
   ["custom","06","Tailor-made","Your whole holiday, shaped in one conversation.","/custom-trip"],
  ] as const;
  return <>
-  <section className="home-hero cinematic-hero">
-   <div className="hero-image cinematic-hero-art"/>
-   <div className="hero-shade"/>
-   <div className="hero-film" aria-hidden="true"/>
-   <div className="hero-route" aria-hidden="true"><span>CMB</span><i/><span>WORLD</span></div>
-   <div className="shell cinematic-hero-layout">
-    <div className="home-copy cinematic-copy">
-     <p className="eyebrow">{config.tagline||"Bespoke journeys · Sri Lanka and beyond"}</p>
-     <h1>Travel,<br/><em>beautifully</em><br/>connected.</h1>
-     <p>From Ella&apos;s misty tea country to the cities and coastlines calling you next—every detail, considered by people who know travel.</p>
-     <div className="hero-actions">
-      <Link className="button button-gold" href="/custom-trip">Design my journey <span aria-hidden="true">↗</span></Link>
-      <Link className="button button-soft" href="/tours">Explore the island</Link>
-     </div>
-     <div className="hero-proof" aria-label="Navigeto travel services"><span><b>01</b> Private journeys</span><span><b>02</b> Worldwide flights</span><span><b>03</b> Local expertise</span></div>
+  <section className="editorial-hero shell">
+   <div className="editorial-hero-copy">
+    <p className="eyebrow">{config.tagline || "Sri Lanka through a different lens"}</p>
+    <h1>The luxury<br/>of getting<br/><em>a little lost.</em></h1>
+    <div className="editorial-hero-note"><SketchArt variant="route"/><span>Beautiful places.<br/>Your own pace.</span></div>
+    <div className="editorial-hero-bottom">
+     {/* Real destination photography stays separate from decorative ink artwork. */}
+     {/* eslint-disable-next-line @next/next/no-img-element */}
+     <img src="/art/watercolour/sri-lanka-coast.webp" width="360" height="260" alt="Watercolour sketch of Galle and Sri Lanka’s south coast"/>
+     <div><p>Private journeys.<br/>Beautiful stays.<br/>A slower way to see the world.</p><Link href="/custom-trip">Find your journey <span aria-hidden="true">↗</span></Link></div>
     </div>
    </div>
-   <div className="hero-scroll" aria-hidden="true"><i/><span>Scroll to wander</span></div>
-   <div className="shell search-wrap"><BookingSearch/></div>
+   <figure className="editorial-hero-photo">
+    {/* eslint-disable-next-line @next/next/no-img-element */}
+    <img src="/art/watercolour/sri-lanka.webp" width="1536" height="1024" fetchPriority="high" alt="Pen-and-watercolour illustration of Sri Lanka’s Nine Arch Bridge and tea country"/>
+    <figcaption><span>01 / THE HILL COUNTRY</span><span>Go a little further.</span></figcaption>
+    <span className="editorial-photo-stamp" aria-hidden="true">SRI LANKA<br/><b>Small island.<br/>Big stories.</b><i>〰</i></span>
+   </figure>
   </section>
-  <section className="experience-ribbon" aria-label="Navigeto experiences">
-   <div><span>THE INDIAN OCEAN</span><i>—</i><span>ELLA BY RAIL</span><i>—</i><span>WILD ENCOUNTERS</span><i>—</i><span>ANCIENT KINGDOMS</span><i>—</i><span>THE WORLD BEYOND</span><i>—</i><span aria-hidden="true">THE INDIAN OCEAN</span><i aria-hidden="true">—</i><span aria-hidden="true">ELLA BY RAIL</span><i aria-hidden="true">—</i></div>
+  <div className="shell editorial-search"><BookingSearch/></div>
+  <section className="section shell editorial-places">
+   <div className="editorial-section-heading"><div><p className="eyebrow">A place for every feeling</p><h2>Places to feel.</h2></div><Link href="/tours">Explore the island ↗</Link></div>
+   <div className="editorial-places-grid">{journeyMoments.slice(0,3).map(([kind,label,description,href],index)=><Link key={kind} href={href} className={`editorial-place editorial-place-${kind}`}><div className={`editorial-place-photo journey-card-${kind}`}/><div><span>0{index+1}</span><h3>{label}</h3><b aria-hidden="true">↗</b></div><p>{description}</p></Link>)}</div>
   </section>
   <GuestAlbumTeaser/>
   <ReviewShowcase/>
