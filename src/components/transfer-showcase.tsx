@@ -28,7 +28,7 @@ export type TransferInterest = { origin?: string; destination?: string; vehicle:
 export function TransferShowcase({ onSelect }: { onSelect: (selection: TransferInterest) => void }) {
   function choose(selection: TransferInterest) {
     onSelect(selection);
-    document.getElementById("enquire")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("enquire")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
   }
   return <div className="transfer-showcase">
     <section className="section shell"><TransportPackageLoader onSelect={selection=>choose({vehicle:selection.vehicle,trip_type:selection.mode==='round'?'round_tour':'day_service',transport_package:selection})}/></section>

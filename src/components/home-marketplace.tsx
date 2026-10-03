@@ -1,6 +1,7 @@
 "use client";
 import { tourDisplayName, tourDurationLabel } from "@/lib/tour-presentation";
 
+import { DestinationCover } from "./destination-cover";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { Money } from "@/components/money";
@@ -114,11 +115,11 @@ export function HomeMarketplace() {
     <div className="shell marketplace-intro">
       <p className="eyebrow">Shop the journey</p>
       <h2>Five ways to go.<br/><em>One beautifully connected place.</em></h2>
-      <p>Browse customer-safe published products, then check exact dates and availability with the Navigeto team. Supplier costs and internal calculations stay private.</p>
+      <p>Discover a stay, a journey or your next faraway place. Our team brings the details together around you.</p>
     </div>
 
     <div className="shell marketplace-row">
-      <MarketplaceHeading eyebrow="Featured hotels" title="Stay somewhere worth remembering." copy="Five published stays with live starting rates from the connected Hotel Master." href="/hotels" action="See all hotels"/>
+      <MarketplaceHeading eyebrow="Featured hotels" title="Stay somewhere worth remembering." copy="Beautiful stays with current starting rates. Choose your dates to find the right room." href="/hotels" action="See all hotels"/>
       {loading ? <LoadingCards/> : state.hotels.length ? <div className="marketplace-grid">
         {state.hotels.map((hotel, index) => <article className="market-card market-hotel-card" key={hotel.rate_id}>
           <Link className="market-card-art" href={`/hotels/${hotel.public_slug}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(7,30,52,.76)),url("${hotel.cover_image_url || fallbackImages[index]}")` }}>
@@ -130,33 +131,33 @@ export function HomeMarketplace() {
     </div>
 
     <div className="shell marketplace-row">
-      <MarketplaceHeading eyebrow="International tours" title="The world, planned from Colombo." copy="Only published international packages appear as bookable products. Until more pass review, start with a controlled custom trip request." href="/tours/international" action="Explore international tours"/>
+      <MarketplaceHeading eyebrow="International tours" title="The world, planned from Colombo." copy="Explore our international journeys, or ask us to design a holiday around your own wish list." href="/tours/international" action="Explore international tours"/>
       {loading ? <LoadingCards/> : state.internationalTours.length ? <div className="marketplace-grid">
-        {state.internationalTours.map((tour, index) => <article className="market-card market-tour-card" key={tour.id}>
-          <Link className="market-card-art" href={`/tours/package/${tour.slug}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(24,19,78,.84)),url("${tour.hero_image_url || fallbackImages[index]}")` }}><span>{tourDurationLabel(tour.duration_days, tour.duration_nights)}</span><b>{tour.country || "International"}</b></Link>
+        {state.internationalTours.map((tour) => <article className="market-card market-tour-card" key={tour.id}>
+          <Link className="market-card-art illustrated-market-art" href={`/tours/package/${tour.slug}`}><DestinationCover identity={tour.slug} country={tour.country||"Sri Lanka"} title={tourDisplayName(tour)} places={tour.destinations}/><span>{tourDurationLabel(tour.duration_days, tour.duration_nights)}</span><b>{tour.country || "International"}</b></Link>
           <div className="market-card-body"><h3 title={tour.title}>{tourDisplayName(tour)}</h3><p>{tour.destinations.slice(0, 3).join(" · ") || tour.summary || "Private international journey"}</p>{tour.price_from ? <Money value={tour.price_from} currency={tour.currency} suffix="Starting from · selling price"/> : <small>Exact selling price checked for your dates</small>}<Link href={`/tours/package/${tour.slug}`}>View journey <span aria-hidden="true">→</span></Link></div>
         </article>)}
       </div> : <div className="marketplace-grid">
         {preferredDestinations.map((destination, index) => <article className={`market-card destination-market-card destination-market-${index + 1}`} key={destination.country}>
-          <div className="destination-market-top"><span>{destination.flag}</span><b>{destination.airport}</b></div><div className="market-card-body"><small>Custom international journey</small><h3>{destination.country}</h3><p>{destination.note}. The team verifies the package, price and availability before quoting.</p><Link href={`/custom-trip?destination=${encodeURIComponent(destination.country)}`}>Plan this trip <span aria-hidden="true">→</span></Link></div>
+          <DestinationCover identity={`holiday-${destination.country}`} country={destination.country} title={destination.note}/><div className="destination-market-top"><span>{destination.flag}</span><b>{destination.airport}</b></div><div className="market-card-body"><small>Custom international journey</small><h3>{destination.country}</h3><p>{destination.note}. The team verifies the package, price and availability before quoting.</p><Link href={`/custom-trip?destination=${encodeURIComponent(destination.country)}`}>Plan this trip <span aria-hidden="true">→</span></Link></div>
         </article>)}
       </div>}
     </div>
 
     <div className="shell marketplace-row">
-      <MarketplaceHeading eyebrow="Sri Lanka tours" title="Published island journeys, ready to shape." copy="Customer-safe selling prices and full day-by-day programmes from the live Tour Library." href="/tours/sri-lanka" action="See all Sri Lanka tours"/>
+      <MarketplaceHeading eyebrow="Sri Lanka tours" title="Island journeys, ready to make your own." copy="Explore the route, picture every day, and find a pace that feels like you." href="/tours/sri-lanka" action="See all Sri Lanka tours"/>
       {loading ? <LoadingCards/> : state.sriLankaTours.length ? <div className="marketplace-grid">
-        {state.sriLankaTours.map((tour, index) => <article className="market-card market-tour-card" key={tour.id}>
-          <Link className="market-card-art" href={`/tours/package/${tour.slug}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(24,19,78,.82)),url("${tour.hero_image_url || fallbackImages[index]}")` }}><span>{tourDurationLabel(tour.duration_days, tour.duration_nights)}</span><b>{tour.destinations[0] || "Sri Lanka"}</b></Link>
+        {state.sriLankaTours.map((tour) => <article className="market-card market-tour-card" key={tour.id}>
+          <Link className="market-card-art illustrated-market-art" href={`/tours/package/${tour.slug}`}><DestinationCover identity={tour.slug} country={tour.country||"Sri Lanka"} title={tourDisplayName(tour)} places={tour.destinations}/><span>{tourDurationLabel(tour.duration_days, tour.duration_nights)}</span><b>{tour.destinations[0] || "Sri Lanka"}</b></Link>
           <div className="market-card-body"><h3 title={tour.title}>{tourDisplayName(tour)}</h3><p>{tour.destinations.slice(0, 4).join(" · ") || tour.summary || "Private Sri Lanka journey"}</p>{tour.price_from ? <Money value={tour.price_from} currency={tour.currency} suffix="Starting from · selling price"/> : <small>Exact selling price checked for your dates</small>}<Link href={`/tours/package/${tour.slug}`}>View itinerary <span aria-hidden="true">→</span></Link></div>
         </article>)}
-      </div> : <EmptyMarketplace title="Sri Lanka tour inventory is being refreshed." copy="Tell us the route, dates and travellers and the team will prepare a controlled quotation." href="/custom-trip" action="Build a Sri Lanka trip"/>}
+      </div> : <EmptyMarketplace title="Sri Lanka tour inventory is being refreshed." copy="Share your route, dates and travellers for a personalised quotation." href="/custom-trip" action="Build a Sri Lanka trip"/>}
     </div>
 
     <div className="shell marketplace-row">
-      <MarketplaceHeading eyebrow="Visa services" title="Know the route before you apply." copy="Five active public Visa products, with provider fees and government-fee treatment kept clear." href="/visas" action="See all Visa services"/>
+      <MarketplaceHeading eyebrow="Visa services" title="Know the route before you apply." copy="Find destination-specific guidance, clear fees and personal support through your application." href="/visas" action="See all Visa services"/>
       {loading ? <LoadingCards/> : state.visas.length ? <div className="marketplace-grid">
-        {state.visas.map((visa) => <article className="market-card visa-market-card" key={visa.id}><div className="visa-market-top"><span>{visa.destinationCode}</span><small>{visa.resultLabel || "Human verification before submission"}</small></div><div className="market-card-body"><h3>{visa.destination}</h3><p>{visa.packageName}</p>{visa.totalEstimate > 0 ? <Money value={visa.totalEstimate} currency={visa.currency} suffix="Published Visa service estimate"/> : <small>Rate confirmed after eligibility review</small>}<Link href={`/visas?destination=${encodeURIComponent(visa.destinationCode)}`}>Check service <span aria-hidden="true">→</span></Link></div></article>)}
+        {state.visas.map((visa) => <article className="market-card visa-market-card" key={visa.id}><DestinationCover identity={visa.id} country={visa.destination} title={visa.packageName}/><div className="visa-market-top"><span>{visa.destinationCode}</span><small>{visa.resultLabel || "Human verification before submission"}</small></div><div className="market-card-body"><h3>{visa.destination}</h3><p>{visa.packageName}</p>{visa.totalEstimate > 0 ? <Money value={visa.totalEstimate} currency={visa.currency} suffix="Published Visa service estimate"/> : <small>Rate confirmed after eligibility review</small>}<Link href={`/visas?destination=${encodeURIComponent(visa.destinationCode)}`}>Check service <span aria-hidden="true">→</span></Link></div></article>)}
       </div> : <EmptyMarketplace title="Visa products are temporarily unavailable." copy="Send the destination and passport nationality for a verified human review." href="/visas" action="Request Visa help"/>}
     </div>
 
@@ -165,7 +166,7 @@ export function HomeMarketplace() {
       <div className="marketplace-grid">
         {preferredDestinations.map((destination, index) => {
           const href = `/flights/search?trip_type=return&origin=CMB&destination=${destination.airport}&depart_date=${flightDates.depart}&return_date=${flightDates.returning}&adults=1&children=0&infants=0&cabin_class=economy&direct_only=false`;
-          return <article className={`market-card flight-market-card flight-market-${index + 1}`} key={destination.airport}><div className="flight-route"><span>CMB</span><i/><b>{destination.airport}</b></div><div className="market-card-body"><small>{destination.flag} Colombo to</small><h3>{destination.country}</h3><p>{destination.note}</p><em>Live fare and baggage rules checked after dates</em><Link href={href}>Search this route <span aria-hidden="true">→</span></Link></div></article>;
+          return <article className={`market-card flight-market-card flight-market-${index + 1}`} key={destination.airport}><DestinationCover identity={`flight-${destination.airport}`} country={destination.country} title={destination.note}/><div className="flight-route"><span>CMB</span><i/><b>{destination.airport}</b></div><div className="market-card-body"><small>{destination.flag} Colombo to</small><h3>{destination.country}</h3><p>{destination.note}</p><em>Live fare and baggage rules checked after dates</em><Link href={href}>Search this route <span aria-hidden="true">→</span></Link></div></article>;
         })}
       </div>
     </div>

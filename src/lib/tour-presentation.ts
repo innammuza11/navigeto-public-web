@@ -29,3 +29,16 @@ export function tourDurationLabel(days?: number, nights?: number): string {
   if (Number.isInteger(nights) && nights! >= 0) parts.push(`${nights} ${nights === 1 ? "night" : "nights"}`);
   return parts.join(" · ") || "Flexible duration";
 }
+
+/** Leave operational source copy out of the public display; callers use route facts as a fallback. */
+export function customerTourSummary(summary?: string | null): string {
+  const text = summary?.replace(/\s+/g, " ").trim() || "";
+  if (/supplier[- ]priced|\bB2B\b|staff review|approved.*tariff|extra-night rates/i.test(text)) return "";
+  return text;
+}
+
+export function matchesTourQuery(tour: TourName & { country?: string | null; tags?: string[] }, query: string): boolean {
+  const terms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+  const text = [tourDisplayName(tour), tour.title, tour.country, ...(tour.destinations || []), ...(tour.tags || [])].join(" ").toLocaleLowerCase();
+  return terms.every(term => text.includes(term));
+}
