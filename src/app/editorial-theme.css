@@ -510,6 +510,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,
   color:var(--moss)
 }
 .editorial-tour-art{
+  width:100%;
   max-width:310px;
   justify-self:end
 }
