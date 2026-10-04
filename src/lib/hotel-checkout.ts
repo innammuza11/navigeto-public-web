@@ -1,3 +1,4 @@
+import { hotelToday } from "./hotel-search-dates.ts";
 export type HotelStaySelection = {
   search_query?: string;
   rate_id?: string;
@@ -28,7 +29,7 @@ function validDate(value: unknown): value is string {
 }
 
 /** Fail closed on stale session selections; never invent booking dates or a party. */
-export function hotelBookingDetails(selection: HotelStaySelection | null, today = new Date().toISOString().slice(0, 10)) {
+export function hotelBookingDetails(selection: HotelStaySelection | null, today = hotelToday()) {
   if (!selection || typeof selection.rate_id !== "string" || !selection.rate_id.trim()) {
     throw new Error("Please return to hotel search and select a live room before submitting.");
   }

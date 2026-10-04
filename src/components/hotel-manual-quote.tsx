@@ -4,6 +4,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { liveApi } from "@/lib/live-api";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
 import { hotelPartyStatus } from "@/lib/hotel-party-policy";
+import { hotelToday } from "@/lib/hotel-search-dates";
 import type { HotelStaySelection } from "@/lib/hotel-checkout";
 
 export function HotelManualQuote({ selection }: { selection: HotelStaySelection & { hotel_name?: string; q?: string } }) {
@@ -33,7 +34,7 @@ export function HotelManualQuote({ selection }: { selection: HotelStaySelection 
       if (!name || !whatsapp) throw new Error("Please enter your name and WhatsApp number.");
       const result = await liveApi.enquiry({ enquiry_type: "hotel", customer_name: name, whatsapp, email: String(data.get("email") || ""), consent_contact: true,
         subject: `Manual hotel quote: ${String(data.get("hotel"))}`, travel_start_date: checkin, travel_end_date: checkout, pax: party.adults + party.children,
-        notes: String(data.get("notes") || ""), details: { quotation_type: "hotel-manual-quote", pricing_status: "unquoted", hotel: String(data.get("hotel")), rate_id: selection.rate_id || null, checkin, checkout, ...party, meal_plan: selection.meal_plan || null, market: selection.market || null, child_ages: childAges, child_bed_needs: bedNeeds } }, () => { if (checkin < new Date().toISOString().slice(0,10)) throw new Error("Please choose upcoming stay dates."); });
+        notes: String(data.get("notes") || ""), details: { quotation_type: "hotel-manual-quote", pricing_status: "unquoted", hotel: String(data.get("hotel")), rate_id: selection.rate_id || null, checkin, checkout, ...party, meal_plan: selection.meal_plan || null, market: selection.market || null, child_ages: childAges, child_bed_needs: bedNeeds } }, () => { if (checkin < hotelToday()) throw new Error("Please choose upcoming stay dates."); });
       setReference(result.enquiry.public_ref);
     } catch (reason) { setError(reason instanceof Error ? reason.message : "Your quote request could not be sent."); }
     finally { locked.current = false; setBusy(false); }
