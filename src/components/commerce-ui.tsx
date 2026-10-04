@@ -11,6 +11,7 @@ import { HolidaySketchCollections } from "./holiday-sketch-collections";
 import { HotelManualQuote } from "@/components/hotel-manual-quote";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
 import { hotelPartyStatus } from "@/lib/hotel-party-policy";
+import { flightSearchDates, transferSearchDate, journeySearchHref } from "@/lib/journey-search-dates";
 import { hotelSearchDates } from "@/lib/hotel-search-dates";
 import { hotelProfileHref } from "@/lib/hotel-navigation";
 import { hotelParty, hotelBookingDetails, hotelSearchHref, type HotelStaySelection } from "@/lib/hotel-checkout";
@@ -19,6 +20,7 @@ import { HotelRequestSession } from "@/lib/hotel-request-session";
 import { hotels, rooms, tourItineraries, tours } from "@/lib/commerce-data";
 import { AvailableHotels } from "@/components/available-hotels";
 import { ModuleSearch } from "@/components/module-search";
+import { FlightOfferCard, FlightJourneySummary } from "@/components/flight-offer-card";
 import { Money } from "@/components/money";
 import { InteractiveItineraryMap, type ItineraryDay } from "@/components/interactive-itinerary-map";
 import {
@@ -128,7 +130,8 @@ const dayLabel = (value: string, index: number) => /^day\s+/i.test(value.trim())
 type CheckoutSelection = HotelStaySelection & {
   title?: string; name?: string; slug?: string; preferred_departure?: string; hotel_style?: string;
   airline?: string;
-  slices?: Array<{ origin?: string; destination?: string }>;
+  slices?: FlightOffer["slices"];
+  cabin_class?: string | null;
   hotel_name?: string;
   room_type?: string;
   rate_id?: string;
@@ -153,15 +156,18 @@ export function Progress({step}:{step:number}){
 }
 
 export function FlightResults(){
- const [sort,setSort]=useState("recommended"); const [directOnly,setDirectOnly]=useState(false); const [offers,setOffers]=useState<FlightOffer[]>([]); const [loading,setLoading]=useState(true); const [error,setError]=useState(""); const [route,setRoute]=useState("CMB to LHR");
- useEffect(()=>{const p=new URLSearchParams(window.location.search);const origin=p.get("origin")||"CMB";const destination=p.get("destination")||"LHR";const direct=p.get("direct_only")==="true";liveApi.flights({origin,destination,depart_date:p.get("depart_date")||"2026-08-15",return_date:p.get("trip_type")!=="one_way"?(p.get("return_date")||"2026-08-24"):undefined,adults:Number(p.get("adults")||1),children:Number(p.get("children")||0),infants:Number(p.get("infants")||0),cabin_class:p.get("cabin_class")||"economy"}).then(r=>{setDirectOnly(direct);setRoute(`${origin} to ${destination}`);setOffers(r.offers);}).catch(e=>setError(e.message)).finally(()=>setLoading(false)); },[]);
+ const [search,setSearch]=useState("");
+ const [providerMessage,setProviderMessage]=useState("");
+ const [sort,setSort]=useState("recommended"); const [directOnly,setDirectOnly]=useState(false); const [offers,setOffers]=useState<FlightOffer[]>([]); const [loading,setLoading]=useState(true); const [error,setError]=useState(""); const [route,setRoute]=useState("Your flight search");
+ useEffect(()=>{const p=new URLSearchParams(window.location.search);const origin=p.get("origin")||"CMB";const destination=p.get("destination")||"KUL";const dates=flightSearchDates(p);if(dates.error){queueMicrotask(()=>{setError(dates.error);setLoading(false);});return;}p.set("depart_date",dates.depart_date);if(dates.return_date)p.set("return_date",dates.return_date);else p.delete("return_date");p.set("origin",origin);p.set("destination",destination);const direct=p.get("direct_only")==="true";liveApi.flights({origin,destination,trip_type:p.get("trip_type")||"return",depart_date:dates.depart_date,return_date:dates.return_date||undefined,adults:Number(p.get("adults")||1),children:Number(p.get("children")||0),infants:Number(p.get("infants")||0),cabin_class:p.get("cabin_class")||"economy"}).then(r=>{setSearch(p.toString());setDirectOnly(direct);setRoute(`${origin} to ${destination}`);if(r.mode==="test"||!r.provider_connected){setProviderMessage(r.mode==="test"?"Airline connection is in test mode. Live fares require confirmation by our ticketing team.":r.message||"Live airline fares are not connected yet. Contact our ticketing team for a confirmed fare.");setOffers([]);}else{setProviderMessage(r.message||"");setOffers(r.offers);}}).catch(e=>setError(e.message)).finally(()=>setLoading(false)); },[]);
  const rows=useMemo(()=>{const filtered=directOnly?offers.filter(offer=>offer.slices.every(slice=>slice.stops===0)):offers;return sort==="price"?[...filtered].sort((a,b)=>a.total_amount-b.total_amount):filtered;},[sort,offers,directOnly]);
- const choose=(offer:FlightOffer)=>{saveSelection("flight",offer); window.location.assign("/flights/booking");};
+ const choose=(offer:FlightOffer)=>{saveSelection("flight",{...offer,search_query:search}); window.location.assign("/flights/booking");};
  return <><ModuleSearch type="flight"/><div className="commerce-layout shell"><aside className="filter-panel"><h3>Refine results</h3><p>Fares come directly from the connected airline marketplace and are rechecked before ticketing.</p><div><b>Stops</b><label><input type="checkbox" checked={directOnly} onChange={e=>setDirectOnly(e.target.checked)}/> Direct flights only</label></div></aside>
  <section className="results-column"><div className="results-head"><div><p className="eyebrow">{route} · live fares</p><h2>{loading?"Searching airlines…":`${rows.length} available options`}</h2></div><select value={sort} onChange={e=>setSort(e.target.value)}><option value="recommended">Recommended</option><option value="price">Lowest price</option></select></div>
- {error&&<div className="notice">{error} You can still submit a flight request.</div>}
+ {error&&<div className="notice" role="alert">{error}</div>}
+ {providerMessage&&<div className="notice">{providerMessage}</div>}
  {!loading&&!error&&!rows.length&&<div className="empty-state"><h3>No flights match this filter.</h3><p>Remove “direct only” or change the route and dates.</p></div>}
- {rows.map((f,i)=>{const s=f.slices[0];return <article className="flight-card" key={f.id}><div className="airline"><span>{f.airline_code||"✈"}</span><div><b>{f.airline||"Airline"}</b><small>{s?.segments?.[0]?.carrier_code}{s?.segments?.[0]?.flight_number} · {f.cabin_class||"Economy"}</small></div></div><div className="flight-times"><div><strong>{new Date(s.departing_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</strong><small>{s.origin}</small></div><div className="flight-line"><span>{s.duration?.replace("PT","").toLowerCase()}</span><i/><small>{s.stops?`${s.stops} stop${s.stops>1?"s":""}`:"Direct"}</small></div><div><strong>{new Date(s.arriving_at).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}</strong><small>{s.destination}</small></div></div><div className="fare"><em>{i===0?"Lowest live fare":"Live fare"}</em><small>Final rules checked by our ticketing team</small><Money value={f.total_amount} currency={f.currency}/><button className="button button-gold" onClick={()=>choose(f)}>Choose fare</button></div></article>})}
+ {rows.map(offer=><FlightOfferCard key={offer.id} offer={offer} onChoose={()=>choose(offer)}/>)}
  </section></div><AvailableHotels title="Stay options for this flight itinerary."/></>;
 }
 
@@ -345,13 +351,19 @@ export function TourDetail({slug}:{slug:string}){
 
 export function TransferResults(){
  const [selected,setSelected]=useState(0);
+ const [search,setSearch]=useState("");
+ const [error,setError]=useState("");
+ const [loading,setLoading]=useState(true);
  const [liveVehicles,setLiveVehicles]=useState<Vehicle[]>([]);
  const [quotes,setQuotes]=useState<Record<number,TransferQuote>>({});
  useEffect(()=>{
    const p=new URLSearchParams(window.location.search);
    const origin=p.get("origin")||"Bandaranaike Airport";
    const destination=p.get("destination")||"Galle";
-   const travelDate=p.get("travel_date")||"2026-08-15";
+   const dates=transferSearchDate(p);
+   if(dates.error){queueMicrotask(()=>{setError(dates.error);setLoading(false);});return;}
+   const travelDate=dates.travel_date;
+   p.set("travel_date",travelDate);
    const tripType=p.get("trip_type")||"one_way";
    const requested=p.get("vehicle_type")||"any";
    const passengers=Number(p.get("passengers")||2);
@@ -359,6 +371,7 @@ export function TransferResults(){
    const pickup_time=p.get("pickup_time")||"09:30";
    liveApi.vehicles().then(async r=>{
       const eligible=r.results.filter(v=>(!v.capacity||v.capacity>=passengers)&&(requested==="any"||v.vehicle_name.toLowerCase().includes(requested.toLowerCase())));
+      setSearch(p.toString());
       setLiveVehicles(eligible);
       const pairs=await Promise.all(eligible.map(async(v,i)=>[
         i,
@@ -374,16 +387,18 @@ export function TransferResults(){
         }).catch(() => ({ quote_available:false, message:"Manual quote" })),
       ] as const));
       setQuotes(Object.fromEntries(pairs));
-   });
+   }).catch(reason=>setError(reason instanceof Error?reason.message:"Transfers could not be loaded. Please try again.")).finally(()=>setLoading(false));
  },[]);
  const pick=()=>{
-   const p=new URLSearchParams(window.location.search);
+   if(loading||error||!liveVehicles[selected])return;
+   const p=new URLSearchParams(search);
    const transferDetails = {
      vehicle:liveVehicles[selected],
      quote:quotes[selected],
      origin:p.get("origin")||"Bandaranaike Airport",
      destination:p.get("destination")||"Galle",
-     date:p.get("travel_date")||"2026-08-15",
+     date:p.get("travel_date")!,
+     search_query:search,
      pickup_time:p.get("pickup_time")||"09:30",
      passengers:Number(p.get("passengers")||2),
      luggage:Number(p.get("luggage")||2),
@@ -398,7 +413,9 @@ export function TransferResults(){
     <div><p className="eyebrow">Vehicles suitable for your party</p><h2>Choose your private transfer.</h2></div>
     <p>Capacity and approved route pricing from TravelOS</p>
    </div>
-   {!liveVehicles.length&&<div className="empty-state"><h3>No catalog vehicle matches this capacity or type.</h3><p>Choose “Best available” or reduce the passenger count, and our operations team can also arrange a custom vehicle.</p></div>}
+   {loading&&<div className="notice">Checking available transfers for your travel date…</div>}
+   {error&&<div className="notice" role="alert">{error}</div>}
+   {!loading&&!error&&!liveVehicles.length&&<div className="empty-state"><h3>No catalog vehicle matches this capacity or type.</h3><p>Choose “Best available” or reduce the passenger count, and our operations team can also arrange a custom vehicle.</p></div>}
    <div className="vehicle-list">
     {liveVehicles.map((v,i)=>{
       const quote=quotes[i];
@@ -441,7 +458,7 @@ export function TransferResults(){
       <span>{liveVehicles[selected]?.vehicle_name}</span>
       {quotes[selected]?.quote_available ? <Money value={quotes[selected].total_amount||0} currency={quotes[selected].currency}/>:null}
      </div>
-     <button className="button button-gold" onClick={pick}>Generate transfer quotation →</button>
+     <button className="button button-gold" onClick={pick} disabled={loading||!!error}>Generate transfer quotation →</button>
    </div>
    )}
   </section>
@@ -534,8 +551,8 @@ export function BookingFlow({type}:{type:"flight"|"hotel"|"tour"|"transfer"}){
  const separateRequest=()=>{if(!window.confirm("The earlier request may already have been received. Starting a separate request does not cancel it and may create another booking request. Continue?"))return;try{hotelRequest.current??=new HotelRequestSession(()=>sessionStorage);hotelRequest.current.startSeparateRequest();setReference("");setError("");}catch{setError("Could not reset booking recovery storage. Please contact Navigeto before submitting again.");}};
  if(type==="hotel"&&selection&&hotelPartyStatus(selection,true).kind!=="automatic")return <HotelManualQuote selection={selection}/>;
  if(reference)return <section className="confirmation shell"><span>✓</span><p className="eyebrow">{type === "transfer" ? "Transfer quotation generated" : "Request received"}</p><h1>Your journey is in good hands.</h1><p>Reference {reference}. {type==="tour"?`${labels.tour}. `:""}A Navigeto specialist will verify live availability and send the next confirmation or payment step.</p><div><Link href="/">Back to home</Link>{type==="hotel"?<button type="button" onClick={separateRequest}>Start a separate hotel request</button>:<EnquiryRecoveryActions onReset={()=>{setReference("");setError("");}}/>}</div></section>;
- const backHref={flight:"/flights/search",hotel:hotelSearchHref(selection),tour:"/tours/sri-lanka",transfer:"/transfers/search"}[type];
- return <><Progress step={step}/>{type==="hotel"&&error&&<div className="shell"><button type="button" disabled={submitting} onClick={separateRequest}>Start a separate hotel request</button></div>}{type!=="hotel"&&error&&<div className="shell"><EnquiryRecoveryActions disabled={submitting} onReset={()=>setError("")}/></div>}<form onSubmit={submit} className="shell checkout-layout"><div className="checkout-main"><p className="eyebrow">{type} request</p><h1>Traveller details</h1><div className="notice">Prices and availability are rechecked before any payment or ticket issuance.</div>{error&&<div className="notice">{error}</div>}<div className="traveller-form"><h2>Lead traveller</h2><div className="form-grid"><label>Title<select><option>Mr</option><option>Ms</option><option>Mrs</option></select></label><label>First name<input name="first_name" required placeholder="As shown on passport"/></label><label>Last name<input name="last_name" required placeholder="As shown on passport"/></label><label>Email<input name="email" required type="email" placeholder="name@example.com"/></label><label>Mobile / WhatsApp<input name="mobile" required placeholder="+94"/></label><label>Nationality<select name="nationality"><option>Sri Lankan</option><option>Other</option></select></label></div>{type==="tour"&&<><h2>Your trip</h2><div className="form-grid"><label>Adults<input name="adults" type="number" min="1" max="100" required defaultValue={selection?.adults??2} key={`adults-${selection?.adults}`}/></label><label>Children<input name="children" type="number" min="0" max="99" required defaultValue={selection?.children??0} key={`children-${selection?.children}`}/></label><label>Preferred departure<input name="departure" type="date" defaultValue={selection?.preferred_departure||""} key={`departure-${selection?.preferred_departure}`}/><small>Leave blank if flexible.</small></label><label>Hotel style<select name="hotel_style" defaultValue={selection?.hotel_style||"Boutique"} key={`style-${selection?.hotel_style}`}><option>Boutique</option><option>Luxury</option><option>Essential</option></select></label></div></>}<h2>Preferences</h2><label>Notes<textarea name="notes" rows={3} placeholder="Meal, accessibility, celebration or timing requests"/></label></div><div className="checkout-actions"><Link href={backHref}>← Back</Link><button type="button" className="button button-gold" onClick={e=>{if(e.currentTarget.form?.reportValidity())setStep(3);}}>Review request →</button></div></div><aside className="price-summary"><p className="eyebrow">Your live selection</p><h3>{labels[type]}</h3><div className="summary-art"/>{type==="hotel"&&selection&&<HotelCheckoutSummary selection={selection}/>} {type==="transfer"&&selection&&(<div><small>Route</small><p>{selection.origin} → {selection.destination}</p><small>Travel date</small><p>{selection.date} {selection.pickup_time?`· ${selection.pickup_time}`:""}</p><small>Party</small><p>{selection.passengers||0} passengers · {selection.luggage||0} luggage</p>{selection.quote?.trip_type&&(<><small>Trip type</small><p>{selection.quote.trip_type==="return"?"Return transfer":"One-way transfer"}</p></>)}{transferSections.length?(
+ const backHref={flight:journeySearchHref("flight",selection?.search_query),hotel:hotelSearchHref(selection),tour:"/tours/sri-lanka",transfer:journeySearchHref("transfer",selection?.search_query)}[type];
+ return <><Progress step={step}/>{type==="hotel"&&error&&<div className="shell"><button type="button" disabled={submitting} onClick={separateRequest}>Start a separate hotel request</button></div>}{type!=="hotel"&&error&&<div className="shell"><EnquiryRecoveryActions disabled={submitting} onReset={()=>setError("")}/></div>}<form onSubmit={submit} className="shell checkout-layout"><div className="checkout-main"><p className="eyebrow">{type} request</p><h1>Traveller details</h1><div className="notice">Prices and availability are rechecked before any payment or ticket issuance.</div>{error&&<div className="notice">{error}</div>}<div className="traveller-form"><h2>Lead traveller</h2><div className="form-grid"><label>Title<select><option>Mr</option><option>Ms</option><option>Mrs</option></select></label><label>First name<input name="first_name" required placeholder="As shown on passport"/></label><label>Last name<input name="last_name" required placeholder="As shown on passport"/></label><label>Email<input name="email" required type="email" placeholder="name@example.com"/></label><label>Mobile / WhatsApp<input name="mobile" required placeholder="+94"/></label><label>Nationality<select name="nationality"><option>Sri Lankan</option><option>Other</option></select></label></div>{type==="tour"&&<><h2>Your trip</h2><div className="form-grid"><label>Adults<input name="adults" type="number" min="1" max="100" required defaultValue={selection?.adults??2} key={`adults-${selection?.adults}`}/></label><label>Children<input name="children" type="number" min="0" max="99" required defaultValue={selection?.children??0} key={`children-${selection?.children}`}/></label><label>Preferred departure<input name="departure" type="date" defaultValue={selection?.preferred_departure||""} key={`departure-${selection?.preferred_departure}`}/><small>Leave blank if flexible.</small></label><label>Hotel style<select name="hotel_style" defaultValue={selection?.hotel_style||"Boutique"} key={`style-${selection?.hotel_style}`}><option>Boutique</option><option>Luxury</option><option>Essential</option></select></label></div></>}<h2>Preferences</h2><label>Notes<textarea name="notes" rows={3} placeholder="Meal, accessibility, celebration or timing requests"/></label></div><div className="checkout-actions"><Link href={backHref}>← Back</Link><button type="button" className="button button-gold" onClick={e=>{if(e.currentTarget.form?.reportValidity())setStep(3);}}>Review request →</button></div></div><aside className="price-summary"><p className="eyebrow">Your live selection</p><h3>{labels[type]}</h3><div className="summary-art"/>{type==="hotel"&&selection&&<HotelCheckoutSummary selection={selection}/>} {type==="flight"&&selection&&<FlightJourneySummary offer={selection}/>} {type==="transfer"&&selection&&(<div><small>Route</small><p>{selection.origin} → {selection.destination}</p><small>Travel date</small><p>{selection.date} {selection.pickup_time?`· ${selection.pickup_time}`:""}</p><small>Party</small><p>{selection.passengers||0} passengers · {selection.luggage||0} luggage</p>{selection.quote?.trip_type&&(<><small>Trip type</small><p>{selection.quote.trip_type==="return"?"Return transfer":"One-way transfer"}</p></>)}{transferSections.length?(
   <><small>Detailed itinerary</small><div>{transferSections.map((section)=><article key={section.title}><b>{section.title}</b><ul>{section.rows.map((row)=><li key={row}>{row}</li>)}</ul></article>)}</div></>
 ) : null}{selection.quote?.included?.length ? <><small>Included</small><ul>{selection.quote.included.map((item) => <li key={item}>✓ {item}</li>)}</ul></> : null}{selection.quote?.excluded?.length ? <><small>Not included</small><ul>{selection.quote.excluded.map((item) => <li key={item}>— {item}</li>)}</ul></> : null}</div>)}{total>0?<div className="summary-total"><span>{type==="tour"?"Starting price per person":"Current total"}</span><Money value={total} currency={currency}/></div>:<p>Price will be confirmed by a Navigeto specialist.</p>}<small>No payment is collected with this request. Final availability and pricing are checked before confirmation.</small>{step>=3&&<button type="submit" disabled={submitting} className="button button-gold">{submitting?(type==="transfer"?"Generating quotation…":"Sending securely…"):submitLabel}</button>}</aside></form></>;
 }
