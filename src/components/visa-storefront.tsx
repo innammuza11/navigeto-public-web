@@ -805,7 +805,12 @@ function VisaApplicationModal({
             <button
               type="button"
               className="button button-gold"
-              onClick={() => setStep(step + 1)}
+              onClick={(event) => {
+                if (event.currentTarget.form?.reportValidity()) {
+                  setError("");
+                  setStep(step + 1);
+                }
+              }}
             >
               Continue →
             </button>
