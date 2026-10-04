@@ -461,7 +461,7 @@ export function TransferResults(){
       <span>{liveVehicles[selected]?.vehicle_name}</span>
       {quotes[selected]?.quote_available ? <Money value={quotes[selected].total_amount||0} currency={quotes[selected].currency}/>:null}
      </div>
-     <button className="button button-gold" onClick={pick} disabled={loading||!!error}>Generate transfer quotation →</button>
+     <button className="button button-gold" onClick={pick} disabled={loading||!!error}>Review transfer request →</button>
    </div>
    )}
   </section>
