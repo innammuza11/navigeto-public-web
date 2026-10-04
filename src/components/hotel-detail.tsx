@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { HotelManualQuote } from "@/components/hotel-manual-quote";
 import { hotelPartyStatus } from "@/lib/hotel-party-policy";
-import { hotelParty } from "@/lib/hotel-checkout";
+import { hotelParty, hotelSearchHref } from "@/lib/hotel-checkout";
 import { useEffect, useState } from "react";
 import { Money } from "@/components/money";
 import {
@@ -115,7 +115,7 @@ export function HotelDetail({ slug }: { slug: string }) {
   const selectedRoom = hotel.rooms[selected] || hotel.rooms[0] || null;
   const selectedRate = selectedRoom ? roomRate(selectedRoom, rates) : rates[0] || null;
   const lowestRate = [...rates].sort((a, b) => a.total_amount - b.total_amount)[0] || null;
-  const searchHref = `/hotels/search?q=${encodeURIComponent(hotel.hotel_name)}&checkin=${query.checkin}&checkout=${query.checkout}&rooms=${query.rooms}&adults=${query.adults}&children=${query.children}&occupancy=${encodeURIComponent(query.occupancy)}`;
+  const searchHref = hotelSearchHref({ ...query, hotel_name: hotel.hotel_name });
   const location = [hotel.address, hotel.city, hotel.destination, hotel.country].filter(Boolean).join(", ");
 
   const saveRoom = () => {
@@ -123,6 +123,8 @@ export function HotelDetail({ slug }: { slug: string }) {
       saveSelection("hotel", {
         ...selectedRate,
         ...query,
+        meal_plan: selectedRate.meal_plan,
+        search_query: window.location.search,
       });
     }
   };

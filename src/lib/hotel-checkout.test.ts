@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { hotelBookingDetails, hotelParty } from "./hotel-checkout.ts";
+import { hotelBookingDetails, hotelParty, hotelSearchHref } from "./hotel-checkout.ts";
 
 const stay = { rate_id: "fixture-rate", checkin: "2026-10-10", checkout: "2026-10-12", rooms: 2, adults: 3, children: 1, occupancy: "triple" };
 const today = "2026-09-04";
@@ -42,4 +42,29 @@ test("rejects malformed or incomplete party counts", () => {
     { children: -1 }, { children: Infinity }, { children: undefined },
     { occupancy: undefined }, { occupancy: "unknown" },
   ]) assert.throws(() => hotelBookingDetails({ ...stay, ...invalid }, today), /guest details/);
+});
+
+test("checkout Back preserves original filters rather than narrowing to the selected rate", () => {
+  const href = hotelSearchHref({ ...stay, hotel_name: "A & B Hotel", meal_plan: "HB", market: "Local",
+    search_query: "q=Sri+Lanka&meal_plan=any&market=All+Markets&children=0&rate_id=private&email=private" });
+  const params = new URL(href, "https://navigeto.com").searchParams;
+  assert.equal(params.get("q"), "Sri Lanka");
+  assert.equal(params.get("meal_plan"), "any");
+  assert.equal(params.get("market"), "All Markets");
+  assert.equal(params.get("children"), "0");
+  assert.equal(params.get("checkin"), stay.checkin);
+  assert.equal(params.get("occupancy"), "triple");
+  assert.equal(params.has("rate_id"), false);
+  assert.equal(params.has("email"), false);
+});
+
+test("older selections return safely with their saved stay and encoded hotel name", () => {
+  const href = hotelSearchHref({ ...stay, hotel_name: "A & B / Hotel", meal_plan: "HB" });
+  const params = new URL(href, "https://navigeto.com").searchParams;
+  assert.equal(params.get("q"), "A & B / Hotel");
+  assert.equal(params.get("checkout"), stay.checkout);
+  assert.equal(params.get("rooms"), "2");
+  assert.equal(params.get("meal_plan"), "HB");
+  assert.equal(hotelSearchHref(null), "/hotels/search");
+  assert.equal(hotelSearchHref({}), "/hotels/search");
 });
