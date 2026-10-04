@@ -16,7 +16,7 @@ import access from "@/components/partner-access.module.css";
 
 const DEFAULT_CONFIG: PublicSiteConfig = {
   announcement_text: "Plan hotels, transfers and tours in one place.",
-  whatsapp_number: "94774206166",
+  whatsapp_number: "94753310101",
   tagline: "Your Sri Lanka journey, professionally handled.",
   phone: "+94 77 420 6166",
   email: "info@navigeto.com",
