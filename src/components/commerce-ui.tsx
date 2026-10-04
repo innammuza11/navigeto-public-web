@@ -11,6 +11,7 @@ import { HolidaySketchCollections } from "./holiday-sketch-collections";
 import { HotelManualQuote } from "@/components/hotel-manual-quote";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
 import { hotelPartyStatus } from "@/lib/hotel-party-policy";
+import { hotelProfileHref } from "@/lib/hotel-navigation";
 import { hotelParty, hotelBookingDetails, hotelSearchHref, type HotelStaySelection } from "@/lib/hotel-checkout";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { HotelRequestSession } from "@/lib/hotel-request-session";
@@ -40,7 +41,6 @@ const hotelImages = [
  "/media/heritage-galle-v1.webp",
 ];
 
-const slugify = (value: string) => value.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 const itineraryText = (item: Record<string, unknown>, keys: string[], fallback: string) => {
   for (const key of keys) {
     const value = item[key];
@@ -174,7 +174,29 @@ export function HotelResults(){
  return <><ModuleSearch type="hotel"/><section className="shell results-section"><div className="results-head"><div><p className="eyebrow">Live stays for your exact dates</p><h2>{loading?"Checking hotel contracts…":`${rates.length} available room options`}</h2></div><select value={sort} onChange={e=>setSort(e.target.value as "price"|"name")}><option value="price">Lowest price</option><option value="name">Hotel name</option></select></div>
  {loading&&<div className="notice">Checking approved TravelOS hotel contracts…</div>}{error&&<div className="notice">{error}</div>}
  {!loading&&!error&&!hotelRows.length&&<div className="empty-state"><h3>No approved rooms match these dates.</h3><p>Try a nearby destination, different room basis, or flexible dates.</p></div>}
- <div className="hotel-grid">{hotelRows.map((h,i)=>{const detailParams=new URLSearchParams(search);detailParams.set("hotel",h.hotel_name);detailParams.set("rate_id",h.rate_id);const publicSlug=h.public_slug||slugify(h.hotel_name);const cover=h.cover_image_url||hotelImages[i%hotelImages.length];return <article className="hotel-card" key={h.rate_id}><Link href={`/hotels/${publicSlug}?${detailParams}`} className="hotel-image" style={{backgroundImage:`url("${cover}")`}} aria-label={`View ${h.hotel_name}`}><span>{h.hotel_category||"Approved rate"}</span></Link><div className="hotel-body"><p className="eyebrow">{h.destination||"Sri Lanka"}</p><Link href={`/hotels/${publicSlug}?${detailParams}`}><h3>{h.hotel_name}</h3></Link><p className="rating"><b>{h.room_type||"Room"}</b> · {h.meal_plan||"Room only"}</p><ul><li>✓ Exact rate for your preferences</li><li>✓ {h.nights} nights · {h.rooms} room</li>{h.cancellation_policy&&<li>✓ Policy available before confirmation</li>}</ul><div className="hotel-price"><div><small>Exact stay total · {h.nights} nights</small><Money value={h.total_amount} currency={h.currency}/></div><div className="hotel-card-actions"><Link className="button button-soft" href={`/hotels/${publicSlug}?${detailParams}`}>View hotel</Link><button className="button button-primary" onClick={()=>choose(h)}>Request room</button></div></div></div></article>})}</div></section></>;
+ <div className="hotel-grid">{hotelRows.map((h,i)=>{
+   const detailParams=new URLSearchParams(search);
+   detailParams.set("hotel",h.hotel_name);
+   detailParams.set("rate_id",h.rate_id);
+   const profileHref=hotelProfileHref(h.public_slug,detailParams);
+   const cover=h.cover_image_url||hotelImages[i%hotelImages.length];
+   const imageStyle={backgroundImage:`url("${cover}")`};
+   return <article className="hotel-card" key={h.rate_id}>
+     {profileHref
+       ? <Link href={profileHref} className="hotel-image" style={imageStyle} aria-label={`View ${h.hotel_name}`}><span>{h.hotel_category||"Approved rate"}</span></Link>
+       : <div className="hotel-image" style={imageStyle} role="img" aria-label={`${h.hotel_name} stay`}><span>{h.hotel_category||"Approved rate"}</span></div>}
+     <div className="hotel-body">
+       <p className="eyebrow">{h.destination||"Sri Lanka"}</p>
+       {profileHref ? <Link href={profileHref}><h3>{h.hotel_name}</h3></Link> : <h3>{h.hotel_name}</h3>}
+       <p className="rating"><b>{h.room_type||"Room"}</b> · {h.meal_plan||"Room only"}</p>
+       <ul><li>✓ Exact rate for your preferences</li><li>✓ {h.nights} nights · {h.rooms} room</li>{h.cancellation_policy&&<li>✓ Policy available before confirmation</li>}</ul>
+       <div className="hotel-price"><div><small>Exact stay total · {h.nights} nights</small><Money value={h.total_amount} currency={h.currency}/></div>
+         <div className="hotel-card-actions">{profileHref&&<Link className="button button-soft" href={profileHref}>View hotel</Link>}<button className="button button-primary" onClick={()=>choose(h)}>Request room</button></div>
+       </div>
+     </div>
+   </article>;
+ })}</div></section></>;
+
 }
 
 export function HotelDetail({slug}:{slug:string}){
