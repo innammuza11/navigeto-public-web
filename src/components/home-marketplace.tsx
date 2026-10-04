@@ -3,6 +3,7 @@ import { tourDisplayName, tourDurationLabel } from "@/lib/tour-presentation";
 
 import { DestinationCover } from "./destination-cover";
 import Link from "next/link";
+import { hotelProfileHref } from "@/lib/hotel-navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Money } from "@/components/money";
 import { liveApi, type HotelStartingRate, type PublicTour } from "@/lib/live-api";
@@ -122,7 +123,7 @@ export function HomeMarketplace() {
       <MarketplaceHeading eyebrow="Featured hotels" title="Stay somewhere worth remembering." copy="Beautiful stays with current starting rates. Choose your dates to find the right room." href="/hotels" action="See all hotels"/>
       {loading ? <LoadingCards/> : state.hotels.length ? <div className="marketplace-grid">
         {state.hotels.map((hotel, index) => <article className="market-card market-hotel-card" key={hotel.rate_id}>
-          <Link className="market-card-art" href={`/hotels/${hotel.public_slug}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(7,30,52,.76)),url("${hotel.cover_image_url || fallbackImages[index]}")` }}>
+          <Link className="market-card-art" href={hotelProfileHref(hotel.public_slug) || `/hotels/search?q=${encodeURIComponent(hotel.hotel_name)}`} style={{ backgroundImage: `linear-gradient(180deg,transparent,rgba(7,30,52,.76)),url("${hotel.cover_image_url || fallbackImages[index]}")` }}>
             <span>{hotel.star_category || "Published stay"}</span><b>{hotel.destination || "Sri Lanka"}</b>
           </Link>
           <div className="market-card-body"><h3>{hotel.hotel_name}</h3><p>{hotel.room_type || "Published room"} · {hotel.meal_plan || "Basis shown at search"}</p><Money value={hotel.starting_rate_per_night} currency={hotel.currency} suffix="Starting from · per room / night"/><Link href={`/hotels/search?q=${encodeURIComponent(hotel.hotel_name)}`}>Check dates <span aria-hidden="true">→</span></Link></div>
