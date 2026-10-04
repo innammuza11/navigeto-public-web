@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { ModuleSearch } from "@/components/module-search";
+import { hotelSearchDates } from "@/lib/hotel-search-dates";
 import { HotelManualQuote } from "@/components/hotel-manual-quote";
 import { hotelPartyStatus } from "@/lib/hotel-party-policy";
 import { hotelParty, hotelSearchHref } from "@/lib/hotel-checkout";
@@ -42,9 +44,11 @@ export function HotelDetail({ slug }: { slug: string }) {
   const [selected, setSelected] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [dateError, setDateError] = useState("");
+  const [search, setSearch] = useState("");
   const [query, setQuery] = useState({
-    checkin: "2026-08-15",
-    checkout: "2026-08-19",
+    checkin: "",
+    checkout: "",
     rooms: 1,
     adults: 2,
     children: 0,
@@ -56,15 +60,23 @@ export function HotelDetail({ slug }: { slug: string }) {
   useEffect(() => {
     let active = true;
     const params = new URLSearchParams(window.location.search);
+    const dates = hotelSearchDates(params);
+    if (dates.error) {
+      queueMicrotask(() => { if (active) { setDateError(dates.error); setLoading(false); } });
+      return;
+    }
+    params.set("checkin", dates.checkin);
+    params.set("checkout", dates.checkout);
     const nextQuery = {
-      checkin: params.get("checkin") || "2026-08-15",
-      checkout: params.get("checkout") || "2026-08-19",
+      checkin: dates.checkin,
+      checkout: dates.checkout,
       ...hotelParty(params),
       meal_plan: params.get("meal_plan") || "any",
       market: params.get("market") || "All Markets",
     };
     liveApi.hotel(slug).then(async ({ result }) => {
       if (!active) return;
+      setSearch(params.toString());
       setQuery(nextQuery);
       setHotel(result);
       if (!result) return;
@@ -96,6 +108,8 @@ export function HotelDetail({ slug }: { slug: string }) {
     return <section className="shell results-section"><div className="notice">Loading the published Hotel Master profile and official photos…</div></section>;
   }
 
+  if (dateError) return <><ModuleSearch type="hotel"/><section className="shell results-section"><div className="notice" role="alert">{dateError}</div></section></>;
+
   if (error || !hotel) {
     return <section className="shell results-section"><div className="empty-state"><h1>Hotel page not found.</h1><p>{error || "This profile is not published yet."}</p><Link className="button button-primary" href="/hotels/search">Search published hotels</Link></div></section>;
   }
@@ -124,7 +138,7 @@ export function HotelDetail({ slug }: { slug: string }) {
         ...selectedRate,
         ...query,
         meal_plan: selectedRate.meal_plan,
-        search_query: window.location.search,
+        search_query: search,
       });
     }
   };

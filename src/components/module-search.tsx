@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { hotelSearchDates, hotelToday, addHotelDays } from "@/lib/hotel-search-dates";
 import { visaDestinations } from "@/lib/live-api";
 
 export type SearchType = "flight" | "hotel" | "tour" | "visa" | "transfer";
@@ -16,7 +17,7 @@ function dateAfter(days: number) {
 
 const defaults: Record<SearchType, Values> = {
   flight: { trip_type: "return", origin: "CMB", destination: "KUL", depart_date: dateAfter(30), return_date: dateAfter(37), adults: "1", children: "0", infants: "0", cabin_class: "economy", direct_only: "false" },
-  hotel: { q: "Sri Lanka", checkin: dateAfter(30), checkout: dateAfter(34), rooms: "1", adults: "2", children: "0", occupancy: "double", meal_plan: "any", market: "All Markets" },
+  hotel: { q: "Sri Lanka", checkin: "", checkout: "", rooms: "1", adults: "2", children: "0", occupancy: "double", meal_plan: "any", market: "All Markets" },
   tour: { country: "Sri Lanka", theme: "culture", duration: "any", month: dateAfter(30).slice(0, 7), travellers: "2", pace: "any", hotel_style: "any", budget: "any" },
   visa: { passport: "LK", destination: "MY", purpose: "tourism", depart_date: dateAfter(45), entry_type: "single", stay_length: "14", previous_refusal: "no" },
   transfer: { origin: "Bandaranaike Airport", destination: "Galle", travel_date: dateAfter(30), pickup_time: "09:30", passengers: "2", luggage: "2", trip_type: "one_way", vehicle_type: "any" },
@@ -57,13 +58,20 @@ function Choice({ label, copy, checked, onChange }: { label: string; copy: strin
 
 export function AdvancedSearchForm({ type, surface = "module", international = false }: { type: SearchType; surface?: SearchSurface; international?: boolean }) {
   const [values, setValues] = useState<Values>({ ...defaults[type], ...(type === "tour" && international ? { country: "" } : {}) });
+  const [today, setToday] = useState("");
   const [advanced, setAdvanced] = useState(surface !== "home");
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       const params = new URLSearchParams(window.location.search);
       const next: Values = { ...defaults[type], ...(type === "tour" && international ? { country: "" } : {}) };
-      for (const key of Object.keys(next)) if (params.get(key)) next[key] = params.get(key) as string;
+      for (const key of Object.keys(next)) if (params.has(key)) next[key] = params.get(key) as string;
+      if (type === "hotel") {
+        const dates = hotelSearchDates(params);
+        next.checkin = dates.checkin;
+        next.checkout = dates.checkout;
+        setToday(hotelToday());
+      }
       if (params.get("direct_only") === "true") next.direct_only = "true";
       setValues(next);
     });
@@ -73,7 +81,7 @@ export function AdvancedSearchForm({ type, surface = "module", international = f
   const set = (key: string, value: string) => setValues((current) => {
     const next = { ...current, [key]: value };
     if (key === "depart_date" && next.return_date && next.return_date <= value) next.return_date = addDays(value, 7);
-    if (key === "checkin" && next.checkout && next.checkout <= value) next.checkout = addDays(value, 2);
+    if (key === "checkin" && next.checkout && next.checkout <= value) next.checkout = addHotelDays(value, 2);
     return next;
   });
   const remember = () => {
@@ -95,8 +103,8 @@ export function AdvancedSearchForm({ type, surface = "module", international = f
         </>}
         {type === "hotel" && <>
           <Field label="Destination or hotel" span={3}><input name="q" required value={values.q} onChange={(event) => set("q", event.target.value)} placeholder="City, region or hotel" autoComplete="off"/></Field>
-          <Field label="Check-in"><input name="checkin" required type="date" value={values.checkin} onChange={(event) => set("checkin", event.target.value)}/></Field>
-          <Field label="Check-out"><input name="checkout" required type="date" min={values.checkin} value={values.checkout} onChange={(event) => set("checkout", event.target.value)}/></Field>
+          <Field label="Check-in"><input name="checkin" required type="date" min={today} value={values.checkin} onChange={(event) => set("checkin", event.target.value)}/></Field>
+          <Field label="Check-out"><input name="checkout" required type="date" min={addHotelDays(values.checkin, 1)} value={values.checkout} onChange={(event) => set("checkout", event.target.value)}/></Field>
           <Field label="Rooms" span={1}><select name="rooms" value={values.rooms} onChange={(event) => set("rooms", event.target.value)}>{[1,2,3,4,5].map((count) => <option key={count}>{count}</option>)}</select></Field>
           <Field label="Adults" span={1}><select name="adults" value={values.adults} onChange={(event) => set("adults", event.target.value)}>{[1,2,3,4,5,6,7,8].map((count) => <option key={count}>{count}</option>)}</select></Field>
         </>}
