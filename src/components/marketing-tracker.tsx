@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import type { PublicSiteConfig } from "@/lib/live-api";
 import { captureMarketingAttribution, marketingConsentDecision, readMarketingConsent, saveMarketingConsent } from "@/lib/marketing";
 
+import { createGoogleTagQueue, isWhatsAppLink } from "@/lib/google-tag-queue";
+
 function initializeGoogle(ids: string[]) {
   const tagIds = [...new Set(ids.filter(Boolean))];
   if (!tagIds.length) return;
-  if (!window.gtag) { window.dataLayer = window.dataLayer || []; window.gtag = (...args: unknown[]) => { window.dataLayer?.push(args); }; window.gtag("js", new Date()); }
+  if (!window.gtag) { window.dataLayer = window.dataLayer || []; window.gtag = createGoogleTagQueue(window.dataLayer); window.gtag("js", new Date()); }
   window.gtag("consent", "update", { ad_storage: "granted", analytics_storage: "granted", ad_user_data: "granted", ad_personalization: "granted" });
   for (const id of tagIds) window.gtag("config", id, { send_page_view: false, anonymize_ip: true });
   if (!document.querySelector("script[data-navigeto-google]")) { const script = document.createElement("script"); script.async = true; script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(tagIds[0])}`; script.dataset.navigetoGoogle = tagIds[0]; document.head.appendChild(script); }
@@ -54,6 +56,25 @@ export function MarketingTracker({ config }: { config: PublicSiteConfig }) {
     if (gtm) window.dataLayer?.push({ event: "virtual_page_view", page_path: pathname, page_location: window.location.href });
     window.fbq?.("track", "PageView");
   }, [decision, consentRequired, googleAdsId, googleTag, hasTracking, metaId, pathname]);
+
+  useEffect(() => {
+    if (decision !== "granted" || !googleTag) return;
+    const trackClick = (event: MouseEvent) => {
+      if (event.defaultPrevented || !readMarketingConsent(consentRequired)) return;
+      const anchor = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (!(anchor instanceof HTMLAnchorElement) || !isWhatsAppLink(anchor.href)) return;
+      // Do not send the destination number, prefilled message or query parameters.
+      // Opening WhatsApp is an intent signal, never proof of a lead or booking.
+      const payload = { page_path: window.location.pathname, page_location: window.location.origin + window.location.pathname, contact_channel: "whatsapp", transport_type: "beacon" };
+      if (googleTag.toUpperCase().startsWith("GTM-")) {
+        window.dataLayer?.push({ event: "whatsapp_click", ...payload });
+      } else if (googleTag.toUpperCase().startsWith("G-")) {
+        window.gtag?.("event", "whatsapp_click", { ...payload, send_to: googleTag });
+      }
+    };
+    document.addEventListener("click", trackClick);
+    return () => document.removeEventListener("click", trackClick);
+  }, [decision, consentRequired, googleTag]);
 
   if (!hasTracking || !consentRequired || decision) return null;
   const decide = (granted: boolean) => { saveMarketingConsent(granted); setDecision(granted ? "granted" : "denied"); };
