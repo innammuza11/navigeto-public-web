@@ -12,3 +12,14 @@ accent with the existing blue and green. Preserve semantic status/error colours,
 main action colours and all partner branding. Use the shared signature on
 Navigeto chrome; avoid red on routine pending states or every repeated row.
 Run `npm run brand:generate` after palette edits and `npm run brand:check`.
+
+## Public website release source
+
+Build and publish navigeto.com from this repository's latest fetched main,
+including all merged releases. Do not substitute the TravelOS `public-web` copy
+or an older checkout. Fetch with an explicit `main:refs/remotes/origin/main`
+refspec where a checkout tracks only one feature branch. Before publication,
+verify HEAD equals the freshly fetched origin/main and the repository is clean.
+Check the white editorial homepage, individual destination artwork, a Visa and
+hotel page, and the Sri Lanka map together in the same candidate. Adding a map
+must preserve the existing theme, pricing, enquiry and analytics changes.

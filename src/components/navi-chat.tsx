@@ -178,7 +178,7 @@ export function NaviAssistantPage() {
           <div><b>02</b><span><strong>Connect the essentials</strong><small>Hotels, transfers, tours, flights and visas.</small></span></div>
           <div><b>03</b><span><strong>Hand off with context</strong><small>Continue with a booking flow or a human specialist.</small></span></div>
         </div>
-        <a className="button button-soft" href="https://wa.me/94774206166" target="_blank" rel="noreferrer">Speak with a travel specialist</a>
+        <a className="button button-soft" href="https://wa.me/94753310101" target="_blank" rel="noreferrer">Speak with a travel specialist</a>
       </div>
       <NaviChat embedded />
     </div>

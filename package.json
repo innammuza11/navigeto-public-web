@@ -28,5 +28,10 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "type": "module"
+  "type": "module",
+  "overrides": {
+    "@next/eslint-plugin-next": {
+      "fast-glob": "npm:tinyglobby@0.2.17"
+    }
+  }
 }
