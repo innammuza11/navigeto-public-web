@@ -56,7 +56,7 @@ function Choice({ label, copy, checked, onChange }: { label: string; copy: strin
 
 export function AdvancedSearchForm({ type, surface = "module" }: { type: SearchType; surface?: SearchSurface }) {
   const [values, setValues] = useState<Values>({ ...defaults[type] });
-  const [advanced, setAdvanced] = useState(true);
+  const [advanced, setAdvanced] = useState(false);
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -81,7 +81,7 @@ export function AdvancedSearchForm({ type, surface = "module" }: { type: SearchT
   const submitLabel = type === "visa" ? "Check requirements" : type === "tour" ? "Find journeys" : type === "transfer" ? "Find vehicles" : `Search ${type}s`;
 
   return <div className={`advanced-search advanced-search-${surface}`}>
-    <div className="search-modebar"><div><span className="live-search-dot"/> <b>Advanced {type} search</b><small>Connected to Navigeto TravelOS</small></div><button type="button" aria-expanded={advanced} onClick={() => setAdvanced((open) => !open)}><span>{advanced ? "Hide" : "Show"} advanced options</span><b>{advancedCounts[type]}</b><i aria-hidden="true">{advanced ? "−" : "+"}</i></button></div>
+    <div className="search-modebar"><div><span className="live-search-dot"/> <b>Find your {type === "hotel" ? "stay" : type === "tour" ? "journey" : type}</b><small>Choose what suits your trip</small></div><button type="button" aria-expanded={advanced} onClick={() => setAdvanced((open) => !open)}><span>{advanced ? "Fewer" : "More"} filters</span><b>{advancedCounts[type]}</b><i aria-hidden="true">{advanced ? "−" : "+"}</i></button></div>
     <form action={actions[type]} className="module-search-form" onSubmit={remember}>
       <div className="search-primary-fields">
         {type === "flight" && <>
@@ -122,7 +122,7 @@ export function AdvancedSearchForm({ type, surface = "module" }: { type: SearchT
         </>}
         <button className="button button-gold module-submit" type="submit">{submitLabel} <span aria-hidden="true">→</span></button>
       </div>
-      {advanced && <div className="search-advanced-fields">
+      <div className="search-advanced-fields" hidden={!advanced} style={advanced ? undefined : { display: "none" }}>
         {type === "flight" && <>
           <Field label="Adults"><select name="adults" value={values.adults} onChange={(event) => set("adults", event.target.value)}>{[1,2,3,4,5,6,7,8,9].map((count) => <option key={count}>{count}</option>)}</select></Field>
           <Field label="Children (2–11)"><select name="children" value={values.children} onChange={(event) => set("children", event.target.value)}>{[0,1,2,3,4,5,6].map((count) => <option key={count}>{count}</option>)}</select></Field>
@@ -134,7 +134,7 @@ export function AdvancedSearchForm({ type, surface = "module" }: { type: SearchT
           <Field label="Children"><select name="children" value={values.children} onChange={(event) => set("children", event.target.value)}>{[0,1,2,3,4,5,6].map((count) => <option key={count}>{count}</option>)}</select></Field>
           <Field label="Room basis"><select name="occupancy" value={values.occupancy} onChange={(event) => set("occupancy", event.target.value)}><option value="single">Single</option><option value="double">Double / twin</option><option value="triple">Triple</option><option value="quadruple">Family / quadruple</option></select></Field>
           <Field label="Meal plan"><select name="meal_plan" value={values.meal_plan} onChange={(event) => set("meal_plan", event.target.value)}><option value="any">Any meal plan</option><option value="RO">Room only</option><option value="BB">Breakfast</option><option value="HB">Half board</option><option value="FB">Full board</option><option value="AI">All inclusive</option></select></Field>
-          <Field label="Guest market"><select name="market" value={values.market} onChange={(event) => set("market", event.target.value)}><option>All Markets</option><option>Local</option><option>India</option><option>Asia Middle East</option><option>Europe</option></select></Field>
+          <Field label="Guest country / region"><select name="market" value={values.market} onChange={(event) => set("market", event.target.value)}><option value="All Markets">Any country / region</option><option value="Local">Sri Lanka</option><option>India</option><option value="Asia Middle East">Asia / Middle East</option><option>Europe</option></select></Field>
         </>}
         {type === "tour" && <>
           <Field label="Travel pace"><select name="pace" value={values.pace} onChange={(event) => set("pace", event.target.value)}><option value="any">Any pace</option><option value="relaxed">Relaxed</option><option value="balanced">Balanced</option><option value="active">Active</option></select></Field>
@@ -151,7 +151,7 @@ export function AdvancedSearchForm({ type, surface = "module" }: { type: SearchT
           <Field label="Journey"><select name="trip_type" value={values.trip_type} onChange={(event) => set("trip_type", event.target.value)}><option value="one_way">One way</option><option value="return">Return</option></select></Field>
           <Field label="Vehicle"><select name="vehicle_type" value={values.vehicle_type} onChange={(event) => set("vehicle_type", event.target.value)}><option value="any">Best available</option><option value="sedan">Sedan</option><option value="van">Van</option><option value="mini coach">Mini coach</option><option value="coach">Coach</option></select></Field>
         </>}
-      </div>}
+      </div>
     </form>
     <div className="search-assurance"><span>✓ Live connected inventory</span><span>✓ Relevant filters only</span><span>✓ Prices rechecked before confirmation</span><span>✓ No hidden booking fee</span></div>
   </div>;
