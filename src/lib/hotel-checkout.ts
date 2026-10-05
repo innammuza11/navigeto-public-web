@@ -1,4 +1,6 @@
+import { hotelToday } from "./hotel-search-dates.ts";
 export type HotelStaySelection = {
+  search_query?: string;
   rate_id?: string;
   checkin?: string;
   checkout?: string;
@@ -27,7 +29,7 @@ function validDate(value: unknown): value is string {
 }
 
 /** Fail closed on stale session selections; never invent booking dates or a party. */
-export function hotelBookingDetails(selection: HotelStaySelection | null, today = new Date().toISOString().slice(0, 10)) {
+export function hotelBookingDetails(selection: HotelStaySelection | null, today = hotelToday()) {
   if (!selection || typeof selection.rate_id !== "string" || !selection.rate_id.trim()) {
     throw new Error("Please return to hotel search and select a live room before submitting.");
   }
@@ -40,4 +42,19 @@ export function hotelBookingDetails(selection: HotelStaySelection | null, today 
     throw new Error("Please return to hotel search and confirm your rooms and guest details.");
   }
   return { rate_id, checkin, checkout, rooms: rooms!, adults: adults!, children: children!, occupancy: occupancy!, guests: adults! + children! };
+}
+
+/** Return to the same search filters, without carrying checkout data in the URL. */
+export function hotelSearchHref(selection: (HotelStaySelection & { hotel_name?: string }) | null) {
+  if (!selection) return "/hotels/search";
+  const original = new URLSearchParams(selection.search_query || "");
+  const params = new URLSearchParams();
+  const fallback = { q: selection.hotel_name, checkin: selection.checkin, checkout: selection.checkout,
+    rooms: selection.rooms, adults: selection.adults, children: selection.children,
+    occupancy: selection.occupancy, meal_plan: selection.meal_plan, market: selection.market };
+  for (const [key, value] of Object.entries(fallback)) {
+    const filter = original.has(key) ? original.get(key) : value;
+    if (filter !== undefined && filter !== null) params.set(key, String(filter));
+  }
+  return `/hotels/search${params.size ? `?${params}` : ""}`;
 }

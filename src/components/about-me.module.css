@@ -100,3 +100,5 @@
     padding: 0 4px 12px;
   }
 }
+/* Editorial journal treatment. */
+.card{background:transparent;border-radius:2px;box-shadow:none;padding:0;border:0}.portrait{border-radius:2px}.copy h2,.identity strong{font-family:var(--font-serif),serif;font-weight:400}.identity strong{font-size:32px}

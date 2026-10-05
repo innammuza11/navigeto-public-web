@@ -66,8 +66,11 @@ export function trackTravelosConversion(input: { sourceRef: string; value?: numb
   const eventId = `travelos:${input.sourceRef}:Lead`;
   const attribution = consentGranted ? captureMarketingAttribution() : {};
   const payload = { event_id: eventId, transaction_id: eventId, value: input.value ?? 0, currency: input.currency || "USD" };
-  if (consentGranted && window.gtag) window.gtag("event", "generate_lead", { ...payload, ...(config.googleAdsConversionId && config.googleAdsConversionLabel ? { send_to: `${config.googleAdsConversionId}/${config.googleAdsConversionLabel}` } : {}) });
-  if (consentGranted && config.googleTagId?.toUpperCase().startsWith("GTM-") && !(config.googleAdsConversionId && config.googleAdsConversionLabel)) window.dataLayer?.push({ event: "generate_lead", ...payload });
+  if (consentGranted && window.gtag) {
+    if (config.googleTagId?.toUpperCase().startsWith("G-")) window.gtag("event", "generate_lead", { ...payload, send_to: config.googleTagId });
+    if (config.googleAdsConversionId && config.googleAdsConversionLabel) window.gtag("event", "conversion", { ...payload, send_to: `${config.googleAdsConversionId}/${config.googleAdsConversionLabel}` });
+  }
+  if (consentGranted && config.googleTagId?.toUpperCase().startsWith("GTM-")) window.dataLayer?.push({ event: "generate_lead", ...payload });
   if (consentGranted && window.fbq) window.fbq("track", "Lead", { value: input.value ?? 0, currency: input.currency || "USD" }, { eventID: eventId });
   const adminUrl = String(config.adminUrl || process.env.NEXT_PUBLIC_ADMIN_URL || "").replace(/\/$/, "");
   if (!adminUrl) return;

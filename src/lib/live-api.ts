@@ -36,6 +36,9 @@ export type FlightOffer = {
   total_amount: number;
   currency: string;
   cabin_class: string | null;
+  baggage?: string | null;
+  conditions?: { change_before_departure?: { allowed: boolean; penalty_amount?: string | number; penalty_currency?: string }; refund_before_departure?: { allowed: boolean; penalty_amount?: string | number; penalty_currency?: string } };
+  expires_at?: string | null;
   slices: Array<{
     origin: string;
     destination: string;
@@ -44,6 +47,12 @@ export type FlightOffer = {
     duration: string;
     stops: number;
     segments: Array<{
+      origin?: string;
+      destination?: string;
+      departing_at?: string;
+      arriving_at?: string;
+      duration?: string;
+      baggage?: string | null;
       carrier: string | null;
       carrier_code: string | null;
       flight_number: string | null;
@@ -290,11 +299,12 @@ export type TransferQuote = {
 
 export const liveApi = {
   siteConfig: () => invoke<PublicSiteConfig>("public-travel-api", {}, "site-config"),
-  flights: (payload: Record<string, unknown>) =>
-    invoke<{ provider_connected: boolean; mode?: "test" | "live"; offers: FlightOffer[]; message?: string }>(
-      "flight-search",
-      payload,
-    ),
+  flights: async (payload: Record<string, unknown>) => {
+    const response = await fetch("/api/flights", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    const data = await response.json();
+    if (!response.ok || data.error) throw new Error(data.error || "Airline fares are temporarily unavailable.");
+    return data as { provider_connected: boolean; mode?: "test" | "live"; offers: FlightOffer[]; message?: string };
+  },
   hotels: (payload: Record<string, unknown>) =>
     invoke<{ results: HotelRate[]; meta: Record<string, unknown> }>("customer-hotels", payload, "search"),
   hotelStartingRates: (payload: Record<string, unknown> = {}) =>

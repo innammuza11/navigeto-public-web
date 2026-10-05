@@ -3,3 +3,8 @@
 .imageLabel{position:absolute;bottom:10px;left:12px;background:#fffffff0;color:#42566c;font-size:10px;padding:5px 8px;border-radius:6px}
 
 .gallery{display:flex;gap:8px;padding:10px 16px 0}.gallery button{padding:3px;border:1px solid #dbe5ed;border-radius:8px;background:white;cursor:pointer}.gallery button[aria-pressed=true]{border:2px solid var(--brand-blue);padding:2px}.gallery img{width:62px;height:44px;object-fit:cover;display:block;border-radius:5px}
+/* Keep vehicle catalogue content intact while matching the public journal. */
+.card{border-radius:3px;box-shadow:none}.title{font-family:var(--font-serif),serif;font-weight:400}.section{background:var(--paper)}
+.header h2,.body h3,.terms h3{font-family:var(--font-serif),serif;font-weight:400;color:var(--ink)}.body h3{font-size:27px}.controls,.controls input,.controls select,.tabs,.tabs button,.action,.terms,.notice,.imageLabel,.gallery button,.gallery img{border-radius:2px}.controls,.card{background:#fffefb;border-color:var(--line)}.tabs,.terms{background:var(--pale)}.price strong{font-family:var(--font-sans),sans-serif}.header .eyebrow{color:var(--muted)}
+
+.action{background:var(--navy)}.price strong{color:var(--ink)}
