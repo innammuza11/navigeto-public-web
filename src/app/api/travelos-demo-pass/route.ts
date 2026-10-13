@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   const origin=request.headers.get("origin");
   // Canonical domains and deploy previews must match the actual host. Never accept a third-party origin.
   const host=request.headers.get("host");
-  if (!origin || new URL(origin).host !== host) return json({error:"Invalid request origin."},403);
+  try { if (!origin || new URL(origin).host !== host) return json({error:"Invalid request origin."},403); } catch { return json({error:"Invalid request origin."},403); }
   if (Number(request.headers.get("content-length")||0)>12000) return json({error:"Request too large."},413);
   try {
     const raw=await request.text();if(raw.length>12000)return json({error:"Request too large."},413);
