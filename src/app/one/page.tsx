@@ -31,7 +31,7 @@ const questions = [
   ["Can you help us get started?", "The proposed onboarding covers your agency details, users, branding and a sample enquiry-to-booking walkthrough. Bring one of your usual itineraries to the demo so we can review the fit with your team."],
 ];
 
-export default function TravelosLanding() {
+export default function NavigetoOneLanding() {
   const structured = { "@context": "https://schema.org", "@type": "WebPage", name: title, description, url: `${SITE_URL}/one`, about: { "@type": "SoftwareApplication", name: "Navigeto One", applicationCategory: "BusinessApplication", operatingSystem: "Web browser", url: `${SITE_URL}/one` }, publisher: { "@id": `${SITE_URL}/#organization` } };
   return <div className={s.page}>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structured).replace(/</g, "\\u003c") }} />
