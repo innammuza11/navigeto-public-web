@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://navigeto.com").replace(/\/$/, "");
 
 export const STATIC_SEO: Record<string, { title: string; description: string }> = {
-  "/one": { title: "Navigeto One | Travel Agency Software & B2B Services", description: "Bring tour costing, branded quotations, itineraries and reservation operations together. Explore Navigeto One and request an agency pilot demo." },
+  "/one/offers": { title: "Navigeto One | Agency Pricing & 14-Day Free Trial", description: "Try Navigeto One free for 14 days. Explore introductory hosted and installation offers for Sri Lankan travel agencies." },
+  "/one": { title: "Navigeto One | Travel Agency Software & B2B Services", description: "Bring tour costing, branded quotations, itineraries and reservation operations together. Try Navigeto One free for 14 days, with no card or automatic charge." },
   "/": {
     title: "Navigeto Travels | Sri Lanka & Worldwide Journeys",
     description: "Bespoke Sri Lanka holidays, international flights, hotels, private tours, transfers and visa support—beautifully connected by Navigeto Travels.",
