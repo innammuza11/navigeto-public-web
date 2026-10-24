@@ -20,6 +20,6 @@ export function demoRequestPayload(form: FormData, search: string) {
     subject: `Navigeto One agency demo — ${agency}`,
     notes: `Software demo request. Agency: ${agency}. Focus: ${goal || "Complete workflow"}. This is not a travel booking.`,
     consent_contact: true,
-    details: { product: "travelos", request_kind: "agency_software_demo", agency_name: agency, focus: goal, source_page: "/navigeto-one", campaign },
+    details: { product: "travelos", request_kind: "agency_software_demo", agency_name: agency, focus: goal, source_page: "/one", campaign },
   };
 }
