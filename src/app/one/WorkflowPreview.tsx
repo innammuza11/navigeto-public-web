@@ -11,7 +11,7 @@ export default function WorkflowPreview() {
   return <div className={s.previewWrap}>
     <div className={s.previewTop}><span><i aria-hidden="true" /> WORKFLOW PREVIEW</span><small>Illustrative data · not a live booking</small></div>
     <div className={s.preview}>
-      <aside className={s.previewSidebar}><strong>Travel<span>OS</span><small>AGENCY WORKSPACE</small></strong><div className={s.previewNav} aria-label="Explore the sample workflow">{steps.map((label, i) => <button key={label} type="button" aria-pressed={step === i} onClick={() => setStep(i)}><span aria-hidden="true">0{i + 1}</span>{label}</button>)}</div><p>Your team.<br />One booking file.</p></aside>
+      <aside className={s.previewSidebar}><strong>Navigeto<span>One</span><small>AGENCY WORKSPACE</small></strong><div className={s.previewNav} aria-label="Explore the sample workflow">{steps.map((label, i) => <button key={label} type="button" aria-pressed={step === i} onClick={() => setStep(i)}><span aria-hidden="true">0{i + 1}</span>{label}</button>)}</div><p>Your team.<br />One booking file.</p></aside>
       <div className={s.previewBody}>
         <div className={s.previewBreadcrumb}>Sample agency <span>/</span> Sri Lanka escape</div>
         <div className={s.previewTitle}><div><small>6 DAYS · 5 NIGHTS · 2 ADULTS</small><h3>{step === 0 ? "A clear cost for every detail." : step === 1 ? "A journey worth saying yes to." : "Ready for the next step."}</h3></div><span className={s.sampleBadge}>Sample</span></div>

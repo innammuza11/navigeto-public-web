@@ -23,7 +23,7 @@ async function invoke<T>(name: string, payload: unknown, action?: string, signal
   });
   const result = await response.json().catch(() => ({}));
   if (!response.ok || result?.error) {
-    throw new Error(result?.error || "The TravelOS service is temporarily unavailable.");
+    throw new Error(result?.error || "The Navigeto One service is temporarily unavailable.");
   }
   return result as T;
 }

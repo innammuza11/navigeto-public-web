@@ -56,7 +56,7 @@ export const pages = {
   },
   about: {
     eyebrow: "About Navigeto Travels", title: "Sri Lanka travel operations with real local control.",
-    copy: "We pair experienced people with TravelOS technology so each enquiry moves cleanly from planning to confirmed operations.",
+    copy: "We pair experienced people with Navigeto One technology so each enquiry moves cleanly from planning to confirmed operations.",
     action: "Meet our approach", stats: [["Founded", "2017"], ["Based in", "Colombo"], ["Support", "Local"]],
     cards: [["Local knowledge", "Routes shaped by people who understand real travel times and seasons."], ["Responsible operations", "Approved partners, protected commercial data and accountable workflows."], ["Human service", "Technology keeps work organised; people make the journey personal."]],
   },

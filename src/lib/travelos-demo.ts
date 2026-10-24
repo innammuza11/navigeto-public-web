@@ -1,4 +1,4 @@
-export const DEMO_WHATSAPP = "https://wa.me/94753310101?text=Hi%20Navigeto%2C%20I%27d%20like%20a%20TravelOS%20demo%20for%20my%20travel%20agency.";
+export const DEMO_WHATSAPP = "https://wa.me/94753310101?text=Hi%20Navigeto%2C%20I%27d%20like%20a%20Navigeto%20One%20demo%20for%20my%20travel%20agency.";
 
 export function demoRequestPayload(form: FormData, search: string) {
   const field = (name: string, max: number) => String(form.get(name) || "").trim().slice(0, max);
@@ -17,9 +17,9 @@ export function demoRequestPayload(form: FormData, search: string) {
   }));
   return {
     enquiry_type: "general", customer_name: name, email, whatsapp: phone,
-    subject: `TravelOS agency demo — ${agency}`,
+    subject: `Navigeto One agency demo — ${agency}`,
     notes: `Software demo request. Agency: ${agency}. Focus: ${goal || "Complete workflow"}. This is not a travel booking.`,
     consent_contact: true,
-    details: { product: "travelos", request_kind: "agency_software_demo", agency_name: agency, focus: goal, source_page: "/travelos", campaign },
+    details: { product: "travelos", request_kind: "agency_software_demo", agency_name: agency, focus: goal, source_page: "/one", campaign },
   };
 }

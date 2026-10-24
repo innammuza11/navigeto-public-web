@@ -32,7 +32,7 @@ export default function DemoRequest() {
     <p>Keep this reference: <strong>{reference}</strong>. The Navigeto team will contact you using the details you provided.</p>
     <p>No subscription or payment has been started.</p><a className={s.textLink} href={DEMO_WHATSAPP} target="_blank" rel="noreferrer">Talk to us on WhatsApp ↗</a>
   </div>;
-  return <form className={s.form} onSubmit={submit} aria-label="Request a TravelOS demo">
+  return <form className={s.form} onSubmit={submit} aria-label="Request a Navigeto One demo">
     <fieldset disabled={busy}>
       <div className={s.formPair}><label>Your name<input name="name" autoComplete="name" required minLength={2} maxLength={160} placeholder="Full name" /></label><label>Agency name<input name="agency" autoComplete="organization" required minLength={2} maxLength={160} placeholder="Your travel company" /></label></div>
       <label>Work email<input name="email" type="email" autoComplete="email" required maxLength={200} placeholder="you@youragency.com" /></label>

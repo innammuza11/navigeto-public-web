@@ -91,7 +91,7 @@ export function AdvancedSearchForm({ type, surface = "module", international = f
   const submitLabel = type === "visa" ? "Check requirements" : type === "tour" ? "Find journeys" : type === "transfer" ? "Find vehicles" : `Search ${type}s`;
 
   return <div className={`advanced-search advanced-search-${surface}`}>
-    <div className="search-modebar"><div><span className="live-search-dot"/> <b>Advanced {type} search</b><small>Connected to Navigeto TravelOS</small></div><button type="button" aria-expanded={advanced} onClick={() => setAdvanced((open) => !open)}><span>{advanced ? "Hide" : "Show"} advanced options</span><b>{advancedCounts[type]}</b><i aria-hidden="true">{advanced ? "−" : "+"}</i></button></div>
+    <div className="search-modebar"><div><span className="live-search-dot"/> <b>Advanced {type} search</b><small>Connected to Navigeto One</small></div><button type="button" aria-expanded={advanced} onClick={() => setAdvanced((open) => !open)}><span>{advanced ? "Hide" : "Show"} advanced options</span><b>{advancedCounts[type]}</b><i aria-hidden="true">{advanced ? "−" : "+"}</i></button></div>
     <form action={actions[type]} className="module-search-form" onSubmit={remember}>
       <div className="search-primary-fields">
         {type === "flight" && <>
