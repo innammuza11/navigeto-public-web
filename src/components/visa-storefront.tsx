@@ -178,7 +178,7 @@ export function VisaStorefront() {
           </div>
           <div className="visa-trust-panel"><DestinationCover identity="visa-intro" country="Worldwide" title="Your next chapter"/>
             <b>Built around verified requirements</b>
-            <span>✓ Live TravelOS Visa products</span>
+            <span>✓ Live Navigeto One Visa products</span>
             <span>✓ Private document handling</span>
             <span>✓ Human verification before submission</span>
             <span>✓ Application progress in one place</span>

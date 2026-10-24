@@ -5,13 +5,13 @@ const videos = [
   { slug: "b2b-walkthrough", title: "Inside the B2B portal", duration: "1:29", description: "Explore the tour library, quote requests, bookings and documents from the agency view.", featured: false, portrait: false },
   { slug: "staff-walkthrough", title: "From costing to operations", duration: "2:28", description: "A closer look at quotation preparation, reservation services and the booking accounts workspace.", featured: false, portrait: false },
   { slug: "enquiry-reel", title: "The enquiry story, in portrait", duration: "1:21", description: "The same sample enquiry in a mobile-friendly vertical edit.", featured: false, portrait: true },
-  { slug: "product-introduction", title: "Meet TravelOS", duration: "0:47", description: "A short introduction to the connected travel workspace.", featured: false, portrait: true },
+  { slug: "product-introduction", title: "Meet Navigeto One", duration: "0:47", description: "A short introduction to the connected travel workspace.", featured: false, portrait: true },
 ];
 
 export default function VideoGallery() {
   return <section id="videos" aria-labelledby="video-heading" className={`${s.container} ${s.section}`}>
     <div className={s.sectionHeading}>
-      <div><p className={s.eyebrow}><span /> WATCH TRAVELOS AT WORK</p><h2 id="video-heading">See the work.<br />Follow the journey.</h2></div>
+      <div><p className={s.eyebrow}><span /> WATCH NAVIGETO ONE AT WORK</p><h2 id="video-heading">See the work.<br />Follow the journey.</h2></div>
       <p>Start with a sample enquiry, then explore the agency portal and staff workflow. Choose a video and press play.</p>
     </div>
     <div className={s.videoGrid}>
