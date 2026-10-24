@@ -1,6 +1,6 @@
 import { trackTravelosConversion } from "@/lib/marketing";
 import { EnquiryRequestSession } from "@/lib/enquiry-request-session";
-import type { PublicPaymentLink, PublicPaymentOption } from "@/lib/public-payment";
+import type { PublicPaymentLink, PublicPaymentOption, OnlineBookingSummary } from "@/lib/public-payment";
 const enquirySession = new EnquiryRequestSession(() => sessionStorage);
 const demoSession = new EnquiryRequestSession(() => sessionStorage, "navigeto:travelos-demo:v1");
 
@@ -347,9 +347,13 @@ export const liveApi = {
     message: string;
     history?: Array<{ role: "user" | "assistant"; content: string }>;
   }) => invoke<NaviResponse>("public-travel-api", payload, "assistant"),
+  requestBookingChange: (payload:{bookingReference:string;email:string;requestType:"cancellation"|"refund";message:string}) =>
+    invoke<{requested:boolean;message:string}>("public-travel-api",payload,"booking-change",AbortSignal.timeout(20000)),
+  bookingStatus: (payload: { bookingReference: string; email: string }) =>
+    invoke<OnlineBookingSummary>("public-travel-api", payload, "booking-status", AbortSignal.timeout(20000)),
   paymentOptions: (payload: { bookingReference: string; email: string }) =>
     invoke<{ payments: PublicPaymentOption[] }>("public-travel-api", payload, "payment-lookup"),
-  createPaymentLink: (payload: { bookingReference: string; email: string; paymentId: string }) =>
+  createPaymentLink: (payload: { bookingReference: string; email: string; paymentId: string; acceptTerms: boolean }) =>
     invoke<PublicPaymentLink>("public-travel-api", payload, "payment-link"),
 };
 
