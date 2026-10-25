@@ -1,6 +1,6 @@
 export const nav = [
   ["Flights", "/flights"], ["Hotels", "/hotels"], ["Tours", "/tours"], ["Reviews", "/reviews"],
-  ["Holidays", "/holidays"], ["Visas", "/visas"], ["Transfers", "/transfers"],
+  ["Holidays", "/holidays"], ["Group tours", "/group-tours"], ["Visas", "/visas"], ["Transfers", "/transfers"],
   ["Custom Trip", "/custom-trip"], ["Corporate", "/corporate"], ["Pay Online", "/pay"],
 ] as const;
 
