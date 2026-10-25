@@ -33,7 +33,7 @@ export function Header({ config = DEFAULT_CONFIG }: { config?: PublicSiteConfig 
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const menuRef = useRef<HTMLButtonElement>(null);
-  const primaryNav = nav.filter(([, href]) => ["/flights", "/hotels", "/tours", "/visas", "/transfers", "/custom-trip"].includes(href));
+  const primaryNav = nav.filter(([, href]) => ["/flights", "/hotels", "/tours", "/group-tours", "/visas", "/transfers", "/custom-trip"].includes(href));
   const isCurrent = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   useEffect(() => {
     if (!open) return;

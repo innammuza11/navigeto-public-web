@@ -1,3 +1,4 @@
+import type { GroupDeparture } from "@/lib/group-departures";
 import { trackTravelosConversion } from "@/lib/marketing";
 import { EnquiryRequestSession } from "@/lib/enquiry-request-session";
 import type { PublicPaymentLink, PublicPaymentOption } from "@/lib/public-payment";
@@ -321,6 +322,7 @@ export const liveApi = {
     trackTravelosConversion({ sourceRef: result.booking.public_ref, value: result.booking.total_amount, currency: result.booking.currency });
     return result;
   },
+  groupDepartures: (payload: Record<string, unknown> = {}) => invoke<{ results: GroupDeparture[]; has_more: boolean }>("public-travel-api", payload, "group-departures", AbortSignal.timeout(15000)),
   tours: (payload: Record<string, unknown> = {}) =>
     invoke<{ results: PublicTour[] }>("public-travel-api", payload, "tour-list"),
   tour: (slug: string) =>
