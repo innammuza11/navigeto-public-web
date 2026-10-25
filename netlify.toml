@@ -18,3 +18,15 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Retain the Next.js image route when publishing an already-built artifact.
+# The runtime generates this rule during builds; explicit no-build releases
+# must carry it from the source configuration as well.
+[[redirects]]
+  from = "/_next/image"
+  to = "/.netlify/images?url=:url&w=:width&q=:quality"
+  status = 200
+  [redirects.query]
+    url = ":url"
+    w = ":width"
+    q = ":quality"
