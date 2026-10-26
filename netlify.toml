@@ -30,3 +30,10 @@
     url = ":url"
     w = ":width"
     q = ":quality"
+
+# Customer-facing short link for the separate land-only Vietnam offer.
+[[redirects]]
+  from = "/vietnamcityescape"
+  to = "https://navigeto-vietnam-city-escape.innammuza.chatgpt.site"
+  status = 302
+  force = true
