@@ -14,6 +14,7 @@ import { ReviewShowcase } from "./review-showcase";
 import { GuestAlbumTeaser } from "./guest-album-teaser";
 import { AboutMeSection } from "./about-me";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
+import { BotTrapField } from "@/components/bot-trap-field";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
 type Data={
  eyebrow:string; title:string; copy:string; action:string;
@@ -70,7 +71,7 @@ function ConnectedEnquiryForm({ kind, transferInterest }: { kind: string; transf
     } finally { setPending(false); }
   }
   if (reference) return <div className="reference-box"><span>Navigeto One reference</span><strong>{reference}</strong><p>Your request is saved for the Navigeto team.</p><EnquiryRecoveryActions onReset={()=>{setReference("");setError("");}}/></div>;
-  return <form onSubmit={submit}>{transferInterest&&<p className="enquiry-selection" role="status"><strong>{transferInterest.vehicle}</strong> selected. Add your contact and travel details to request a quote. Availability is confirmed by our team.</p>}<input ref={nameRef} autoComplete="name" name="name" aria-label="Name" placeholder="Your name" required/><input type="tel" autoComplete="tel" name="contact" aria-label="WhatsApp number" placeholder="WhatsApp number with country code" required/><textarea key={transferNotes} defaultValue={transferNotes} name="details" aria-label="Trip details" placeholder="Dates, destination and what matters to you" rows={4}/>{error && <><p role="alert">{error}</p><EnquiryRecoveryActions disabled={pending} onReset={()=>setError("")}/></>}<button className="button button-gold" type="submit" disabled={pending}>{pending ? "Sending to Navigeto One…" : "Send enquiry"}</button></form>;
+  return <form onSubmit={submit}><BotTrapField/>{transferInterest&&<p className="enquiry-selection" role="status"><strong>{transferInterest.vehicle}</strong> selected. Add your contact and travel details to request a quote. Availability is confirmed by our team.</p>}<input ref={nameRef} autoComplete="name" name="name" aria-label="Name" placeholder="Your name" required/><input type="tel" autoComplete="tel" name="contact" aria-label="WhatsApp number" placeholder="WhatsApp number with country code" required/><textarea key={transferNotes} defaultValue={transferNotes} name="details" aria-label="Trip details" placeholder="Dates, destination and what matters to you" rows={4}/>{error && <><p role="alert">{error}</p><EnquiryRecoveryActions disabled={pending} onReset={()=>setError("")}/></>}<button className="button button-gold" type="submit" disabled={pending}>{pending ? "Sending to Navigeto One…" : "Send enquiry"}</button></form>;
 }
 
 export function LegalPage({kind}:{kind:"privacy"|"terms"}) {
