@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { liveApi } from "@/lib/live-api";
+import { BotTrapField } from "@/components/bot-trap-field";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
 import { hotelPartyStatus } from "@/lib/hotel-party-policy";
 import { hotelToday } from "@/lib/hotel-search-dates";
@@ -42,6 +43,7 @@ export function HotelManualQuote({ selection }: { selection: HotelStaySelection 
   if (reference) return <section className="shell confirmation"><h1>Quote request received</h1><p>Reference {reference}. Our team will verify room capacity, child policies and the full price before confirmation.</p><EnquiryRecoveryActions onReset={()=>{setReference("");setError("");}}/></section>;
   return <section className="shell results-section"><h1>Manual quote required</h1><p>No automatic total is shown. Our team must verify your party’s room arrangements and any child charges. Room capacity is not confirmed by selecting a room basis.</p>
     <form onSubmit={submit} className="traveller-form">
+      <BotTrapField />
       {error && <p role="alert">{error}</p>}
       {error && <EnquiryRecoveryActions disabled={busy} onReset={()=>setError("")}/>}
       <div className="form-grid">

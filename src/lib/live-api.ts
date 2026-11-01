@@ -1,6 +1,7 @@
 import type { GroupDeparture } from "@/lib/group-departures";
 import { trackTravelosConversion } from "@/lib/marketing";
 import { EnquiryRequestSession } from "@/lib/enquiry-request-session";
+import { botSignals } from "@/lib/bot-signals";
 import type { PublicPaymentLink, PublicPaymentOption } from "@/lib/public-payment";
 const enquirySession = new EnquiryRequestSession(() => sessionStorage);
 const demoSession = new EnquiryRequestSession(() => sessionStorage, "navigeto:travelos-demo:v1");
@@ -336,13 +337,13 @@ export const liveApi = {
     demoSession.submit(payload, async data => {
       const ready = await invoke<{ enquiry_receipts?: number }>("public-travel-api", {}, "enquiry-capabilities", AbortSignal.timeout(15000));
       if (ready.enquiry_receipts !== 1) throw new Error("Demo requests are temporarily unavailable. Please contact us on WhatsApp.");
-      return invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", data, "enquiry", AbortSignal.timeout(20000));
+      return invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", { ...data, ...botSignals() }, "enquiry", AbortSignal.timeout(20000));
     }),
   enquiry: (payload: Record<string, unknown>, validateNew: () => void = () => {}) =>
     enquirySession.submit(payload, async data => {
       const ready = await invoke<{ enquiry_receipts?: number }>("public-travel-api", {}, "enquiry-capabilities");
       if (ready.enquiry_receipts !== 1) throw new Error("Safe enquiry submission is temporarily unavailable. Please retry with the same details later.");
-      return invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", data, "enquiry");
+      return invoke<{ enquiry: { public_ref: string; status: string } }>("public-travel-api", { ...data, ...botSignals() }, "enquiry");
     }, validateNew,
       result => trackTravelosConversion({ sourceRef: result.enquiry.public_ref })),
   assistant: (payload: {
