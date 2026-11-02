@@ -38,7 +38,7 @@ const roomFacts = (room: PublicHotelRoom) => [
 
 const phoneHref = (value: string) => `tel:${value.replace(/[^\d+]/g, "")}`;
 
-export function HotelDetail({ slug }: { slug: string }) {
+export function HotelDetail({ slug, initialHotel }: { slug: string; initialHotel?: PublicHotel | null }) {
   const [hotel, setHotel] = useState<PublicHotel | null>(null);
   const [rates, setRates] = useState<HotelRate[]>([]);
   const [selected, setSelected] = useState(0);
@@ -105,6 +105,18 @@ export function HotelDetail({ slug }: { slug: string }) {
   }, [slug]);
 
   if (loading) {
+    // Rates depend on the visitor's dates, so only the published profile is rendered on the server.
+    if (initialHotel) return <section className="detail-top shell hotel-detail-top" aria-busy="true">
+      <p className="breadcrumbs"><Link href="/">Home</Link> / <Link href="/hotels">Hotels</Link> / {initialHotel.destination}</p>
+      <div className="detail-title"><div>
+        <p className="eyebrow">{initialHotel.star_category || "Published Hotel Master profile"} · {initialHotel.destination}</p>
+        <h1>{initialHotel.hotel_name}</h1>
+        <p className="body-copy">{initialHotel.full_description || initialHotel.short_description}</p>
+      </div></div>
+      {initialHotel.facilities.length > 0 && <div className="amenity-grid">{initialHotel.facilities.map((facility) => <div key={facility}>✓ <b>{facility}</b></div>)}</div>}
+      {initialHotel.rooms.length > 0 && <p className="rating">Room categories: {initialHotel.rooms.map((room) => room.room_name).join(" · ")}</p>}
+      <div className="notice">Checking live rates for your dates…</div>
+    </section>;
     return <section className="shell results-section"><div className="notice">Loading the published Hotel Master profile and official photos…</div></section>;
   }
 

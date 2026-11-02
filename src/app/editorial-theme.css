@@ -1750,3 +1750,42 @@ body,.editorial-site,.site-header,.announcement,.footer,.inner-hero,.module-sear
     padding-bottom:72px
   }
 }
+/* Server-rendered journey index under the tour collections. */
+.tour-index{
+  padding-block:30px 60px
+}
+.tour-index details{
+  border-top:1px solid var(--line)
+}
+.tour-index summary{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px 0;
+  cursor:pointer;
+  font-weight:700;
+  color:var(--ink)
+}
+.tour-index summary span{
+  color:var(--muted);
+  font-weight:500;
+  font-size:13px
+}
+.tour-index ul{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:8px 28px;
+  margin:0 0 20px;
+  padding:0;
+  list-style:none
+}
+.tour-index li{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:14px
+}
+.tour-index li small{
+  color:var(--muted);
+  white-space:nowrap
+}
