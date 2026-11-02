@@ -4,8 +4,9 @@ import { SiteShell } from "@/components/site-shell";
 import styles from "@/components/partner-access.module.css";
 
 export const metadata: Metadata = {
-  title: "Partner registration & sign in | Navigeto",
+  title: { absolute: "Partner Registration & Sign In | Navigeto Travels" },
   description: "Join Navigeto as a travel agent, hotel or driver. Already registered? Sign in to your existing partner account.",
+  alternates: { canonical: "/partners" },
 };
 
 const partners = [
