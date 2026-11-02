@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { breadcrumbJsonLd, enquirySourcePage, showsEnquiryBar, tourJsonLd, uniqueTourSlugs, whatsappLeadMessage, whatsappLink } from "./seo-schema.ts";
+import { breadcrumbJsonLd, enquirySourcePage, groupToursForIndex, showsEnquiryBar, tourJsonLd, uniqueTourSlugs, whatsappLeadMessage, whatsappLink } from "./seo-schema.ts";
 
 const site = "https://navigeto.com";
 type Trip = { "@type": string; url: string; offers?: { price: number; priceCurrency: string }; itinerary: { itemListElement: Array<{ name?: string; item?: { name: string } }> } };
@@ -56,4 +56,11 @@ test("source page accepts on-site paths only", () => {
   assert.equal(enquirySourcePage("?from=https%3A%2F%2Fevil.example"), undefined);
   assert.equal(enquirySourcePage("?from=%2F%2Fevil.example"), undefined);
   assert.equal(enquirySourcePage(""), undefined);
+});
+
+test("journey index groups by country with Sri Lanka first and honours the collection", () => {
+  const list = [{ slug: "t1", country: "Thailand" }, { slug: "s1", country: "Sri Lanka" }, { slug: "n1", country: null }, { slug: "v1", country: "Vietnam" }];
+  assert.deepEqual(groupToursForIndex(list, "all").map(([country, items]) => [country, items.length]), [["Sri Lanka", 2], ["Thailand", 1], ["Vietnam", 1]]);
+  assert.deepEqual(groupToursForIndex(list, "sri-lanka").map(([country]) => country), ["Sri Lanka"]);
+  assert.deepEqual(groupToursForIndex(list, "international").map(([country]) => country), ["Thailand", "Vietnam"]);
 });

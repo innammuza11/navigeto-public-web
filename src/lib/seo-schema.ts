@@ -103,3 +103,18 @@ export function enquirySourcePage(search: string) {
   const from = new URLSearchParams(search).get("from") || "";
   return /^\/[a-z0-9\-/]{0,160}$/i.test(from) && !from.startsWith("//") ? from : undefined;
 }
+
+export type TourIndexScope = "all" | "sri-lanka" | "international";
+
+/** Server-rendered "every journey" index: crawlable links grouped by country, Sri Lanka first. */
+export function groupToursForIndex<T extends { slug: string; country?: string | null }>(tours: T[], scope: TourIndexScope) {
+  const isSriLanka = (tour: T) => /^(sri\s*lanka)?$/i.test((tour.country || "").trim());
+  const groups = new Map<string, T[]>();
+  for (const tour of tours) {
+    if (scope === "sri-lanka" && !isSriLanka(tour)) continue;
+    if (scope === "international" && isSriLanka(tour)) continue;
+    const country = (tour.country || "").trim() || "Sri Lanka";
+    groups.set(country, [...(groups.get(country) || []), tour]);
+  }
+  return [...groups.entries()].sort(([a], [b]) => a === "Sri Lanka" ? -1 : b === "Sri Lanka" ? 1 : a.localeCompare(b));
+}
