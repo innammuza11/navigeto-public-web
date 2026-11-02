@@ -1694,3 +1694,59 @@ body,.editorial-site,.site-header,.announcement,.footer,.inner-hero,.module-sear
 .itinerary-experience,.itinerary-world,.itinerary-map-stage { background-image:none; }
 .itinerary-intro h2 { font-size:clamp(36px,4.2vw,60px);line-height:1.1;max-width:650px; }
 #itinerary { scroll-margin-top:135px; }
+/* Light consent panel: keep "Decline marketing" as visible as "Allow". */
+.marketing-consent .button-soft{
+  border-color:var(--line);
+  color:var(--ink)
+}
+/* Phone-width enquiry bar; leaves room for the Navi launcher at bottom-right. */
+.enquiry-bar{
+  display:none
+}
+@media(max-width:720px){
+  .enquiry-bar{
+    position:fixed;
+    z-index:65;
+    left:12px;
+    right:76px;
+    bottom:12px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    padding:6px;
+    border:1px solid var(--line);
+    border-radius:3px;
+    background:var(--paper);
+    box-shadow:0 10px 30px #172d4020
+  }
+  .enquiry-bar a{
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:2px;
+    font-size:13px;
+    font-weight:700;
+    text-decoration:none
+  }
+  .enquiry-bar-whatsapp{
+    gap:7px;
+    border:1px solid var(--brand-green);
+    background:var(--paper);
+    color:var(--ink)
+  }
+  .enquiry-bar-whatsapp:before{
+    content:"";
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--brand-green)
+  }
+  .enquiry-bar-quote{
+    background:var(--navy);
+    color:white
+  }
+  .editorial-site{
+    padding-bottom:72px
+  }
+}

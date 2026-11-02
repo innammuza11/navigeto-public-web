@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { displayCurrencies, useCurrency } from "@/components/currency-context";
 import { NaviChat } from "@/components/navi-chat";
 import { MarketingTracker } from "@/components/marketing-tracker";
+import { EnquiryBar } from "@/components/enquiry-bar";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 import { nav } from "@/lib/site-data";
 import access from "@/components/partner-access.module.css";
@@ -98,5 +99,5 @@ export function SiteShell({children, hideNavi = false}:{children:React.ReactNode
     liveApi.siteConfig().then((value) => { if (active) setConfig({ ...DEFAULT_CONFIG, ...value }); }).catch(() => undefined);
     return () => { active = false; };
   }, []);
-  return <div className="editorial-site"><a className="skip-link" href="#main-content">Skip to content</a><MarketingTracker config={config}/><Header config={config}/><main id="main-content" tabIndex={-1}>{children}</main><Footer config={config}/>{!hideNavi && config.assistant_enabled !== false && <NaviChat/>}</div>;
+  return <div className="editorial-site"><a className="skip-link" href="#main-content">Skip to content</a><MarketingTracker config={config}/><Header config={config}/><main id="main-content" tabIndex={-1}>{children}</main><Footer config={config}/><EnquiryBar whatsappNumber={String(config.whatsapp_number || DEFAULT_CONFIG.whatsapp_number)}/>{!hideNavi && config.assistant_enabled !== false && <NaviChat/>}</div>;
 }

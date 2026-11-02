@@ -306,15 +306,16 @@ function TourSellingRates({ cards }: { cards: PublicTourRateCard[] }) {
   </section>;
 }
 
-export function TourDetail({slug}:{slug:string}){
+export function TourDetail({slug,initialTour}:{slug:string;initialTour?:PublicTour|null}){
  const fallback=tours.find(t=>t.slug===slug)||tours[0];
- const [tour,setTour]=useState<PublicTour|null>(null);
+ // A server-loaded tour renders the full itinerary in the first HTML for search engines.
+ const [tour,setTour]=useState<PublicTour|null>(initialTour??null);
  const [hotelLevel,setHotelLevel]=useState("Boutique");
  const [tourAdults,setTourAdults]=useState(2);
  const [tourChildren,setTourChildren]=useState(0);
  const [departure,setDeparture]=useState("");
- const [loading,setLoading]=useState(true);
- useEffect(()=>{liveApi.tour(slug).then(r=>setTour(r.result)).catch(()=>setTour(null)).finally(()=>setLoading(false));},[slug]);
+ const [loading,setLoading]=useState(!initialTour);
+ useEffect(()=>{if(initialTour)return;liveApi.tour(slug).then(r=>setTour(r.result)).catch(()=>setTour(null)).finally(()=>setLoading(false));},[slug,initialTour]);
  const book=()=>saveSelection("tour",{...(tour||fallback),title:tour?.title||fallback.name,adults:tourAdults,children:tourChildren,preferred_departure:departure,hotel_style:hotelLevel});
  const routeDestinations=useMemo(()=>tour?.destinations?.length?tourPlaces(tour):fallback.route.split(" · ").map(cleanPlace).filter(Boolean),[tour,fallback.route]);
  const liveItinerary:ItineraryDay[]=useMemo(()=>tour?.itinerary?.length?tour.itinerary.map((item,index)=>{
