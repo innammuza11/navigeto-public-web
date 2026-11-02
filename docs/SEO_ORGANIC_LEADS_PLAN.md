@@ -77,12 +77,11 @@ JavaScript runs. That is what most crawlers and AI answer engines read.
 12. `/tours` has two `<h1>` elements: the hero and a search heading.
 13. Thin pages: `/group-tours` (42 words), `/pay` (101), `/reviews` (137),
     `/visas` (144). `/visas` and `/group-tours` should carry real copy.
-14. `/tours/[category]` accepts any slug and renders the full catalogue with a
+14. **Fixed (follow-up PR).** `/tours/[category]` accepted any slug and renders the full catalogue with a
     self-canonical. For example, `/tours/anything` is indexable duplicate
     content. Restrict it to known categories or use `noindex` for the rest.
-15. Images: 6 decorative `<img>` elements without `alt` across About,
-    Contact, Custom trip, Flights, Tours and Transfers. Decorative images
-    should have `alt=""` so the omission is explicit.
+15. Images: decorative artwork already uses `alt=""` (an earlier count in
+    this audit wrongly flagged those as missing alt text; corrected 2 Nov).
 16. Performance, home page, desktop pane: 1.4 MB transferred (1.05 MB images,
     185 KB JS), TTFB ~1.2 s, CLS 0. PageSpeed Insights quota was exhausted
     during the audit, so there are no lab LCP numbers. Run Search Console's
@@ -120,9 +119,12 @@ sign-off on the wording.
    sitemap,** in `public-travel-api`. This removes the per-country fan-out.
    Note that 5 published packages have no country; check they are in the
    first 100 (they are listed today).
-4. Restrict `/tours/[category]` to known categories (404 otherwise).
-5. Give decorative images `alt=""`, keep one H1 per page, and normalise title
-   suffixes to "| Navigeto Travels".
+4. ~~Restrict `/tours/[category]` to known categories~~ — done: other slugs
+   permanently redirect to `/tours`.
+5. ~~Normalise title suffixes to "| Navigeto Travels"~~ — done for the static
+   pages. Still open: `/tours` has two H1s (collection hero plus the shared
+   `ModuleSearch` heading, whose styling targets `h1`); hotel `seo_title` values
+   in the Hotel Master still end in "| Navigeto".
 6. **Search Console:** submit the sitemap and watch "Discovered – not indexed"
    for the 170 tours and 218 hotels. Needs the user's access (below).
 
