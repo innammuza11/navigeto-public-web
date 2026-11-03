@@ -44,3 +44,22 @@ export function tourEnquiryDetails(selection: TourEnquirySelection | null, input
     },
   };
 }
+
+/** One-step quote from the tour page: the customiser's choices plus name and WhatsApp. */
+export function tourQuickEnquiry(selection: TourEnquirySelection | null, input: {
+  adults: unknown; children: unknown; departure: string; hotelStyle: string; name: string; whatsapp: string;
+}, today: string) {
+  const name = input.name.trim();
+  const whatsapp = input.whatsapp.trim();
+  if (!name) throw new Error("Please enter your name.");
+  if (whatsapp.replace(/\D/g, "").length < 7) throw new Error("Please enter your WhatsApp number with the country code.");
+  const request = tourEnquiryDetails(selection, input, today);
+  return {
+    enquiry_type: "tour",
+    customer_name: name,
+    whatsapp,
+    consent_contact: true,
+    ...request,
+    details: { ...request.details, source_page: `/tours/package/${selection!.slug}`, request_channel: "tour_quick_quote" },
+  };
+}

@@ -32,3 +32,20 @@ test("rejects missing selection, fractional or missing party, invalid/past dates
   for (const departure of ["2026-02-30", "2026-10-02", "tomorrow"]) assert.throws(() => tourEnquiryDetails(tour, { ...choices, departure }, "2026-10-03"), /departure/);
   assert.throws(() => tourEnquiryDetails(tour, { ...choices, hotelStyle: "invalid" }, "2026-10-03"), /hotel style/);
 });
+test("quick quote carries the customiser choices, contact and source page", async () => {
+  const { tourQuickEnquiry } = await import("./tour-enquiry.ts");
+  const result = tourQuickEnquiry(tour, { ...choices, name: " Ama ", whatsapp: "+94 77 123 4567" }, "2026-10-03");
+  assert.equal(result.enquiry_type, "tour");
+  assert.equal(result.customer_name, "Ama");
+  assert.equal(result.whatsapp, "+94 77 123 4567");
+  assert.equal(result.subject, "tour request: Island Journey");
+  assert.equal(result.pax, 5);
+  assert.equal(result.details.source_page, "/tours/package/island-journey");
+  assert.equal(result.details.request_channel, "tour_quick_quote");
+  assert.equal(result.details.hotel_style, "Luxury");
+});
+test("quick quote needs a name and a usable WhatsApp number", async () => {
+  const { tourQuickEnquiry } = await import("./tour-enquiry.ts");
+  assert.throws(() => tourQuickEnquiry(tour, { ...choices, name: "", whatsapp: "+94771234567" }, "2026-10-03"), /name/);
+  assert.throws(() => tourQuickEnquiry(tour, { ...choices, name: "Ama", whatsapp: "123" }, "2026-10-03"), /WhatsApp/);
+});
