@@ -40,7 +40,7 @@ export function ProductPage({data,kind}:{data:Data;kind:string}) {
   </>;
 }
 
-function ConnectedEnquiryForm({ kind, transferInterest }: { kind: string; transferInterest?: TransferInterest | null }) {
+export function ConnectedEnquiryForm({ kind, transferInterest, subject, sourcePage: fixedSourcePage }: { kind: string; transferInterest?: TransferInterest | null; subject?: string; sourcePage?: string }) {
   const nameRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (transferInterest) nameRef.current?.focus({ preventScroll: true });
@@ -56,13 +56,13 @@ function ConnectedEnquiryForm({ kind, transferInterest }: { kind: string; transf
     const target = event.currentTarget;
     const form = new FormData(target);
     // Set by the site-wide enquiry bar so the team can see which page produced the lead.
-    const sourcePage = enquirySourcePage(window.location.search);
+    const sourcePage = fixedSourcePage || enquirySourcePage(window.location.search);
     try {
       const result = await liveApi.enquiry({
         enquiry_type: kind === "flights" ? "flight" : kind === "hotels" ? "hotel" : kind === "visas" ? "visa" : kind === "transfers" ? "transfer" : kind === "corporate" ? "corporate" : kind === "holidays" ? "holiday" : kind === "tours" ? "tour" : "custom_trip",
         customer_name: String(form.get("name") || ""),
         whatsapp: String(form.get("contact") || ""),
-        subject: `${kind.replaceAll("-", " ")} website enquiry`,
+        subject: subject || `${kind.replaceAll("-", " ")} website enquiry`,
         notes: String(form.get("details") || ""),
         ...(transferInterest || sourcePage ? { details: { ...(transferInterest ? { transfer_interest: transferInterest, price_status: "indicative_pending_confirmation" } : {}), ...(sourcePage ? { source_page: sourcePage } : {}) } } : {}),
         consent_contact: true,

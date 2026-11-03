@@ -1789,3 +1789,87 @@ body,.editorial-site,.site-header,.announcement,.footer,.inner-hero,.module-sear
   color:var(--muted);
   white-space:nowrap
 }
+/* Sri Lanka destination guides. */
+.destination-guide-hero .editorial-intro-art img,
+.destination-hub img{
+  display:block;
+  width:100%;
+  height:auto
+}
+.destination-hub .rich-card{
+  color:inherit;
+  text-decoration:none;
+  min-height:0;
+  gap:8px
+}
+.destination-hub .rich-card h2{
+  font-size:28px;
+  margin:0
+}
+.destination-hub .rich-card img{
+  margin-bottom:10px
+}
+.destination-facts{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:36px
+}
+.destination-tours{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:10px 28px;
+  margin:0 0 18px;
+  padding:0;
+  list-style:none
+}
+.destination-tours li{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 0;
+  border-bottom:1px solid var(--line)
+}
+.destination-tours small{
+  color:var(--muted);
+  white-space:nowrap
+}
+.destination-faq details{
+  border-top:1px solid var(--line);
+  padding:4px 0
+}
+.destination-faq summary{
+  padding:14px 0;
+  cursor:pointer;
+  font-weight:700;
+  color:var(--ink)
+}
+.destination-faq details p{
+  margin:0 0 16px;
+  color:var(--muted)
+}
+.destination-pairs{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px
+}
+.destination-pairs a{
+  display:grid;
+  gap:4px;
+  padding:20px;
+  border:1px solid var(--line);
+  color:var(--ink);
+  text-decoration:none
+}
+.destination-pairs span{
+  color:var(--muted);
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase
+}
+@media(max-width:720px){
+  .destination-facts,
+  .destination-pairs{
+    grid-template-columns:1fr;
+    gap:20px
+  }
+}
