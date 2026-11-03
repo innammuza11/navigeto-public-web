@@ -743,6 +743,32 @@ surrounding UI stays quiet. */
   box-shadow:none;
   background:#fffefb
 }
+/* The light editorial panel needs dark text; the older dark-panel rules made it white on cream. */
+.tour-customizer-redesign.tour-customizer-next{
+  color:var(--ink);
+  border-color:var(--line)
+}
+.tour-customizer-redesign.tour-customizer-next h3,
+.tour-customizer-redesign.tour-customizer-next .tour-customizer-price b,
+.tour-customizer-redesign.tour-customizer-next .tour-customizer-price strong{
+  color:var(--ink)
+}
+.tour-customizer-redesign.tour-customizer-next>p:not(.eyebrow),
+.tour-customizer-redesign.tour-customizer-next label,
+.tour-customizer-redesign.tour-customizer-next small,
+.tour-customizer-redesign.tour-customizer-next>div span{
+  color:var(--muted)
+}
+.tour-customizer-redesign.tour-customizer-next select,
+.tour-customizer-redesign.tour-customizer-next input{
+  border-color:var(--line);
+  background:#fff;
+  color:var(--ink);
+  color-scheme:light
+}
+.tour-customizer-redesign.tour-customizer-next>div{
+  border-color:var(--line)
+}
 .tour-detail-hero-redesign{
   border-radius:0
 }
@@ -1872,4 +1898,28 @@ body,.editorial-site,.site-header,.announcement,.footer,.inner-hero,.module-sear
     grid-template-columns:1fr;
     gap:20px
   }
+}
+/* One-step quote inside the tour customiser. */
+.tour-quick-quote{
+  display:grid;
+  gap:10px;
+  margin:6px 0 4px;
+  padding-top:16px;
+  border-top:1px solid var(--line)
+}
+.tour-quick-quote-title{
+  margin:0;
+  font-weight:700;
+  color:var(--ink)
+}
+.tour-quick-quote label{
+  display:grid;
+  gap:6px
+}
+.tour-quick-quote input{
+  font-size:16px
+}
+.tour-quick-quote-error{
+  margin:0;
+  font-weight:600
 }
