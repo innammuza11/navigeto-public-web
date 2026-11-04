@@ -5,6 +5,7 @@ import { journeyEnquiryDetails } from "@/lib/journey-enquiry";
 import { hotelToday, addHotelDays } from "@/lib/hotel-search-dates";
 import { tourEnquiryDetails } from "@/lib/tour-enquiry";
 import { TourQuickEnquiry } from "@/components/tour-quick-enquiry";
+import { TourItineraryDownload } from "@/components/tour-itinerary-download";
 import { destinationArtwork } from "@/lib/destination-art";
 import { DestinationCover } from "./destination-cover";
 import { SketchArt } from "./sketch-art";
@@ -359,6 +360,7 @@ export function TourDetail({slug,initialTour}:{slug:string;initialTour?:PublicTo
   <div className="itinerary-world"><div className="shell"><InteractiveItineraryMap days={liveItinerary} destinations={routeDestinations} country={journeyCountry} journeyImage={isSriLankaJourney?null:hero}/></div></div>
   {publicRates.length?<TourSellingRates cards={publicRates}/>:null}
   <section className="shell tour-after-map" id="included"><div className="tour-inclusions"><div><p className="eyebrow">Included</p><h3>Handled as one journey.</h3><ul>{(tour?.inclusions?.length?tour.inclusions:["Private transport","Selected accommodation","Published experiences","Navigeto local support"]).map(x=><li key={x}>✓ {x}</li>)}</ul></div><div><p className="eyebrow">Before you confirm</p><h3>Clear from the start.</h3><ul>{(tour?.exclusions?.length?tour.exclusions:["International flights unless stated","Visa and insurance","Personal expenses"]).map(x=><li key={x}>— {x}</li>)}</ul></div></div></section><div id="hotels">{isSriLankaJourney?<AvailableHotels title="Hotels currently available for this journey." destination={tour?.destinations?.[0]||""}/>:<section className="shell tour-after-map"><div className="tour-inclusions"><div><p className="eyebrow">Published hotel plan</p><h3>Your proposed stay.</h3>{proposedHotels.length?<ul>{proposedHotels.map(hotel=><li key={hotel}>{hotel}</li>)}</ul>:<p>The hotel plan is confirmed with your final quotation.</p>}<p>See the itinerary and inclusions for nights, room basis and meals. Rooms are subject to written supplier confirmation.</p></div></div></section>}</div>
+  {tour && !isGroupJourney ? <TourItineraryDownload tour={{id:tour.id,slug:tour.slug,title:tour.title}}/> : null}
  </>;
 }
 
