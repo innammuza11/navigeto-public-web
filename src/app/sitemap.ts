@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { liveApi } from "@/lib/live-api";
 import { SITE_URL, STATIC_SEO } from "@/lib/seo";
 import { DESTINATION_GUIDES } from "@/lib/destination-guides";
+import { ITINERARY_GUIDES } from "@/lib/itinerary-guides";
 import { allPublishedTours } from "@/lib/tour-catalogue";
 import { publicVisaCatalog } from "@/lib/visa-catalog-server";
 import { visaDestinations } from "@/lib/visa-pages";
@@ -17,6 +18,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   entries.set(`${SITE_URL}/group-tours`, { url: `${SITE_URL}/group-tours`, changeFrequency: "daily", priority: 0.8 });
   for (const path of ["/tours/sri-lanka", "/tours/international"]) entries.set(`${SITE_URL}${path}`, { url: `${SITE_URL}${path}`, changeFrequency: "weekly", priority: 0.8 });
   for (const path of ["/sri-lanka", ...DESTINATION_GUIDES.map(guide => `/sri-lanka/${guide.slug}`)]) entries.set(`${SITE_URL}${path}`, { url: `${SITE_URL}${path}`, changeFrequency: "monthly", priority: 0.8, images: [`${SITE_URL}/art/watercolour/${DESTINATION_GUIDES.find(guide => path.endsWith(`/${guide.slug}`))?.art || "sri-lanka"}.webp`] });
+  for (const path of ["/itineraries", ...ITINERARY_GUIDES.map(guide => `/itineraries/${guide.slug}`)]) entries.set(`${SITE_URL}${path}`, { url: `${SITE_URL}${path}`, changeFrequency: "monthly", priority: 0.8 });
   entries.set(`${SITE_URL}/partners`, { url: `${SITE_URL}/partners`, changeFrequency: "monthly", priority: 0.4 });
   const [tourResult, hotelResult, visaResult] = await Promise.allSettled([allPublishedTours(), liveApi.hotelSitemap(), publicVisaCatalog()]);
   // Only visa destinations whose requirements are officially verified are listed (the rest are noindex).

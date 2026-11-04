@@ -2066,3 +2066,67 @@ body,.editorial-site,.site-header,.announcement,.footer,.inner-hero,.module-sear
     padding:0
   }
 }
+/* Suggested itineraries. */
+.itinerary-suits{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:22px 0 0;
+  padding:0;
+  list-style:none
+}
+.itinerary-suits li{
+  padding:6px 12px;
+  border:1px solid var(--line);
+  font-size:13px;
+  color:var(--muted)
+}
+.itinerary-days{
+  display:grid;
+  gap:0;
+  margin:0;
+  padding:0;
+  list-style:none
+}
+.itinerary-days li{
+  display:grid;
+  grid-template-columns:110px 1fr;
+  gap:24px;
+  padding:22px 0;
+  border-top:1px solid var(--line)
+}
+.itinerary-days li>span{
+  font-weight:700;
+  color:var(--muted);
+  font-size:13px;
+  letter-spacing:.06em;
+  text-transform:uppercase
+}
+.itinerary-days h3{
+  margin:0 0 6px
+}
+.itinerary-days p{
+  margin:0 0 8px;
+  color:var(--muted)
+}
+.itinerary-tips{
+  display:grid;
+  gap:12px;
+  margin:0;
+  padding-left:20px
+}
+.itinerary-card{
+  color:inherit;
+  text-decoration:none;
+  min-height:0
+}
+.itinerary-card h2{
+  font-size:28px;
+  margin:0
+}
+@media(max-width:720px){
+  .itinerary-days li{
+    grid-template-columns:1fr;
+    gap:6px
+  }
+}
