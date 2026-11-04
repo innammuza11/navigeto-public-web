@@ -1,0 +1,129 @@
+/*
+ * Navigeto brand colour layer — loaded last, after tropical-motion.css and
+ * editorial-theme.css. It keeps the white editorial layout but replaces the
+ * older slate/teal/sage tones with the shared Navigeto palette
+ * (shared/brand/palette.json → --brand-* tokens): navy wordmark, blue, green,
+ * and the small red signature. Layout, imagery, logos and partner colours are
+ * unchanged.
+ *
+ * Text-safe shades: brand blue (#1E86C8) and green (#169C58) are below 4.5:1 on
+ * white, so small text and filled buttons use the deeper tints below (5.4:1).
+ * The pure brand blue/green are kept for large display text, rules and fills.
+ */
+:root{
+  --brand-blue-deep:#1670A8;
+  --brand-green-deep:#0E7A43;
+  --brand-blue-wash:#EEF6FC;
+  --brand-green-wash:#EDF7F1;
+  --brand-navy-wash:#F4F3F9;
+
+  --navy:var(--brand-navy);
+  --ink:var(--brand-navy);
+  --forest:var(--brand-green-deep);
+  --moss:var(--brand-green-deep);
+  --teal:var(--brand-blue-deep);
+  --gold:var(--brand-blue-deep);
+  --sun:var(--brand-blue);
+  --amber:var(--brand-blue-deep);
+  --aqua:var(--brand-blue);
+  --green:var(--brand-green);
+  --sky:var(--brand-blue-wash);
+  --pale:var(--brand-navy-wash);
+  --muted:#5B5878;
+  --line:#E4E3EE;
+}
+
+::selection{background:#D6EAF7;color:var(--brand-navy)}
+
+/* Actions: navy primary, brand-blue secondary; only the search action below uses red. */
+.button-primary{background:var(--brand-navy);border-color:var(--brand-navy);color:#fff}
+.button-gold{background:var(--brand-blue-deep);border-color:var(--brand-blue-deep);color:#fff}
+.button-primary:hover,.button-gold:hover{filter:none;background:#155F8F;border-color:#155F8F}
+.button-primary:hover{background:#1A1546;border-color:#1A1546}
+
+/* Navigation: blue active marker; red stays a signature accent (eyebrows, chrome line). */
+.desktop-nav a:hover,.desktop-nav a[aria-current=page]{color:var(--brand-navy);box-shadow:0 2px var(--brand-blue)}
+
+/* Former teal link colour → deep brand blue. */
+.editorial-hero-bottom a,.editorial-section-heading>a,.editorial-place b,
+.footer-brand a,.footer-grid a:hover,.editorial-detail-hero .tour-back-link,
+.review-source-card>b:last-child,.holiday-sketch-card a{color:var(--brand-blue-deep)}
+
+/* Former slate captions → brand navy family. */
+.sketch-art,.editorial-photo-stamp{color:var(--brand-navy)}
+.tour-editorial-art.illustrated-tour-art h3,.tour-cinematic-art.illustrated-tour-art h3,
+.illustrated-tour-art .tour-editorial-badges span,.illustrated-tour-art .tour-editorial-badges small,
+.market-card-art.illustrated-market-art>span,.market-card-art.illustrated-market-art>b{color:var(--brand-navy)}
+.tour-editorial-art.illustrated-tour-art>div:last-child p,
+.tour-cinematic-art.illustrated-tour-art p,.tour-cinematic-art.illustrated-tour-art small{color:var(--muted)}
+.illustrated-tour-art .tour-editorial-badges span,.illustrated-tour-art .tour-editorial-badges small{border-color:var(--line)}
+
+/* Green accents: brand green for display italics, deep green for small labels. */
+.editorial-hero h1 em,.footer-intro h2 em{color:var(--brand-green)}
+.storyboard-place{color:var(--brand-green-deep)}
+
+/* Offset photo shadows and the CTA band pick up soft brand washes. */
+.editorial-hero-bottom img{box-shadow:-12px 12px 0 var(--brand-blue-wash)}
+.editorial-detail-photo>.destination-cover{box-shadow:7px 7px 0 var(--brand-green-wash)}
+.cta{background:var(--brand-blue-wash)}
+@media (max-width:900px){
+  .editorial-hero-bottom img{box-shadow:-7px 7px var(--brand-blue-wash)}
+}
+
+/*
+ * Search panels (home tabs + every module search page): Navigeto navy→blue
+ * card, white field tiles, and the red signature on the search action — the
+ * one red action per screen, as in the approved Flights reference.
+ */
+:root{--brand-search-gradient:linear-gradient(112deg,var(--brand-navy) 0%,#1F3A7E 58%,var(--brand-blue-deep) 100%)}
+.home-search-panel,.module-search .advanced-search{
+  background:var(--brand-search-gradient);
+  border:0;border-radius:16px;
+  box-shadow:0 18px 44px rgba(34,28,86,.2);
+  color:#fff;overflow:visible
+}
+.home-search-panel{padding:16px 20px 18px}
+.module-search .advanced-search{padding:4px 20px 18px}
+.home-search-panel .advanced-search,.home-search-panel .advanced-search-home{background:transparent;border:0;box-shadow:none;padding:0}
+
+/* Service tabs become pills on the dark card. */
+.home-search-panel .search-tabs{gap:8px;padding:0 0 12px;border-bottom:0;overflow-x:auto;scrollbar-width:none}
+.home-search-panel .search-tabs button{flex:none;padding:7px 15px;border:1px solid rgba(255,255,255,.24);border-radius:999px;color:rgba(255,255,255,.86);background:transparent}
+.home-search-panel .search-tabs button:hover{border-color:rgba(255,255,255,.6);color:#fff}
+.home-search-panel .search-tabs button.active{background:#fff;border-color:#fff;color:var(--brand-navy)}
+.home-search-panel .search-tabs button.active:after{display:none}
+
+.home-search-panel .search-modebar,.module-search .search-modebar{border-bottom:1px solid rgba(255,255,255,.16);color:#fff}
+.home-search-panel .search-modebar>div b,.module-search .search-modebar>div b{color:rgba(255,255,255,.9);letter-spacing:.14em;text-transform:uppercase}
+.home-search-panel .search-modebar>button,.module-search .search-modebar>button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.3);border-radius:999px;color:#fff}
+.home-search-panel .search-modebar>button:hover,.module-search .search-modebar>button:hover{background:rgba(255,255,255,.16)}
+.home-search-panel .search-modebar button>b,.module-search .search-modebar button>b{background:rgba(255,255,255,.18);color:#fff}
+.home-search-panel .live-search-dot,.module-search .live-search-dot{background:var(--brand-green);box-shadow:0 0 0 4px rgba(22,156,88,.28)}
+
+.home-search-panel .module-search-form,.module-search .module-search-form{padding:14px 0 0}
+.home-search-panel .search-advanced-fields,.module-search .search-advanced-fields{border-top-color:rgba(255,255,255,.16)}
+.home-search-panel .module-field,.module-search .module-field,
+.home-search-panel .module-choice,.module-search .module-choice{background:#fff;border:1px solid transparent;border-radius:10px}
+.home-search-panel .module-field:focus-within,.module-search .module-field:focus-within{border-color:var(--brand-blue);box-shadow:0 0 0 3px rgba(30,134,200,.35)}
+.home-search-panel .module-field span,.module-search .module-field span{color:var(--muted)}
+.home-search-panel .module-field input,.home-search-panel .module-field select,
+.module-search .module-field input,.module-search .module-field select{color:var(--brand-navy)}
+.home-search-panel .swap-button,.module-search .swap-button{background:#fff;border:0;color:var(--brand-navy)}
+.home-search-panel .module-choice>input:checked+span,.module-search .module-choice>input:checked+span{background:var(--brand-blue-deep)}
+
+.module-submit,.home-search-panel .module-submit,.module-search .module-submit{
+  background:var(--brand-red);border-color:var(--brand-red);color:var(--brand-on-red);
+  border-radius:10px;box-shadow:0 8px 20px rgba(215,25,63,.28)
+}
+.module-submit:hover,.home-search-panel .module-submit:hover,.module-search .module-submit:hover{background:var(--brand-red-hover);border-color:var(--brand-red-hover);filter:none}
+
+/* White focus rings stay visible on the dark card. */
+.home-search-panel :focus-visible,.module-search .advanced-search :focus-visible{outline-color:#fff}
+
+@media (max-width:720px){
+  .home-search-panel{padding:12px 12px 14px;border-radius:14px}
+  .module-search .advanced-search{padding:2px 12px 14px;border-radius:14px}
+}
+
+/* The card carries its own edge; drop the older outlined wrapper around it. */
+.editorial-search{border:0;padding:0;background:transparent}
