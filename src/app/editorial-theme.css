@@ -1923,6 +1923,149 @@ body,.editorial-site,.site-header,.announcement,.footer,.inner-hero,.module-sear
   margin:0;
   font-weight:600
 }
+/* Visa destination pages. */
+.visa-verified,
+.visa-review{
+  display:inline-block;
+  margin:6px 0 0;
+  padding:6px 12px;
+  border:1px solid var(--line);
+  font-size:13px;
+  color:var(--muted)
+}
+.visa-verified:before{
+  content:"✓ ";
+  color:var(--brand-green)
+}
+.visa-service ul{
+  margin:8px 0 14px;
+  padding-left:18px;
+  color:var(--muted)
+}
+.visa-documents{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px
+}
+.visa-documents ul{
+  display:grid;
+  gap:8px;
+  padding-left:20px
+}
+.visa-funds,
+.visa-sources{
+  color:var(--muted);
+  font-size:14px
+}
+@media(max-width:720px){
+  .visa-documents{
+    grid-template-columns:1fr;
+    gap:20px
+  }
+}
+/* Itinerary download band on tour pages. */
+.itinerary-download{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:40px;
+  align-items:start;
+  margin-block:30px 70px;
+  padding:34px;
+  border:1px solid var(--line);
+  background:var(--pale)
+}
+.itinerary-download h3{
+  margin:0 0 10px;
+  color:var(--ink)
+}
+.itinerary-download p{
+  color:var(--muted)
+}
+.itinerary-download form{
+  display:grid;
+  gap:10px
+}
+.itinerary-download label{
+  display:grid;
+  gap:6px;
+  color:var(--muted)
+}
+.itinerary-download input{
+  min-height:45px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  font-size:16px
+}
+@media(max-width:720px){
+  .itinerary-download{
+    grid-template-columns:1fr;
+    gap:20px;
+    padding:22px
+  }
+}
+/* Print-ready itinerary sheet (Save as PDF). */
+.itinerary-sheet{
+  max-width:780px;
+  margin:0 auto;
+  padding:40px 24px;
+  background:#fff;
+  color:var(--ink)
+}
+.itinerary-sheet header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding-bottom:18px;
+  margin-bottom:24px;
+  border-bottom:1px solid var(--line)
+}
+.itinerary-sheet header img{
+  width:170px;
+  height:auto
+}
+.itinerary-sheet h1{
+  margin:6px 0 8px;
+  font-size:38px
+}
+.itinerary-sheet h2{
+  margin:28px 0 10px;
+  font-size:22px
+}
+.itinerary-sheet-meta{
+  color:var(--muted);
+  font-weight:600
+}
+.itinerary-sheet ol{
+  padding-left:20px
+}
+.itinerary-sheet ol li{
+  margin-bottom:14px;
+  break-inside:avoid
+}
+.itinerary-sheet ol p{
+  margin:4px 0
+}
+.itinerary-sheet small{
+  color:var(--muted)
+}
+.itinerary-sheet footer{
+  margin-top:36px;
+  padding-top:16px;
+  border-top:1px solid var(--line);
+  font-size:13px;
+  color:var(--muted)
+}
+@media print{
+  .itinerary-sheet-print{
+    display:none
+  }
+  .itinerary-sheet{
+    padding:0
+  }
+}
 /* Suggested itineraries. */
 .itinerary-suits{
   display:flex;

@@ -4,6 +4,8 @@ import { SITE_URL, STATIC_SEO } from "@/lib/seo";
 import { DESTINATION_GUIDES } from "@/lib/destination-guides";
 import { ITINERARY_GUIDES } from "@/lib/itinerary-guides";
 import { allPublishedTours } from "@/lib/tour-catalogue";
+import { publicVisaCatalog } from "@/lib/visa-catalog-server";
+import { visaDestinations } from "@/lib/visa-pages";
 
 type Entry = MetadataRoute.Sitemap[number];
 
@@ -18,7 +20,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   for (const path of ["/sri-lanka", ...DESTINATION_GUIDES.map(guide => `/sri-lanka/${guide.slug}`)]) entries.set(`${SITE_URL}${path}`, { url: `${SITE_URL}${path}`, changeFrequency: "monthly", priority: 0.8, images: [`${SITE_URL}/art/watercolour/${DESTINATION_GUIDES.find(guide => path.endsWith(`/${guide.slug}`))?.art || "sri-lanka"}.webp`] });
   for (const path of ["/itineraries", ...ITINERARY_GUIDES.map(guide => `/itineraries/${guide.slug}`)]) entries.set(`${SITE_URL}${path}`, { url: `${SITE_URL}${path}`, changeFrequency: "monthly", priority: 0.8 });
   entries.set(`${SITE_URL}/partners`, { url: `${SITE_URL}/partners`, changeFrequency: "monthly", priority: 0.4 });
-  const [tourResult, hotelResult] = await Promise.allSettled([allPublishedTours(), liveApi.hotelSitemap()]);
+  const [tourResult, hotelResult, visaResult] = await Promise.allSettled([allPublishedTours(), liveApi.hotelSitemap(), publicVisaCatalog()]);
+  // Only visa destinations whose requirements are officially verified are listed (the rest are noindex).
+  if (visaResult.status === "fulfilled") for (const destination of visaDestinations(visaResult.value).filter(item => item.verified)) { const url = `${SITE_URL}/visas/${destination.slug}`; entries.set(url, { url, lastModified: destination.lastVerifiedAt || undefined, changeFrequency: "weekly", priority: 0.7 }); }
   if (tourResult.status === "fulfilled") for (const tour of tourResult.value) { const url = `${SITE_URL}/tours/package/${tour.slug}`; entries.set(url, { url, changeFrequency: "weekly", priority: 0.8, images: tour.hero_image_url ? [tour.hero_image_url] : undefined }); }
   if (hotelResult.status === "fulfilled") for (const hotel of hotelResult.value.results) { const url = `${SITE_URL}/hotels/${hotel.public_slug}`; entries.set(url, { url, lastModified: hotel.updated_at || undefined, changeFrequency: "weekly", priority: 0.8 }); }
   return [...entries.values()];

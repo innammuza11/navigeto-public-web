@@ -130,7 +130,14 @@ export function VisaStorefront() {
   const [selected, setSelected] = useState<VisaProduct | null>(null);
   useEffect(() => {
     jsonRequest<{ countries: VisaCountry[] }>("/api/visa/catalog")
-      .then((data) => setCountries(data.countries || []))
+      .then((data) => {
+        const list = data.countries || [];
+        setCountries(list);
+        // Destination guide pages link here with ?country=XX to open that country.
+        const code = new URLSearchParams(window.location.search).get("country")?.toUpperCase();
+        const match = code ? list.find((item) => item.code === code) : undefined;
+        if (match) setSelectedCountry(match);
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
