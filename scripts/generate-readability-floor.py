@@ -24,6 +24,22 @@ OUT = ROOT / "src/app/readability.css"
 FLOOR = 11.0
 MAP_FLOOR = 9.0
 MAP_LABELS = ("itinerary-landmark", "itinerary-atlas-marker", "itinerary-atlas-compass")
+# Sizes that come from outside the theme files. Tailwind's preflight sets
+# small{font-size:80%}, so a <small> hint inside an 11px label rendered at 8.8px.
+# max() keeps 80% wherever that is readable and only lifts it to the floor.
+EXTRA_RULES = [f"small{{font-size:max({FLOOR:g}px,80%)}}"]
+# font-size, or the size token of the font shorthand (e.g. "font:700 8px var(--x)"
+# -> 8px; a "/1.6" line-height after it is ignored).
+DECL = re.compile(r"(?<![\w-])font(-size)?\s*:\s*([^;}]+)")
+SHORTHAND_SIZE = re.compile(r"(?:^|\s)([0-9.]+px)(?:/\S+)?(?=\s|$)")
+
+
+def size_of(is_longhand: bool, value: str):
+    value = value.strip()
+    if is_longhand:
+        return value
+    m = SHORTHAND_SIZE.search(value)
+    return m.group(1) if m else None
 
 
 def strip_comments(css: str) -> str:
@@ -65,7 +81,7 @@ def main() -> None:
         rules: list = []
         walk(strip_comments((ROOT / src).read_text()), 0, [], rules)
         for context, selector, body in rules:
-            values = re.findall(r"font-size:\s*([^;}]+)", body)
+            values = [v for v in (size_of(bool(m.group(1)), m.group(2)) for m in DECL.finditer(body)) if v]
             if not values:
                 continue
             # Key on each selector of a list, with combinators normalised, so
@@ -92,7 +108,8 @@ def main() -> None:
         f" * Raises theme text below {FLOOR:g}px (map labels below {MAP_FLOOR:g}px) to a readable floor.",
         " * Imported last in src/app/layout.tsx. */",
     ]
-    count = 0
+    lines += EXTRA_RULES
+    count = len(EXTRA_RULES)
     for context, sel, value in decls:
         if sel not in small:
             continue
