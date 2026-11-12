@@ -1,15 +1,21 @@
 const ADMIN_ORIGIN = process.env.TRAVELOS_ADMIN_ORIGIN || "https://admin.navigeto.com";
 
+// One path segment: an id or signed token (base64url, may contain "."), never
+// "." / ".." and never "\\" or "%" — new URL() treats "\\" as "/" and resolves
+// "..", which let "portal/..\\admin\\overview" escape the allowlist.
+const SEG = String.raw`(?!\.{1,2}(?:/|$))[A-Za-z0-9_.-]{1,512}`;
+const exact = (pattern: string) => new RegExp(`^${pattern.replaceAll("SEG", SEG)}$`);
+
 const ALLOWED = [
-  /^catalog$/,
-  /^countries$/,
-  /^check$/,
-  /^intake$/,
-  /^intake\/[^/]+\/documents$/,
-  /^intake\/[^/]+\/passport\/confirm$/,
-  /^intake\/[^/]+\/submit$/,
-  /^portal\/[^/]+$/,
-  /^intake\/[^/]+\/documents\/[^/]+$/,
+  exact("catalog"),
+  exact("countries"),
+  exact("check"),
+  exact("intake"),
+  exact("intake/SEG/documents"),
+  exact("intake/SEG/passport/confirm"),
+  exact("intake/SEG/submit"),
+  exact("portal/SEG"),
+  exact("intake/SEG/documents/SEG"),
 ];
 
 export function isAllowedVisaPath(path: string) {

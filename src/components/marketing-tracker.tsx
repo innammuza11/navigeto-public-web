@@ -7,6 +7,13 @@ import { captureMarketingAttribution, marketingConsentDecision, readMarketingCon
 
 import { createGoogleTagQueue, isWhatsAppLink } from "@/lib/google-tag-queue";
 
+// Pages whose URL carries a private access token (the visa document portal,
+// /visas/application/<token>). Advertising tags must never load or record a
+// page view there: the token alone opens the applicant's passport documents.
+export function isPrivateTokenPath(pathname: string | null | undefined) {
+  return /^\/visas\/application(\/|$)/.test(pathname || "");
+}
+
 function initializeGoogle(ids: string[]) {
   const tagIds = [...new Set(ids.filter(Boolean))];
   if (!tagIds.length) return;
@@ -47,7 +54,7 @@ export function MarketingTracker({ config }: { config: PublicSiteConfig }) {
   }, [googleTag, googleAdsId, googleAdsLabel, metaId, consentRequired]);
 
   useEffect(() => {
-    if (!hasTracking || decision !== "granted" || !readMarketingConsent(consentRequired)) return;
+    if (!hasTracking || decision !== "granted" || !readMarketingConsent(consentRequired) || isPrivateTokenPath(pathname)) return;
     const gtm = googleTag?.toUpperCase().startsWith("GTM-") ? googleTag : "";
     if (gtm) initializeGtm(gtm);
     initializeGoogle([gtm ? "" : googleTag || "", googleAdsId || ""]);
@@ -60,7 +67,7 @@ export function MarketingTracker({ config }: { config: PublicSiteConfig }) {
   useEffect(() => {
     if (decision !== "granted" || !googleTag) return;
     const trackClick = (event: MouseEvent) => {
-      if (event.defaultPrevented || !readMarketingConsent(consentRequired)) return;
+      if (event.defaultPrevented || !readMarketingConsent(consentRequired) || isPrivateTokenPath(window.location.pathname)) return;
       const anchor = event.target instanceof Element ? event.target.closest("a[href]") : null;
       if (!(anchor instanceof HTMLAnchorElement) || !isWhatsAppLink(anchor.href)) return;
       // Do not send the destination number, prefilled message or query parameters.

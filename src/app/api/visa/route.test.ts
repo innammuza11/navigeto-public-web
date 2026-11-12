@@ -16,14 +16,20 @@ test("runtime identity requires the exact public site and name, not a build flag
 });
 
 test("allows every Visa path used by the storefront", () => {
-  for (const path of ["catalog", "countries", "check", "intake", "intake/a/documents", "intake/a/documents/b", "intake/a/passport/confirm", "intake/a/submit", "portal/token"]) {
+  for (const path of ["catalog", "countries", "check", "intake", "intake/a/documents", "intake/a/documents/b", "intake/a/passport/confirm", "intake/a/submit", "portal/token", "portal/eyJ2IjoxfQ.c2lnbmF0dXJl-_", "intake/0d4c1a52-7b6e-4f3a-9c55-2f1f0a6b9e10/documents/3"]) {
     assert.equal(isAllowedVisaPath(path), true, path);
   }
 });
 
 test("rejects admin and path-confusion variants", () => {
-  for (const path of ["admin/overview", "intake//submit", "../catalog", "intake/a/passport/confirm/extra"]) {
+  for (const path of ["admin/overview", "intake//submit", "../catalog", "intake/a/passport/confirm/extra", "portal/..\\admin\\overview", "portal/..", "intake/../documents", "intake/a%2F..%2Fadmin/submit", "portal/a\\b"]) {
     assert.equal(isAllowedVisaPath(path), false, path);
+  }
+});
+
+test("an allowed path never resolves outside /api/visa/", () => {
+  for (const path of ["portal/..\\admin\\overview", "portal/.."]) {
+    if (isAllowedVisaPath(path)) assert.ok(buildAdminVisaUrl("https://navigeto.com/api/visa/x", path).pathname.startsWith("/api/visa/"), path);
   }
 });
 
