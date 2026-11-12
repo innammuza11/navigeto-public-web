@@ -6,6 +6,7 @@ import "./globals.css";
 import "./tropical-motion.css";
 import "./editorial-theme.css";
 import "./brand-theme.css";
+import "./readability.css";
 
 const sans=Manrope({subsets:["latin"],variable:"--font-sans"});
 const serif=Bodoni_Moda({subsets:["latin"],variable:"--font-serif",weight:["400","500","600"],style:["normal","italic"]});
