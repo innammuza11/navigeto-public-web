@@ -6,6 +6,9 @@ import { TourResults } from "@/components/commerce-ui";
 import { TourIndex } from "@/components/tour-index";
 import { NaviAssistantPage } from "@/components/navi-chat";
 import { seoMetadata, STATIC_SEO } from "@/lib/seo";
+// Rebuild from the live tour catalogue at most every 10 minutes, so publishing,
+// unpublishing or renaming a package reaches the site without a new deploy.
+export const revalidate = 600;
 
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
  const {slug}=await params; const path=`/${slug}`;
