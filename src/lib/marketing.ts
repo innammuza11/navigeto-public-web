@@ -74,5 +74,14 @@ export function trackTravelosConversion(input: { sourceRef: string; value?: numb
   if (consentGranted && window.fbq) window.fbq("track", "Lead", { value: input.value ?? 0, currency: input.currency || "USD" }, { eventID: eventId });
   const adminUrl = String(config.adminUrl || process.env.NEXT_PUBLIC_ADMIN_URL || "").replace(/\/$/, "");
   if (!adminUrl) return;
-  void fetch(`${adminUrl}/api/marketing/events`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event_id: eventId, event_name: "Lead", source_ref: input.sourceRef, event_source_url: window.location.href, value: input.value ?? null, currency: input.currency || null, consent_granted: consentGranted, attribution }), keepalive: true }).catch(() => undefined);
+  void fetch(`${adminUrl}/api/marketing/events`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ event_id: eventId, event_name: "Lead", source_ref: input.sourceRef, event_source_url: safeEventSourceUrl(), value: input.value ?? null, currency: input.currency || null, consent_granted: consentGranted, attribution }), keepalive: true }).catch(() => undefined);
+}
+
+/** Page URL for conversion events, without any private access token: the
+ * visa document portal path (/visas/application/<token>) is reduced to its
+ * route, and query strings are dropped. Conversions are forwarded to ad
+ * platforms, so they must never carry a token. */
+export function safeEventSourceUrl(location: Pick<Location, "origin" | "pathname"> = window.location) {
+  const path = /^\/visas\/application(\/|$)/.test(location.pathname) ? "/visas/application" : location.pathname;
+  return `${location.origin}${path}`;
 }
