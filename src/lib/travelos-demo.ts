@@ -1,4 +1,4 @@
-export const DEMO_WHATSAPP = "https://wa.me/94753310101?text=Hi%20Navigeto%2C%20I%27d%20like%20a%20Navigeto%20One%20demo%20for%20my%20travel%20agency.";
+export const DEMO_WHATSAPP = "https://wa.me/94774206166?text=Hi%20Navigeto%2C%20I%27d%20like%20a%20Navigeto%20One%20demo%20for%20my%20travel%20agency.";
 
 export function demoRequestPayload(form: FormData, search: string) {
   const field = (name: string, max: number) => String(form.get(name) || "").trim().slice(0, max);

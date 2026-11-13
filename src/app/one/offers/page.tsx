@@ -4,7 +4,7 @@ import Link from "next/link";
 import s from "./offers.module.css";
 
 const trialUrl = "https://admin.navigeto.com/partner/register?type=agent";
-const whatsappUrl = "https://wa.me/94753310101?text=Hi%20Navigeto%2C%20I%27d%20like%20to%20discuss%20the%20Navigeto%20One%20agency%20offers.";
+const whatsappUrl = "https://wa.me/94774206166?text=Hi%20Navigeto%2C%20I%27d%20like%20to%20discuss%20the%20Navigeto%20One%20agency%20offers.";
 export const metadata: Metadata = {
   title: { absolute: "Navigeto One | Agency Pricing & 14-Day Free Trial" },
   description: "Try Navigeto One free for 14 days. Explore the LKR 15,000/month agency pilot and USD 4,000 installation offer for the first five agencies. No automatic charge.",
@@ -30,6 +30,6 @@ export default function AgencyOffers() {
       </section>
       <section className={s.notes}><h2>A clear starting point.</h2><p>Your free trial does not create a paid subscription. Trial access expires after 336 hours; saved records are preserved, and you can contact us for an export.</p><p>Paid AI and live checkout are disabled. Offer availability, module scope, support, applicable taxes and commercial terms are confirmed in your written proposal.</p><div className={s.downloads}><a href="/one-offers/agency-offers.pdf" download>Download the pricing PDF <span aria-hidden="true">↓</span></a><a href="/one-offers/whatsapp-offer.png" download>Download the WhatsApp offer <span aria-hidden="true">↓</span></a></div></section>
     </main>
-    <footer className={s.footer}><div><strong>Navigeto One</strong><p>For the people who make journeys happen.</p></div><div><a href={whatsappUrl} target="_blank" rel="noopener noreferrer">WhatsApp +94 75 331 0101</a><a href="tel:+94774206166">Call +94 77 420 6166</a><a href="mailto:info@navigeto.com">info@navigeto.com</a></div><Link href="/one">Back to Navigeto One <span aria-hidden="true">↗</span></Link></footer>
+    <footer className={s.footer}><div><strong>Navigeto One</strong><p>For the people who make journeys happen.</p></div><div><a href={whatsappUrl} target="_blank" rel="noopener noreferrer">WhatsApp +94 77 420 6166</a><a href="tel:+94774206166">Call +94 77 420 6166</a><a href="mailto:info@navigeto.com">info@navigeto.com</a></div><Link href="/one">Back to Navigeto One <span aria-hidden="true">↗</span></Link></footer>
   </div>;
 }
