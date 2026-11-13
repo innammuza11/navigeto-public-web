@@ -24,6 +24,6 @@ export default async function ItinerarySheet({ params }: { params: Promise<{ slu
     <ol>{sheet.days.map(day => <li key={`${day.label}-${day.title}`}><b>{day.label}: {day.title}</b>{day.description ? <p>{day.description}</p> : null}{day.overnight || day.meals ? <small>{[day.overnight && `Overnight: ${day.overnight}`, day.meals && `Meals: ${day.meals}`].filter(Boolean).join(" · ")}</small> : null}</li>)}</ol>
     {sheet.inclusions.length ? <><h2>Included</h2><ul>{sheet.inclusions.map(item => <li key={item}>{item}</li>)}</ul></> : null}
     {sheet.exclusions.length ? <><h2>Not included</h2><ul>{sheet.exclusions.map(item => <li key={item}>{item}</li>)}</ul></> : null}
-    <footer><p>Every route can be adjusted: nights, hotels, pace and stops. Prices and availability are confirmed for your dates before booking.</p><p><b>Navigeto Travels</b> · WhatsApp +94 75 331 0101 · info@navigeto.com · {SITE_URL.replace(/^https?:\/\//, "")}/tours/package/{tour.slug}</p></footer>
+    <footer><p>Every route can be adjusted: nights, hotels, pace and stops. Prices and availability are confirmed for your dates before booking.</p><p><b>Navigeto Travels</b> · WhatsApp +94 77 420 6166 · info@navigeto.com · {SITE_URL.replace(/^https?:\/\//, "")}/tours/package/{tour.slug}</p></footer>
   </main>;
 }

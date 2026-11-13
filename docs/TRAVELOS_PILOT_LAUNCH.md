@@ -28,7 +28,7 @@ storage limits, onboarding and support before taking payment.
 - Page: https://navigeto.com/travelos
 - Sharing image: https://navigeto.com/travelos/opengraph-image
 - Primary CTA: Request a personal demo.
-- Secondary CTA: WhatsApp the owner's published business number +94 75 331 0101.
+- Secondary CTA: WhatsApp the owner's published business number +94 77 420 6166.
 - Existing partner login remains separate from pilot signup.
 - General public enquiry subject: `TravelOS agency demo — {agency}`.
 - Details tag: `request_kind=agency_software_demo`, `product=travelos`.
