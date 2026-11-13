@@ -5,6 +5,9 @@ import { TourResults } from "@/components/commerce-ui";
 import { TourIndex } from "@/components/tour-index";
 import { SiteShell } from "@/components/site-shell";
 import { seoMetadata } from "@/lib/seo";
+// Rebuild from the live tour catalogue at most every 10 minutes, so publishing,
+// unpublishing or renaming a package reaches the site without a new deploy.
+export const revalidate = 600;
 // Only these collections exist; any other slug rendered the full catalogue as an indexable duplicate of /tours.
 const COLLECTIONS = { "sri-lanka": "Sri Lanka", international: "International" } as const;
 type Collection = keyof typeof COLLECTIONS;

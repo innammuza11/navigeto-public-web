@@ -8,6 +8,9 @@ import { DESTINATION_GUIDES, guideBySlug, guideJsonLd, toursForGuide } from "@/l
 import { seoMetadata, SITE_URL } from "@/lib/seo";
 import { allPublishedTours } from "@/lib/tour-catalogue";
 import { tourDisplayName, tourDurationLabel } from "@/lib/tour-presentation";
+// Rebuild from the live tour catalogue at most every 10 minutes, so publishing,
+// unpublishing or renaming a package reaches the site without a new deploy.
+export const revalidate = 600;
 
 export const dynamicParams = false;
 export function generateStaticParams() { return DESTINATION_GUIDES.map(guide => ({ place: guide.slug })); }
