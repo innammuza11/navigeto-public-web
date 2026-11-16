@@ -6,5 +6,10 @@
   "redHover": "#B81435",
   "redSoft": "#FFF1F4",
   "redOnDark": "#FF8FA7",
-  "onRed": "#FFFFFF"
+  "onRed": "#FFFFFF",
+  "yellow": "#F5B700",
+  "yellowHover": "#DCA300",
+  "yellowSoft": "#FFF7DB",
+  "yellowOnDark": "#FFD24A",
+  "onYellow": "#221C56"
 }

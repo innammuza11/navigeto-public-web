@@ -8,7 +8,12 @@
   --brand-red-soft: #FFF1F4;
   --brand-red-on-dark: #FF8FA7;
   --brand-on-red: #FFFFFF;
-  --brand-signature: linear-gradient(90deg, var(--brand-blue) 0% 78%, var(--brand-green) 78% 94%, var(--brand-red) 94% 100%);
+  --brand-yellow: #F5B700;
+  --brand-yellow-hover: #DCA300;
+  --brand-yellow-soft: #FFF7DB;
+  --brand-yellow-on-dark: #FFD24A;
+  --brand-on-yellow: #221C56;
+  --brand-signature: linear-gradient(90deg, var(--brand-blue) 0% 70%, var(--brand-green) 70% 84%, var(--brand-yellow) 84% 95%, var(--brand-red) 95% 100%);
 }
 
 /* Opt-in signature: no positioning changes, no pointer-event interception. */
@@ -21,3 +26,5 @@
 .brand-rule { height: 3px; background: var(--brand-signature); }
 .brand-accent-text { color: var(--brand-red); }
 .brand-accent-border { border-color: var(--brand-red); }
+.brand-sun-text { color: var(--brand-yellow-on-dark); }
+.brand-sun-marker { display: inline-block; width: 28px; height: 4px; border-radius: 999px; background: var(--brand-yellow); }
