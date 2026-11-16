@@ -8,8 +8,8 @@ committed output with `npm run brand:check`.
 Navigeto red is **#D7193F**. Blue #1E86C8 and green #169C58 remain core brand
 colours; existing local blue/green UI tokens retain their roles.
 
-Use `.brand-signature` on Navigeto headers/footers: a thin 3px line with 78%
-blue, 16% green and 6% red. Use red sparingly for small decorative rules or
+Use `.brand-signature` on Navigeto headers/footers: a thin 3px line with 70%
+blue, 14% green, 11% yellow and 5% red. Use red sparingly for small decorative rules or
 heading accents. Do not recolour every card, button, link or pending status.
 Use semantic errors/warnings/success colours with clear labels. White on red
 and red on white are the standard text pairs; use `--brand-red-on-dark` for
@@ -19,3 +19,12 @@ white-label documents retain their own branding.
 The logo artwork, search/enquiry functions, payments, pricing and booking
 behaviour remain unchanged. Future UI should reuse these tokens instead of
 introducing hardcoded brand hex values.
+
+## Sunshine yellow (November 2026)
+
+Yellow **#F5B700** (hover #DCA300, soft #FFF7DB, on dark #FFD24A, text on
+yellow = navy) is a warm accent in `src/app/brand-theme.css`: eyebrow bars,
+the active nav underline, the active search tab, the search card's section label,
+gold buttons (navy label), a highlighter stroke under hero italics, the CTA
+wash and the footer rule. Never use yellow as text on white. The red search
+button and navy primary button are unchanged.

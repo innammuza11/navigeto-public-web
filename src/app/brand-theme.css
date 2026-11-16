@@ -127,3 +127,34 @@
 
 /* The card carries its own edge; drop the older outlined wrapper around it. */
 .editorial-search{border:0;padding:0;background:transparent}
+
+/*
+ * Sunshine yellow accent (November 2026, owner request: "a yellow touch").
+ * Yellow is used as a fill, marker or glow — never as text on white, which is
+ * too faint to read. Text on yellow is navy (--brand-on-yellow). Red keeps the
+ * search action; navy keeps the primary button.
+ */
+::selection{background:color-mix(in srgb,var(--brand-yellow) 45%,white);color:var(--brand-navy)}
+
+/* Section eyebrows: a short rounded yellow bar instead of the thin red dash. */
+.eyebrow:before{width:22px;height:3px;flex-basis:22px;border-radius:999px;background:var(--brand-yellow)}
+
+/* Header navigation: yellow active/hover underline. */
+.desktop-nav a:hover,.desktop-nav a[aria-current=page]{box-shadow:0 3px var(--brand-yellow)}
+
+/* "Gold" buttons are genuinely gold again: yellow fill, navy label (8.9:1). */
+.button-gold{background:var(--brand-yellow);border-color:var(--brand-yellow);color:var(--brand-on-yellow);box-shadow:0 10px 24px color-mix(in srgb,var(--brand-yellow) 32%,transparent)}
+.button-gold:hover{background:var(--brand-yellow-hover);border-color:var(--brand-yellow-hover);color:var(--brand-on-yellow)}
+
+/* Hero headline: a soft highlighter stroke under the italic words. */
+.editorial-hero h1 em,.footer-intro h2 em{background:linear-gradient(transparent 70%,color-mix(in srgb,var(--brand-yellow) 42%,transparent) 70% 92%,transparent 92%);padding-inline:.04em}
+.editorial-hero-bottom img{box-shadow:-12px 12px 0 var(--brand-yellow-soft)}
+@media (max-width:900px){.editorial-hero-bottom img{box-shadow:-7px 7px var(--brand-yellow-soft)}}
+
+/* Search card: yellow active tab and yellow section label. */
+.home-search-panel .search-tabs button.active{background:var(--brand-yellow);border-color:var(--brand-yellow);color:var(--brand-on-yellow)}
+.home-search-panel .search-modebar>div b,.module-search .search-modebar>div b{color:var(--brand-yellow-on-dark)}
+
+/* Call-to-action band and footer rule pick up the warm wash. */
+.cta{background:var(--brand-yellow-soft)}
+.footer{border-top:3px solid var(--brand-yellow)}
