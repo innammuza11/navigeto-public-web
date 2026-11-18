@@ -2,6 +2,8 @@
 // before publishing) plus helpers that match published tours by length.
 // No prices here: tour prices come only from the published catalogue.
 
+import { CONTENT_REVIEWED, reviewedPageNode } from "./answer-engine.ts";
+
 export type ItineraryDay = { day: string; title: string; copy: string; stop?: string };
 
 export type ItineraryGuide = {
@@ -185,6 +187,7 @@ export function itineraryJsonLd(siteUrl: string, guide: ItineraryGuide) {
         { "@type": "ListItem", position: 2, name: "Sri Lanka itineraries", item: `${siteUrl}/itineraries` },
         { "@type": "ListItem", position: 3, name: guide.name, item: url },
       ] },
+      reviewedPageNode(siteUrl, `/itineraries/${guide.slug}`, guide.name, CONTENT_REVIEWED.itineraries),
     ],
   };
 }

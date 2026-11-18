@@ -6,6 +6,7 @@ import { SiteShell } from "@/components/site-shell";
 import { guideBySlug } from "@/lib/destination-guides";
 import { ITINERARY_GUIDES, itineraryBySlug, itineraryJsonLd, toursForItinerary } from "@/lib/itinerary-guides";
 import { seoMetadata, SITE_URL } from "@/lib/seo";
+import { CONTENT_REVIEWED, reviewedLabel } from "@/lib/answer-engine";
 import { allPublishedTours } from "@/lib/tour-catalogue";
 import { tourDisplayName, tourDurationLabel } from "@/lib/tour-presentation";
 
@@ -37,6 +38,7 @@ export default async function ItineraryPage({ params }: { params: Promise<{ slug
       <p className="eyebrow">Suggested route · private car and chauffeur</p>
       <h1>{guide.headline}</h1>
       <p className="lede">{guide.intro}</p>
+        <p className="content-reviewed">Written and reviewed by the Navigeto Sri Lanka team · <time dateTime={CONTENT_REVIEWED.itineraries}>{reviewedLabel(CONTENT_REVIEWED.itineraries)}</time></p>
       <div className="hero-actions"><a href="#enquire" className="button button-gold">Get a quote for this route</a>{tours.length ? <a href="#tours" className="button button-soft">See {tours.length} ready-made tour{tours.length === 1 ? "" : "s"}</a> : null}</div>
       <ul className="itinerary-suits">{guide.suits.map(item => <li key={item}>{item}</li>)}</ul>
     </div></section>

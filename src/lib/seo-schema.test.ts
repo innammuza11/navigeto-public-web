@@ -64,3 +64,11 @@ test("journey index groups by country with Sri Lanka first and honours the colle
   assert.deepEqual(groupToursForIndex(list, "sri-lanka").map(([country]) => country), ["Sri Lanka"]);
   assert.deepEqual(groupToursForIndex(list, "international").map(([country]) => country), ["Thailand", "Vietnam"]);
 });
+
+test("enquiry origin records the SEO page, channel and form page, paths only", async () => {
+  const { enquiryOrigin } = await import("./seo-schema.ts");
+  assert.deepEqual(enquiryOrigin("/custom-trip", "website_form", "/custom-trip"), { source_page: "/custom-trip", request_channel: "website_form" });
+  assert.deepEqual(enquiryOrigin("/sri-lanka/ella", "enquiry_bar", "/custom-trip"), { source_page: "/sri-lanka/ella", request_channel: "enquiry_bar", form_page: "/custom-trip" });
+  assert.deepEqual(enquiryOrigin("https://evil.example/x", "website_form"), { request_channel: "website_form" });
+  assert.deepEqual(enquiryOrigin("//evil.example", "website_form"), { request_channel: "website_form" });
+});

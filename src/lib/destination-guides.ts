@@ -2,6 +2,8 @@
 // publishing) plus pure helpers that match published tours to each place.
 // No prices here: tour prices come only from the published catalogue.
 
+import { CONTENT_REVIEWED, reviewedPageNode } from "./answer-engine.ts";
+
 export type DestinationGuide = {
   slug: string;
   name: string;
@@ -267,6 +269,7 @@ export function guideJsonLd(siteUrl: string, guide: DestinationGuide) {
         { "@type": "ListItem", position: 2, name: "Sri Lanka destinations", item: `${siteUrl}/sri-lanka` },
         { "@type": "ListItem", position: 3, name: guide.name, item: url },
       ] },
+      reviewedPageNode(siteUrl, `/sri-lanka/${guide.slug}`, guide.metaTitle, CONTENT_REVIEWED.guides),
     ],
   };
 }
