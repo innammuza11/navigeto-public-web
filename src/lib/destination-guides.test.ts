@@ -28,7 +28,7 @@ test("tours match on destinations or itinerary places, case-insensitively", () =
 
 test("guide schema has destination, FAQ and breadcrumbs", () => {
   const graph = guideJsonLd("https://navigeto.com", guideBySlug("kandy")!)["@graph"] as Array<Record<string, unknown>>;
-  assert.deepEqual(graph.map(node => node["@type"]), ["TouristDestination", "FAQPage", "BreadcrumbList"]);
+  assert.deepEqual(graph.map(node => node["@type"]), ["TouristDestination", "FAQPage", "BreadcrumbList", "WebPage"]);
   assert.equal((graph[1].mainEntity as unknown[]).length, 3);
 });
 

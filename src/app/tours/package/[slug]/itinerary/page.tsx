@@ -6,6 +6,9 @@ import { printableItinerary } from "@/lib/itinerary-print";
 import { liveApi } from "@/lib/live-api";
 import { SITE_URL } from "@/lib/seo";
 import { tourDisplayName } from "@/lib/tour-presentation";
+// Rebuild from the live tour catalogue at most every 10 minutes, so publishing,
+// unpublishing or renaming a package reaches the site without a new deploy.
+export const revalidate = 600;
 
 export const metadata: Metadata = { robots: { index: false, follow: true } };
 

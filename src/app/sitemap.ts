@@ -6,6 +6,9 @@ import { ITINERARY_GUIDES } from "@/lib/itinerary-guides";
 import { allPublishedTours } from "@/lib/tour-catalogue";
 import { publicVisaCatalog } from "@/lib/visa-catalog-server";
 import { visaDestinations } from "@/lib/visa-pages";
+// Rebuild from the live tour catalogue at most every 10 minutes, so publishing,
+// unpublishing or renaming a package reaches the site without a new deploy.
+export const revalidate = 600;
 
 type Entry = MetadataRoute.Sitemap[number];
 

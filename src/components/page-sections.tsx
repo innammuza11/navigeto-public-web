@@ -16,7 +16,7 @@ import { AboutMeSection } from "./about-me";
 import { liveApi, type PublicSiteConfig } from "@/lib/live-api";
 import { BotTrapField } from "@/components/bot-trap-field";
 import { EnquiryRecoveryActions } from "@/components/enquiry-recovery-actions";
-import { enquirySourcePage } from "@/lib/seo-schema";
+import { enquiryOrigin, enquirySourcePage } from "@/lib/seo-schema";
 type Data={
  eyebrow:string; title:string; copy:string; action:string;
  stats:readonly (readonly [string,string])[];
@@ -56,7 +56,8 @@ export function ConnectedEnquiryForm({ kind, transferInterest, subject, sourcePa
     const target = event.currentTarget;
     const form = new FormData(target);
     // Set by the site-wide enquiry bar so the team can see which page produced the lead.
-    const sourcePage = fixedSourcePage || enquirySourcePage(window.location.search);
+    const fromBar = enquirySourcePage(window.location.search);
+    const sourcePage = fixedSourcePage || fromBar || window.location.pathname;
     try {
       const result = await liveApi.enquiry({
         enquiry_type: kind === "flights" ? "flight" : kind === "hotels" ? "hotel" : kind === "visas" ? "visa" : kind === "transfers" ? "transfer" : kind === "corporate" ? "corporate" : kind === "holidays" ? "holiday" : kind === "tours" ? "tour" : "custom_trip",
@@ -64,7 +65,7 @@ export function ConnectedEnquiryForm({ kind, transferInterest, subject, sourcePa
         whatsapp: String(form.get("contact") || ""),
         subject: subject || `${kind.replaceAll("-", " ")} website enquiry`,
         notes: String(form.get("details") || ""),
-        ...(transferInterest || sourcePage ? { details: { ...(transferInterest ? { transfer_interest: transferInterest, price_status: "indicative_pending_confirmation" } : {}), ...(sourcePage ? { source_page: sourcePage } : {}) } } : {}),
+        details: { ...(transferInterest ? { transfer_interest: transferInterest, price_status: "indicative_pending_confirmation" } : {}), ...enquiryOrigin(sourcePage, fromBar && !fixedSourcePage ? "enquiry_bar" : "website_form", window.location.pathname) },
         consent_contact: true,
       });
       setReference(result.enquiry.public_ref);

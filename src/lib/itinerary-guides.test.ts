@@ -29,5 +29,5 @@ test("tours match the itinerary length, Sri Lanka only, closest first", () => {
 
 test("itinerary schema has trip, FAQ and breadcrumbs", () => {
   const graph = itineraryJsonLd("https://navigeto.com", itineraryBySlug("sri-lanka-10-days")!)["@graph"] as Array<Record<string, unknown>>;
-  assert.deepEqual(graph.map(node => node["@type"]), ["TouristTrip", "FAQPage", "BreadcrumbList"]);
+  assert.deepEqual(graph.map(node => node["@type"]), ["TouristTrip", "FAQPage", "BreadcrumbList", "WebPage"]);
 });
