@@ -104,6 +104,17 @@ export function enquirySourcePage(search: string) {
   return /^\/[a-z0-9\-/]{0,160}$/i.test(from) && !from.startsWith("//") ? from : undefined;
 }
 
+const SAFE_PATH = /^\/[a-z0-9\-/]{0,160}$/i;
+
+/** Lead-attribution fields saved in enquiry details: the SEO page that produced the lead,
+ *  how it was sent, and (when different) the page the form itself was on. Paths only. */
+export function enquiryOrigin(sourcePage: string, channel: string, formPage?: string) {
+  const safe = (path?: string) => path && SAFE_PATH.test(path) && !path.startsWith("//") ? path : undefined;
+  const source = safe(sourcePage);
+  const form = safe(formPage);
+  return { ...(source ? { source_page: source } : {}), request_channel: channel, ...(form && form !== source ? { form_page: form } : {}) };
+}
+
 export type TourIndexScope = "all" | "sri-lanka" | "international";
 
 /** Server-rendered "every journey" index: crawlable links grouped by country, Sri Lanka first. */

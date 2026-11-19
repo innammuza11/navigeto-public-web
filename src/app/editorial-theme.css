@@ -2130,3 +2130,7 @@ body,.editorial-site,.site-header,.announcement,.footer,.inner-hero,.module-sear
     gap:6px
   }
 }
+
+/* Answer blocks (AEO) and editorial review line */
+.content-reviewed{margin-top:.75rem;font-size:.875rem;color:var(--muted, #5b6470)}
+.answer-faq{max-width:60rem}

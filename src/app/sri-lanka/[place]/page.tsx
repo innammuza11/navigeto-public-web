@@ -6,6 +6,7 @@ import { ConnectedEnquiryForm } from "@/components/page-sections";
 import { SiteShell } from "@/components/site-shell";
 import { DESTINATION_GUIDES, guideBySlug, guideJsonLd, toursForGuide } from "@/lib/destination-guides";
 import { seoMetadata, SITE_URL } from "@/lib/seo";
+import { CONTENT_REVIEWED, reviewedLabel } from "@/lib/answer-engine";
 import { allPublishedTours } from "@/lib/tour-catalogue";
 import { tourDisplayName, tourDurationLabel } from "@/lib/tour-presentation";
 // Rebuild from the live tour catalogue at most every 10 minutes, so publishing,
@@ -42,6 +43,7 @@ export default async function DestinationGuidePage({ params }: { params: Promise
         <p className="eyebrow">{guide.region} · Sri Lanka</p>
         <h1>{guide.headline}</h1>
         <p className="lede">{guide.intro}</p>
+        <p className="content-reviewed">Written and reviewed by the Navigeto Sri Lanka team · <time dateTime={CONTENT_REVIEWED.guides}>{reviewedLabel(CONTENT_REVIEWED.guides)}</time></p>
         <div className="hero-actions"><a href="#enquire" className="button button-gold">Plan a trip with {guide.name.split(" ")[0]}</a>{tours.length ? <a href="#tours" className="button button-soft">See {tours.length} published tour{tours.length === 1 ? "" : "s"}</a> : null}</div>
       </div>
       <div className="editorial-intro-art"><img src={`/art/watercolour/${guide.art}.webp`} width={600} height={400} alt="" loading="eager" decoding="async"/></div>
