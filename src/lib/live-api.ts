@@ -319,7 +319,9 @@ export const liveApi = {
   hotel: (slug: string) =>
     invoke<{ result: PublicHotel | null }>("customer-hotels", { slug }, "detail"),
   hotelBooking: async (payload: Record<string, unknown>) => {
-    const result = await invoke<{ booking: { public_ref: string; total_amount: number; currency: string } }>("customer-hotels", payload, "booking");
+    // Same invisible human checks as enquiries; customer-hotels enforces them
+    // (hidden trap + form timing). They are not part of the booking receipt hash.
+    const result = await invoke<{ booking: { public_ref: string; total_amount: number; currency: string } }>("customer-hotels", { ...payload, ...botSignals() }, "booking");
     trackTravelosConversion({ sourceRef: result.booking.public_ref, value: result.booking.total_amount, currency: result.booking.currency });
     return result;
   },
