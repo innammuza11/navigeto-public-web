@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { TransportPackageLoader } from "./transport-packages/TransportPackageLoader";
 import type { TransportSelection } from "./transport-packages/TransportPackages";
+import styles from "./transfer-showcase.module.css";
 
 // Public reference: https://biataxi.lk/airport-transfers, checked 2026-09-10.
 // Indicative selling proposals, not approved supplier costs or automatic quotes.
@@ -31,6 +32,16 @@ export function TransferShowcase({ onSelect }: { onSelect: (selection: TransferI
     document.getElementById("enquire")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
   }
   return <div className="transfer-showcase">
+    <section className={`shell ${styles.guided}`} aria-labelledby="guided-journeys-heading">
+      <div>
+        <p className="eyebrow">Navigeto Rides</p>
+        <h2 id="guided-journeys-heading">Explore Sri Lanka with a local guide</h2>
+        <p>Plan a day trip or a multi-day tour with a private vehicle, driver and local guide.</p>
+      </div>
+      <a className="button button-gold" href="https://admin.navigeto.com/ride/guided">
+        Plan a guided trip <span aria-hidden="true">→</span>
+      </a>
+    </section>
     <section className="section shell"><TransportPackageLoader onSelect={selection=>choose({vehicle:selection.vehicle,trip_type:selection.mode==='round'?'round_tour':'day_service',transport_package:selection})}/></section>
     <section className="section shell" aria-labelledby="airport-routes-heading">
       <div className="section-title"><p className="eyebrow">From Bandaranaike International Airport</p><h2 id="airport-routes-heading">Popular airport transfers.</h2><p>Indicative prices per private vehicle, one way. Share your dates and group details for a confirmed quotation.</p></div>

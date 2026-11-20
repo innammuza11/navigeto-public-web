@@ -1,0 +1,27 @@
+.guided {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem 2rem;
+  margin-top: clamp(2rem, 5vw, 4rem);
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: var(--brand-yellow-soft);
+}
+
+.guided h2 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  line-height: 1.2;
+}
+
+.guided p {
+  margin: 0;
+}
+
+.guided p:last-child {
+  max-width: 44ch;
+  color: var(--muted);
+}
