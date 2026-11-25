@@ -4,7 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ConnectedEnquiryForm } from "@/components/page-sections";
 import { SiteShell } from "@/components/site-shell";
-import { DESTINATION_GUIDES, guideBySlug, guideJsonLd, toursForGuide } from "@/lib/destination-guides";
+import { DESTINATION_GUIDES, guideBySlug, guideJsonLd, hotelsForGuide, toursForGuide } from "@/lib/destination-guides";
+import { liveApi } from "@/lib/live-api";
 import { seoMetadata, SITE_URL } from "@/lib/seo";
 import { CONTENT_REVIEWED, reviewedLabel } from "@/lib/answer-engine";
 import { allPublishedTours } from "@/lib/tour-catalogue";
@@ -14,6 +15,9 @@ import { tourDisplayName, tourDurationLabel } from "@/lib/tour-presentation";
 export const revalidate = 600;
 
 export const dynamicParams = false;
+
+// Only a plain star rating ("4", "4 Star") is shown; free-text categories are left out.
+const starLabel = (star?: string | null) => { const match = String(star || "").trim().match(/^(\d(?:\.\d)?)(\s*-?\s*star)?$/i); return match ? `${match[1]}-star` : ""; };
 export function generateStaticParams() { return DESTINATION_GUIDES.map(guide => ({ place: guide.slug })); }
 
 export async function generateMetadata({ params }: { params: Promise<{ place: string }> }): Promise<Metadata> {
@@ -32,7 +36,13 @@ export async function generateMetadata({ params }: { params: Promise<{ place: st
 export default async function DestinationGuidePage({ params }: { params: Promise<{ place: string }> }) {
   const guide = guideBySlug((await params).place);
   if (!guide) notFound();
-  const tours = toursForGuide(await allPublishedTours().catch(() => []), guide);
+  const [tourList, hotelLists] = await Promise.all([
+    allPublishedTours().catch(() => []),
+    // One search per place name; the search is fuzzy, so hotelsForGuide keeps only hotels in this area.
+    Promise.allSettled(guide.aliases.map(alias => liveApi.hotelStartingRates({ q: alias, max_results: 40 }))),
+  ]);
+  const tours = toursForGuide(tourList, guide);
+  const hotels = hotelsForGuide(hotelLists.flatMap(result => result.status === "fulfilled" ? result.value.results : []), guide);
   const pairs = guide.pairWith.map(slug => guideBySlug(slug)!).filter(Boolean);
   const path = `/sri-lanka/${guide.slug}`;
   return <SiteShell>
@@ -62,6 +72,11 @@ export default async function DestinationGuidePage({ params }: { params: Promise
     {tours.length ? <section className="section shell" id="tours"><div className="section-title"><p className="eyebrow">Published Navigeto journeys</p><h2>Private tours that include {guide.name}.</h2><p>Every route can be changed: the number of nights, hotels, pace and stops.</p></div>
       <ul className="destination-tours">{tours.slice(0, 12).map(tour => <li key={tour.slug}><Link prefetch={false} href={`/tours/package/${tour.slug}`}>{tourDisplayName(tour)}</Link><small>{tourDurationLabel(tour.duration_days, tour.duration_nights)}</small></li>)}</ul>
       {tours.length > 12 ? <p><Link className="text-link" href="/tours/sri-lanka">See all Sri Lanka journeys →</Link></p> : null}
+    </section> : null}
+
+    {hotels.length ? <section className="section shell" id="hotels"><div className="section-title"><p className="eyebrow">Where to stay</p><h2>Hotels in and around {guide.name}.</h2><p>Published hotel profiles with rooms, facilities and live rates. Your Sri Lanka specialist can add any of them to your route.</p></div>
+      <ul className="destination-tours destination-hotels">{hotels.slice(0, 12).map(hotel => <li key={hotel.public_slug}><Link prefetch={false} href={`/hotels/${hotel.public_slug}`}>{hotel.hotel_name}</Link><small>{[starLabel(hotel.star_category), hotel.destination].filter(Boolean).join(" · ")}</small></li>)}</ul>
+      <p><Link className="text-link" prefetch={false} href={`/hotels/search?q=${encodeURIComponent(guide.aliases[0])}`}>See {guide.name.split(" ")[0]} hotels with live rates →</Link></p>
     </section> : null}
 
     <section className="section shell destination-faq"><div className="section-title"><p className="eyebrow">Good to know</p><h2>{guide.name} questions, answered.</h2></div>

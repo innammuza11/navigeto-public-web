@@ -243,18 +243,40 @@ export function guideBySlug(slug: string) {
 
 type TourPlaces = { slug: string; destinations?: string[]; itinerary?: Array<Record<string, unknown>> };
 
+/** True when a place name (a tour stop or a hotel's destination) is in the guide's area. */
+export function placeInGuide(place: string, guide: DestinationGuide) {
+  let text = place.toLowerCase();
+  for (const name of guide.excludes || []) text = text.replaceAll(name.toLowerCase(), " ");
+  // Whole words only: "Ella" must not match Dickwella or Wellawaya, nor "Galle" Tangalle.
+  return guide.aliases.some(name => new RegExp(`(^|[^\\p{L}])${name.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^\\p{L}])`, "u").test(text));
+}
+
 /** Published tours whose destinations or itinerary mention the guide's place. */
 export function toursForGuide<T extends TourPlaces>(tours: T[], guide: DestinationGuide) {
-  const names = guide.aliases.map(name => name.toLowerCase());
-  const excluded = (guide.excludes || []).map(name => name.toLowerCase());
   return tours.filter(tour => {
     const places = [...(tour.destinations || []), ...(tour.itinerary || []).flatMap(day => ["title", "route", "location", "overnight"].map(key => day[key]).filter((value): value is string => typeof value === "string"))];
-    return places.some(place => {
-      let text = place.toLowerCase();
-      for (const name of excluded) text = text.replaceAll(name, " ");
-      return names.some(name => text.includes(name));
-    });
+    return places.some(place => placeInGuide(place, guide));
   });
+}
+
+type GuideHotel = { public_slug?: string | null; hotel_name: string; destination?: string | null; star_category?: string | null };
+
+const starValue = (star?: string | null) => Number.parseFloat(String(star || "").replace(/[^\d.]/g, "")) || 0;
+
+/** Published hotel profiles located in the guide's area (the hotel search is fuzzy, so filter by destination),
+ *  one per profile, higher star category first. */
+export function hotelsForGuide<T extends GuideHotel>(hotels: T[], guide: DestinationGuide) {
+  const bySlug = new Map<string, T>();
+  for (const hotel of hotels) {
+    if (!hotel.public_slug || !hotel.destination || !placeInGuide(hotel.destination, guide)) continue;
+    if (!bySlug.has(hotel.public_slug)) bySlug.set(hotel.public_slug, hotel);
+  }
+  return [...bySlug.values()].sort((a, b) => starValue(b.star_category) - starValue(a.star_category) || a.hotel_name.localeCompare(b.hotel_name));
+}
+
+/** The guide whose area contains this hotel destination, for linking a hotel profile back to its guide. */
+export function guideForPlace(place?: string | null) {
+  return place ? DESTINATION_GUIDES.find(guide => placeInGuide(place, guide)) || null : null;
 }
 
 export function guideJsonLd(siteUrl: string, guide: DestinationGuide) {

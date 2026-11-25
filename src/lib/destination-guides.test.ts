@@ -37,3 +37,32 @@ test("Galle Face in Colombo is not a Galle visit", () => {
   const tours = [{ slug: "colombo", destinations: ["Colombo"], itinerary: [{ title: "Galle Face Green sunset" }] }, { slug: "fort", destinations: ["Galle"] }];
   assert.deepEqual(toursForGuide(tours, galle).map(tour => tour.slug), ["fort"]);
 });
+
+test("guide hotels keep only published profiles in the guide's area, best first", async () => {
+  const { hotelsForGuide, guideForPlace } = await import("./destination-guides.ts");
+  const ella = guideBySlug("ella")!;
+  const galle = guideBySlug("galle")!;
+  const hotels = [
+    { public_slug: "candella-house", hotel_name: "Candella House", destination: "Galle", star_category: "4" },
+    { public_slug: "98-acres", hotel_name: "98 Acres Resort", destination: "Ella", star_category: "4 Star" },
+    { public_slug: "3-arch", hotel_name: "3 Arch Resort", destination: "Ella", star_category: "3" },
+    { public_slug: "98-acres", hotel_name: "98 Acres Resort", destination: "Ella", star_category: "4 Star" },
+    { public_slug: null, hotel_name: "No Profile", destination: "Ella", star_category: "5" },
+  ];
+  assert.deepEqual(hotelsForGuide(hotels, ella).map(hotel => hotel.public_slug), ["98-acres", "3-arch"]);
+  assert.deepEqual(hotelsForGuide([{ public_slug: "gf", hotel_name: "Galle Face Hotel", destination: "Galle Face, Colombo" }], galle), []);
+  assert.equal(guideForPlace("Rathgama, Galle")?.slug, "galle");
+  assert.equal(guideForPlace("Colombo"), null);
+});
+
+test("place matching uses whole words, so Dickwella, Wellawaya and Tangalle stay out", async () => {
+  const { placeInGuide } = await import("./destination-guides.ts");
+  const ella = guideBySlug("ella")!;
+  const galle = guideBySlug("galle")!;
+  assert.equal(placeInGuide("Ella", ella), true);
+  assert.equal(placeInGuide("Kandy to Ella by train", ella), true);
+  assert.equal(placeInGuide("Dickwella", ella), false);
+  assert.equal(placeInGuide("Wellawaya", ella), false);
+  assert.equal(placeInGuide("Tangalle", galle), false);
+  assert.equal(placeInGuide("Rathgama, Galle", galle), true);
+});
