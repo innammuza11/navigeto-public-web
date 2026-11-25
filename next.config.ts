@@ -32,6 +32,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/travelos/:path*", destination: "/one/:path*", permanent: true },
       { source: "/navigeto-one/:path*", destination: "/one/:path*", permanent: true },
+      // Short, shareable address for the online vehicle booking page (served by TravelOS).
+      { source: "/book-vehicle", destination: "https://admin.navigeto.com/book-vehicle", permanent: false },
       {
         source: "/vietnamescape",
         destination: "https://navigeto-vietnam-december-2026.innammuza.chatgpt.site",
