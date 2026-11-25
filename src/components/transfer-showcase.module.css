@@ -25,3 +25,12 @@
   max-width: 44ch;
   color: var(--muted);
 }
+
+/* Online vehicle booking band: same layout as the guided band, calmer surface. */
+.bookOnline {
+  background: var(--pale);
+}
+
+.bookOnline + .guided {
+  margin-top: 1rem;
+}

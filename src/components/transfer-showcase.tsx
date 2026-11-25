@@ -32,6 +32,16 @@ export function TransferShowcase({ onSelect }: { onSelect: (selection: TransferI
     document.getElementById("enquire")?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
   }
   return <div className="transfer-showcase">
+    <section className={`shell ${styles.guided} ${styles.bookOnline}`} aria-labelledby="book-vehicle-heading">
+      <div>
+        <p className="eyebrow">Book online</p>
+        <h2 id="book-vehicle-heading">See your price and request a vehicle</h2>
+        <p>Choose an airport transfer, a car and driver by the day, or a round tour. No payment is taken when you send the request.</p>
+      </div>
+      <a className="button button-primary" href="https://admin.navigeto.com/book-vehicle">
+        Book a vehicle <span aria-hidden="true">→</span>
+      </a>
+    </section>
     <section className={`shell ${styles.guided}`} aria-labelledby="guided-journeys-heading">
       <div>
         <p className="eyebrow">Navigeto Rides</p>
